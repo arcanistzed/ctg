@@ -1,7 +1,7 @@
 {
   "name": "ctg",
   "title": "Combat Tracker Groups",
-  "description": "Group combatants with the same initiative under helpful toggles in the Combat Tracker",
+  "description": "Group combatants in the Combat Tracker",
   "version": "This is auto replaced",
   "manifestPlusVersion": "1.2.0",
   "minimumCoreVersion": "0.8.9",
@@ -33,7 +33,7 @@
   "media": [
     {
       "type": "cover",
-      "url": "CHANGE",
+      "url": "https://i.imgur.com/25E5mBu.png",
       "caption": "Combat Tracker Groups"
     }
   ]
