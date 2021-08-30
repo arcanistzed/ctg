@@ -2,9 +2,9 @@
 
 ![Version](https://img.shields.io/github/v/tag/arcanistzed/ctg?label=Version&style=flat-square&color=2577a1) ![Latest Release Download Count](https://img.shields.io/github/downloads/arcanistzed/ctg/latest/module.zip?label=Downloads&style=flat-square&color=9b43a8) ![Foundry Core Compatible Version](https://img.shields.io/badge/dynamic/json.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2Farcanistzed%2Fctg%2Fmain%2Fmodule.json&label=Foundry%20Core%20Compatible%20Version&query=$.compatibleCoreVersion&style=flat-square&color=ff6400)
 
-Group combatants with the same initiative under helpful toggles in the Combat Tracker.
+Group combatants in the combat tracker by name or initiative. Also, allow for rolling group initiative.
 
-![ctg](CHANGE)
+![ctg](https://i.imgur.com/25E5mBu.png)
 
 ## Installation
 
