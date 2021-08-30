@@ -1,0 +1,40 @@
+{
+  "name": "ctg",
+  "title": "Combat Tracker Groups",
+  "description": "Group combatants with the same initiative under helpful toggles in the Combat Tracker",
+  "version": "This is auto replaced",
+  "manifestPlusVersion": "1.2.0",
+  "minimumCoreVersion": "0.8.9",
+  "compatibleCoreVersion": "0.8.9",
+  "author": "arcanist",
+  "authors": [
+    {
+      "name": "arcanist",
+      "url": "https://arcanistzed.github.io/",
+      "email": "arcanistzed@gmail.com",
+      "discord": "arcanist#4317",
+      "reddit": "u/arcanistzed"
+    }
+  ],
+  "esmodules": [
+    "scripts/module.js",
+    "scripts/gi.js"
+  ],
+  "styles": [
+    "styles/module.css"
+  ],
+  "url": "This is auto replaced",
+  "manifest": "This is auto replaced",
+  "download": "This is auto replaced",
+  "readme": "https://github.com/arcanistzed/ctg/blob/main/README.md",
+  "changelog": "https://github.com/arcanistzed/ctg/blob/main/CHANGELOG.md",
+  "license": "https://github.com/arcanistzed/ctg/blob/main/LICENSE",
+  "bugs": "https://github.com/arcanistzed/ctg/issues/new/choose",
+  "media": [
+    {
+      "type": "cover",
+      "url": "CHANGE",
+      "caption": "Combat Tracker Groups"
+    }
+  ]
+}

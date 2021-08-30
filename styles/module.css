@@ -1,0 +1,94 @@
+/* Modes */
+
+#ctg-modeContainer {
+  flex: 0;
+  display: inline-flex;
+  list-style-type: none;
+  padding: 10px 5px;
+  border-bottom: 2px groove #444;
+  margin: 0;
+  gap: 10px;
+}
+
+#ctg-modeBox {
+  margin: 2px 0;
+}
+
+#ctg-modeBox > input {
+  display: none;
+}
+
+[name="ctg-mode-radio"]:checked + #ctg-modeLabel {
+  background-color: rgba(255, 100, 0, 0.25);
+}
+
+#ctg-modeLabel {
+  padding: 5px;
+  border: solid white 1px;
+  border-radius: 3px;
+}
+
+/* Toggles */
+
+.ctg-labelBox:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ctg-labelBox {
+  padding: 5px 10px;
+  font-size: 20px;
+  text-shadow: 1px 1px 4px #000;
+}
+
+.ctg-labelFlex {
+  display: inline-flex;
+  width: 80%;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.ctg-labelCount {
+  font-size: 14px;
+  margin: auto 0;
+  visibility: hidden;
+}
+
+.ctg-labelCount::before {
+  content: "(";
+}
+
+.ctg-labelCount::after {
+  content: ")";
+}
+
+.ctg-labelFlex:hover .ctg-labelCount {
+  visibility: visible;
+}
+
+.ctg-labelCount::before,
+.ctg-labelCount::after {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ctg-labelValue {
+  right: 10px;
+  position: absolute;
+  padding: 2px;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.ctg-toggle > li.combatant {
+  padding-left: 20px;
+}
+
+.ctg-toggle[open] > .ctg-labelBox + .active {
+  animation: fadein 0.25s ease-in;
+}
+
+@keyframes fadein {
+  0%    { opacity: 0; }
+  100%  { opacity: 1; }
+}
