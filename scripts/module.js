@@ -6,7 +6,7 @@ export default class Ctg {
                 config: false,
                 type: String,
                 default: "initiative",
-                onChange: mode => this.createGroups(mode)
+                onChange: mode => this.createGroups(mode),
             });
         });
 
@@ -17,7 +17,7 @@ export default class Ctg {
             // Create modes if GM
             if (game.user.isGM) this.createModes(html[0]);
             // Create groups
-            this.createGroups(game.settings.get(Ctg.ID, "mode"))
+            this.createGroups(game.settings.get(Ctg.ID, "mode"));
 
             // Add a listner to the mode container if GM
             if (game.user.isGM) document.querySelector("#ctg-modeContainer").addEventListener('click', event => {
@@ -78,7 +78,7 @@ export default class Ctg {
         if (game.user.isGM) document.querySelector("#ctg-mode-radio-" + mode).checked = true;
 
         /** Group combatants into positions */
-        const groups = Object.values(game.combats.active.turns.reduce((accumulator, currentValue) => {
+        const groups = Object.values(game.combat.turns.reduce((accumulator, currentValue) => {
             accumulator[currentValue[mode]] = [...accumulator[currentValue[mode]] || [], currentValue];
             return accumulator;
         }, {}));
@@ -88,7 +88,7 @@ export default class Ctg {
         groups.forEach(group => {
             /** Toggle which contains combatants */
             const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle");
-            
+
             /** Name of the current group */
             let groupNames = [];
 
@@ -138,11 +138,14 @@ export default class Ctg {
         });
 
         // Get the current toggle
-        const currentToggle = document.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`).parentElement
-        // Open the toggle for the current combatant
-        currentToggle.open = true;
-        // Darken the current toggle's label box
-        currentToggle.querySelector(".ctg-labelBox").style.filter = "brightness(0.5)";
+        const currentToggle = document.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`)?.parentElement
+        // If a the combatant could be found in the DOM
+        if (currentToggle) {
+            // Open the toggle for the current combatant
+            currentToggle.open = true;
+            // Darken the current toggle's label box
+            currentToggle.querySelector(".ctg-labelBox").style.filter = "brightness(0.5)";
+        };
     };
 };
 
