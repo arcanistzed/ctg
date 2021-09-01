@@ -12,6 +12,8 @@ In the setup screen, use the URL `https://github.com/arcanistzed/ctg/releases/la
 
 ## Usage
 
+After creating a new combat, the combatants in the Combat Tracker will be instantly and automaticaly grouped by the selected criteria and put into toggles. This grouping is done either by their initiative value or alphapbetically by their name. The toggles will automatically open when they contain the current combatant.
+
 ## License
 
 Copyright © 2021 arcanist
