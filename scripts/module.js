@@ -129,7 +129,6 @@ export default class Ctg {
                     labelFlex.append(labelCount);
                     // Insert the value into the label flex
                     labelFlex.append(labelValue);
-
                 };
 
                 // Move the element into the toggle
