@@ -12,6 +12,8 @@ In the setup screen, use the URL `https://github.com/arcanistzed/ctg/releases/la
 
 ## Usage
 
+After creating a new combat, the combatants in the Combat Tracker will be instantly and automaticaly grouped by the selected criteria and put into toggles. This grouping is done either by their initiative value or alphapbetically by their name. The toggles will automatically open when they contain the current combatant.
+
 ## License
 
 Copyright © 2021 arcanist
@@ -27,3 +29,7 @@ You can submit bugs via [Github Issues](https://github.com/arcanistzed/ctg/issue
 ## Contact me
 
 Come hang out on my [my Discord server](https://discord.gg/AAkZWWqVav) or [click here to send me an email](mailto:arcanistzed@gmail.com?subject=Initiative%20Toggles%20module).
+
+## TODO
+
+* Group by actor ID
