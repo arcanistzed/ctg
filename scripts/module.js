@@ -19,7 +19,7 @@ export default class Ctg {
             // Create groups
             this.createGroups(game.settings.get(Ctg.ID, "mode"));
 
-            // Add a listner to the mode container if GM
+            // Add a listener to the mode container if GM
             if (game.user.isGM) document.querySelector("#ctg-modeContainer").addEventListener('click', event => {
                 const mode = event.target.id?.replace("ctg-mode-radio-", "");
                 if (Ctg.MODES.includes(mode)) game.settings.set(Ctg.ID, "mode", mode);
