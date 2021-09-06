@@ -35,22 +35,31 @@
 }
 
 .ctg-labelBox {
-  padding: 5px 10px;
   font-size: 20px;
   text-shadow: 1px 1px 4px #000;
+  padding: 5px;
 }
 
 .ctg-labelFlex {
   display: inline-flex;
-  width: 80%;
+  width: calc(100% - 22px);
   justify-content: flex-start;
-  gap: 10px;
+  gap: 5px;
+}
+
+.ctg-labelFlex > * {
+  margin: auto 0;
+}
+
+.ctg-labelName {
+  flex-grow: 1;
 }
 
 .ctg-labelCount {
   font-size: 14px;
-  margin: auto 0;
   visibility: hidden;
+  flex-basis: 2em;
+  text-align: center;
 }
 
 .ctg-labelCount::before {
@@ -71,13 +80,10 @@
 }
 
 .ctg-labelValue {
-  right: 10px;
-  position: absolute;
-  padding: 2px;
-  width: 30px;
-  height: 30px;
-  text-align: center;
+  flex-basis: 2em;
+  text-align: right;
   font-size: 16px;
+  text-overflow: ellipsis;
 }
 
 .ctg-toggle > li.combatant {
@@ -89,6 +95,10 @@
 }
 
 @keyframes fadein {
-  0%    { opacity: 0; }
-  100%  { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
