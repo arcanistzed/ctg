@@ -1,38 +1,68 @@
 export default class Ctg {
     constructor() {
-        Hooks.on("init", () => {
+        Hooks.on("ready", () => {
             game.settings.register(Ctg.ID, "mode", {
                 scope: "world",
                 config: false,
                 type: String,
-                default: "initiative",
+                default: () => game.i18n.localize("ctg.modes.initiative"),
                 onChange: mode => this.createGroups(mode),
             });
-        });
 
-        Hooks.on("renderCombatTracker", (_app, html, options) => {
-            // Exit if there is no combat
-            if (!options.combat) return;
+            // Localize modes
+            Ctg.MODES = [
+                [game.i18n.localize("ctg.modes.initiative"), "initiative"],
+                [game.i18n.localize("ctg.modes.name"), "name"],
+                [game.i18n.localize("ctg.modes.selection"), "data.flags.ctg.group"]
+            ];
 
-            // Create modes if GM
-            if (game.user.isGM) this.createModes(html[0]);
-            // Create groups
-            this.createGroups(game.settings.get(Ctg.ID, "mode"));
+            Hooks.on("renderCombatTracker", (_app, html, options) => {
+                // Exit if there is no combat
+                if (!options.combat) return;
 
-            // Add a listener to the mode container if GM
-            if (game.user.isGM) document.querySelector("#ctg-modeContainer").addEventListener('click', event => {
-                const mode = event.target.id?.replace("ctg-mode-radio-", "");
-                if (Ctg.MODES.includes(mode)) game.settings.set(Ctg.ID, "mode", mode);
+                // Create modes if GM
+                if (game.user.isGM) this.createModes(html[0]);
+                // Create groups
+                this.createGroups(game.settings.get(Ctg.ID, "mode"));
+
+                // Add a listener to the mode container if GM
+                if (game.user.isGM) document.querySelector("#ctg-modeContainer").addEventListener('click', event => {
+                    const mode = event.target.id?.replace("ctg-mode-radio-", "");
+                    if (Ctg.MODES.map(m => m[0]).includes(mode)) game.settings.set(Ctg.ID, "mode", mode);
+                });
             });
         });
 
+        // Manage group selection
+        Hooks.on("getSceneControlButtons", controls => {
+            // Add a scene control under the tokens menu if GM
+            if (game.user.isGM) controls.find(c => c.name == "token").tools.push({
+                name: "groups",
+                title: "ctg.selectControl",
+                icon: "fas fa-users",
+                toggle: true,
+                active: Ctg.selectGroups || false,
+                onClick: toggled => Ctg.selectGroups = toggled,
+            });
+        });
+
+        this.groupSelected();
     };
 
     /** The module's ID */
     static ID = "ctg";
 
-    /** Grouping Modes */
-    static MODES = ["initiative", "name"];
+    /** Grouping Modes
+     * The first item is the name and the second is the path
+     */
+    static MODES = [
+        ["initiative"],
+        ["name"],
+        ["selection", "data.flags.ctg.group"]
+    ];
+
+    /** Whether the user is currently selecting groups */
+    static selectGroups = false;
 
     /**
      * Create Combat Tracker modes
@@ -44,20 +74,20 @@ export default class Ctg {
         html.querySelector("#combat > #combat-round").after(container);
 
         // For each mode that exists
-        Ctg.MODES.forEach(m => {
+        Ctg.MODES.forEach(mode => {
             // Add a box
             const modeBox = document.createElement("li"); modeBox.id = "ctg-modeBox";
             container.append(modeBox);
 
             // Create a radio button
-            const radio = document.createElement("input"); radio.id = "ctg-mode-radio-" + m;
+            const radio = document.createElement("input"); radio.id = "ctg-mode-radio-" + mode[0];
             radio.type = "radio"; radio.name = "ctg-mode-radio";
 
             // Create a label for the radio button
             const label = document.createElement("label"); label.id = "ctg-modeLabel";
-            label.htmlFor = "ctg-mode-radio-" + m;
-            label.title = "Group by " + m.capitalize();
-            label.innerText = m.capitalize();
+            label.htmlFor = "ctg-mode-radio-" + mode[0];
+            label.title = "Group by " + mode[0].capitalize();
+            label.innerText = mode[0].capitalize();
 
             // Add the label and the radio button to the box
             modeBox.append(radio);
@@ -77,9 +107,12 @@ export default class Ctg {
         // Show current mode if GM
         if (game.user.isGM) document.querySelector("#ctg-mode-radio-" + mode).checked = true;
 
+        // Get the path for this mode
+        const path = Ctg.MODES.find(m => m[0] === mode).at(-1);
+
         /** Group combatants into positions */
-        const groups = Object.values(game.combat.turns.reduce((accumulator, currentValue) => {
-            accumulator[currentValue[mode]] = [...accumulator[currentValue[mode]] || [], currentValue];
+        const groups = Object.values(game.combat.turns.reduce((accumulator, current) => {
+            accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
             return accumulator;
         }, {}));
 
@@ -115,7 +148,7 @@ export default class Ctg {
                     // Add the group name to the label
                     labelName.innerText = groupNames.length < 3 ? groupNames.join(" and ") : groupNames.join(", ");
                     // Add the value to the label if not in name mode
-                    if (mode !== "name") labelValue.innerText = combatant[mode];
+                    if (mode === "initiative") labelValue.innerText = getProperty(combatant, path);
                     // Add the count to the label
                     labelCount.innerText = arr.length;
 
@@ -146,6 +179,31 @@ export default class Ctg {
             currentToggle.querySelector(".ctg-labelBox").style.filter = "brightness(0.5)";
         };
     };
+
+    /** Manage grouping of selected tokens */
+    groupSelected() {
+        // Whenever the controlled token changes
+        Hooks.on("controlToken", (_token, controlled) => {
+            // Generate a unique ID
+            const uid = randomID(16);
+
+            // If controlling more than one token, a new token is being controlled, and the user is in select groups mode
+            if (canvas.tokens.controlled.length > 1 && controlled && Ctg.selectGroups) {
+
+                // Add the same flag to each combatant in batch
+                let updates = [];
+                canvas.tokens.controlled.forEach(token => {
+                    updates.push({
+                        _id: token.combatant.id,
+                        ["flags.ctg.group"]: uid
+                    });
+                });
+                game.combat.updateEmbeddedDocuments("Combatant", updates);
+            };
+        });
+    };
 };
 
-new Ctg();
+globalThis.Ctg = Ctg;
+
+new Ctg;
