@@ -1,0 +1,10 @@
+{
+    "ctg": {
+        "modes": {
+            "initiative": "initiative",
+            "name": "name",
+            "selection": "selection"
+        },
+        "selectControl": "Select Combat Groups"
+    }
+}
