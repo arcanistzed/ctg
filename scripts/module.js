@@ -59,7 +59,11 @@ export default class Ctg {
     /** Grouping Modes
      * The first item is the name and the second is the path
      */
-    static MODES = [];
+    static MODES = [
+        ["initiative"],
+        ["name"],
+        ["selection", "data.flags.ctg.group"]
+    ];
 
     /** Whether the user is currently selecting groups */
     static selectGroups = false;
