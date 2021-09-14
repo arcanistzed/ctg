@@ -13,7 +13,8 @@ export default class Ctg {
             Ctg.MODES = [
                 [game.i18n.localize("ctg.modes.initiative"), "initiative"],
                 [game.i18n.localize("ctg.modes.name"), "name"],
-                [game.i18n.localize("ctg.modes.selection"), "data.flags.ctg.group"]
+                [game.i18n.localize("ctg.modes.selection"), "data.flags.ctg.group"],
+                [game.i18n.localize("ctg.modes.players"), "players"]
             ];
 
             Hooks.on("renderCombatTracker", (app, html, options) => {
@@ -58,11 +59,7 @@ export default class Ctg {
     /** Grouping Modes
      * The first item is the name and the second is the path
      */
-    static MODES = [
-        ["initiative"],
-        ["name"],
-        ["selection", "data.flags.ctg.group"]
-    ];
+    static MODES = [];
 
     /** Whether the user is currently selecting groups */
     static selectGroups = false;

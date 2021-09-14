@@ -3,7 +3,8 @@
         "modes": {
             "initiative": "initiative",
             "name": "name",
-            "selection": "selection"
+            "selection": "selection",
+            "players": "players"
         },
         "selectControl": "Select Combat Groups"
     }
