@@ -16,7 +16,7 @@ export default class Ctg {
                 [game.i18n.localize("ctg.modes.selection"), "data.flags.ctg.group"]
             ];
 
-            Hooks.on("renderCombatTracker", (_app, html, options) => {
+            Hooks.on("renderCombatTracker", (app, html, options) => {
                 // Exit if there is no combat
                 if (!options.combat) return;
 
@@ -25,11 +25,14 @@ export default class Ctg {
                 // Create groups
                 this.createGroups(game.settings.get(Ctg.ID, "mode"));
 
-                // Add a listener to the mode container if GM
+                // Add a listener to the mode container to change modes if GM
                 if (game.user.isGM) document.querySelector("#ctg-modeContainer").addEventListener('click', event => {
                     const mode = event.target.id?.replace("ctg-mode-radio-", "");
                     if (Ctg.MODES.map(m => m[0]).includes(mode)) game.settings.set(Ctg.ID, "mode", mode);
                 });
+
+                // Manage rolling initiative for the whole group at once
+                this.rollGroupInitiative();
             });
         });
 
@@ -107,16 +110,9 @@ export default class Ctg {
         // Show current mode if GM
         if (game.user.isGM) document.querySelector("#ctg-mode-radio-" + mode).checked = true;
 
-        // Get the path for this mode
-        const path = Ctg.MODES.find(m => m[0] === mode).at(-1);
+        // Get groups
+        const groups = Ctg.groups(mode);
 
-        /** Group combatants into positions */
-        const groups = Object.values(game.combat.turns.reduce((accumulator, current) => {
-            accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
-            return accumulator;
-        }, {}));
-
-        // Create groups
         // Go through each of the groups
         groups.forEach(group => {
             /** Toggle which contains combatants */
@@ -148,7 +144,7 @@ export default class Ctg {
                     // Add the group name to the label
                     labelName.innerText = groupNames.length < 3 ? groupNames.join(" and ") : groupNames.join(", ");
                     // Add the value to the label if not in name mode
-                    if (mode === "initiative") labelValue.innerText = getProperty(combatant, path);
+                    if (mode === "initiative") labelValue.innerText = getProperty(combatant, Ctg.MODES.find(m => m[0] === mode).at(-1));
                     // Add the count to the label
                     labelCount.innerText = arr.length;
 
@@ -180,6 +176,21 @@ export default class Ctg {
         };
     };
 
+    /** Group Combatants
+     * @static
+     * @param {String} mode - The current mode
+     * @return {Array} An array of groupings  
+     * @memberof Ctg
+     */
+    static groups(mode) {
+        // Get the path for this mode
+        const path = Ctg.MODES.find(m => m[0] === mode).at(-1);
+        return Object.values(game.combat.turns.reduce((accumulator, current) => {
+            accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
+            return accumulator;
+        }, {}));
+    };
+
     /** Manage grouping of selected tokens */
     groupSelected() {
         // Whenever the controlled token changes
@@ -199,6 +210,44 @@ export default class Ctg {
                     });
                 });
                 game.combat.updateEmbeddedDocuments("Combatant", updates);
+            };
+        });
+    };
+
+    /** Manage rolling for group initiative for all of the combatants in the group
+     * @memberof Ctg
+     */
+    rollGroupInitiative() {
+        // Listen for if any of the roll initiative buttons are clicked
+        document.querySelectorAll(".combatant-control.roll").forEach(el => el.onpointerdown = ev => {
+            console.log(ev, ev.button, ev.ctrlKey, ev.shiftKey)
+            if (ev.ctrlKey || ev.shiftKey) {
+
+                // Get the ID of the combatant
+                const id = ev.currentTarget.closest(".combatant").dataset.combatantId;
+
+                // The next time the combatant is updated
+                Hooks.once("updateCombatant", async (_app, change) => {
+                    // If this was a change to their initiative
+                    if (change.initiative) {
+                        let updates = [];
+
+                        // Go through the list of the groups
+                        Ctg.groups(game.settings.get(Ctg.ID, "mode")).forEach(group => {
+                            // Go through each group that contains this combatant
+                            if (group.some(combatant => combatant.id === id)) group.forEach(combatant => {
+                                // Give all of the combatants in this group the new initiative value
+                                updates.push({
+                                    _id: combatant.id,
+                                    initiative: change.initiative
+                                });
+                            });
+                        });
+
+                        // Update the combatants
+                        await game.combat.updateEmbeddedDocuments("Combatant", updates);
+                    };
+                });
             };
         });
     };
