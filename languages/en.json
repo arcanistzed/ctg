@@ -1,6 +1,7 @@
 {
     "ctg": {
         "modes": {
+            "none": "none",
             "initiative": "initiative",
             "name": "name",
             "selection": "selection",

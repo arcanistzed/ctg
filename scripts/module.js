@@ -11,6 +11,7 @@ export default class Ctg {
 
             // Localize modes
             Ctg.MODES = [
+                [game.i18n.localize("ctg.modes.none"), ""],
                 [game.i18n.localize("ctg.modes.initiative"), "initiative"],
                 [game.i18n.localize("ctg.modes.name"), "name"],
                 [game.i18n.localize("ctg.modes.selection"), "data.flags.ctg.group"],
@@ -111,69 +112,70 @@ export default class Ctg {
         // Show current mode if GM
         if (game.user.isGM) document.querySelector("#ctg-mode-radio-" + mode).checked = true;
 
-        // Get groups
-        const groups = Ctg.groups(mode);
+        if (mode !== "none") {
+            // Get groups
+            const groups = Ctg.groups(mode);
+            // Go through each of the groups
+            groups.forEach(group => {
+                /** Toggle which contains combatants */
+                const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle");
 
-        // Go through each of the groups
-        groups.forEach(group => {
-            /** Toggle which contains combatants */
-            const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle");
+                /** Name of the current group */
+                let groupNames = [];
 
-            /** Name of the current group */
-            let groupNames = [];
+                // Go through each of the combatants at this position   
+                group.forEach((combatant, i, arr) => {
+                    /** The DOM element of this combatant */
+                    const element = document.querySelector(`[data-combatant-id="${combatant.id}"]`);
 
-            // Go through each of the combatants at this position   
-            group.forEach((combatant, i, arr) => {
-                /** The DOM element of this combatant */
-                const element = document.querySelector(`[data-combatant-id="${combatant.id}"]`);
+                    // Add the name of the current combatant to the group names if it's not already there
+                    if (!groupNames.includes(combatant.name)) groupNames.push(combatant.name);
 
-                // Add the name of the current combatant to the group names if it's not already there
-                if (!groupNames.includes(combatant.name)) groupNames.push(combatant.name);
+                    // If it's the first entry
+                    if (i === arr.length - 1) {
+                        // Add the toggle here
+                        element.before(toggle);
 
-                // If it's the first entry
-                if (i === arr.length - 1) {
-                    // Add the toggle here
-                    element.before(toggle);
+                        // Create a label for the toggle
+                        const labelBox = document.createElement("summary"); labelBox.classList.add("ctg-labelBox");
+                        const labelFlex = document.createElement("div"); labelFlex.classList.add("ctg-labelFlex");
+                        const labelName = document.createElement("div"); labelName.classList.add("ctg-labelName");
+                        const labelCount = document.createElement("div"); labelCount.classList.add("ctg-labelCount");
+                        const labelValue = document.createElement("div"); labelValue.classList.add("ctg-labelValue");
 
-                    // Create a label for the toggle
-                    const labelBox = document.createElement("summary"); labelBox.classList.add("ctg-labelBox");
-                    const labelFlex = document.createElement("div"); labelFlex.classList.add("ctg-labelFlex");
-                    const labelName = document.createElement("div"); labelName.classList.add("ctg-labelName");
-                    const labelCount = document.createElement("div"); labelCount.classList.add("ctg-labelCount");
-                    const labelValue = document.createElement("div"); labelValue.classList.add("ctg-labelValue");
+                        // Add the group name to the label
+                        labelName.innerText = groupNames.length < 3 ? groupNames.join(" and ") : groupNames.join(", ");
+                        // Add the value to the label if not in name mode
+                        if (mode === "initiative") labelValue.innerText = getProperty(combatant, Ctg.MODES.find(m => m[0] === mode).at(-1));
+                        // Add the count to the label
+                        labelCount.innerText = arr.length;
 
-                    // Add the group name to the label
-                    labelName.innerText = groupNames.length < 3 ? groupNames.join(" and ") : groupNames.join(", ");
-                    // Add the value to the label if not in name mode
-                    if (mode === "initiative") labelValue.innerText = getProperty(combatant, Ctg.MODES.find(m => m[0] === mode).at(-1));
-                    // Add the count to the label
-                    labelCount.innerText = arr.length;
+                        // Insert the label box
+                        toggle.prepend(labelBox);
+                        // Insert the label flex into the label box
+                        labelBox.prepend(labelFlex);
+                        // Insert the name into the label flex
+                        labelFlex.prepend(labelName);
+                        // Insert the count into the label flex
+                        labelFlex.append(labelCount);
+                        // Insert the value into the label flex
+                        labelFlex.append(labelValue);
+                    };
 
-                    // Insert the label box
-                    toggle.prepend(labelBox);
-                    // Insert the label flex into the label box
-                    labelBox.prepend(labelFlex);
-                    // Insert the name into the label flex
-                    labelFlex.prepend(labelName);
-                    // Insert the count into the label flex
-                    labelFlex.append(labelCount);
-                    // Insert the value into the label flex
-                    labelFlex.append(labelValue);
-                };
-
-                // Move the element into the toggle
-                toggle.append(element);
+                    // Move the element into the toggle
+                    toggle.append(element);
+                });
             });
-        });
 
-        // Get the current toggle
-        const currentToggle = document.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`)?.parentElement
-        // If a the combatant could be found in the DOM
-        if (currentToggle) {
-            // Open the toggle for the current combatant
-            currentToggle.open = true;
-            // Darken the current toggle's label box
-            currentToggle.querySelector(".ctg-labelBox").style.filter = "brightness(0.5)";
+            // Get the current toggle
+            const currentToggle = document.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`)?.parentElement
+            // If a the combatant could be found in the DOM
+            if (currentToggle) {
+                // Open the toggle for the current combatant
+                currentToggle.open = true;
+                // Darken the current toggle's label box
+                currentToggle.querySelector(".ctg-labelBox").style.filter = "brightness(0.5)";
+            };
         };
     };
 
