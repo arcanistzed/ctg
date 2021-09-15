@@ -117,6 +117,9 @@ export default class Ctg {
      * @param {Boolean} popOut - Whether this Combat Tracker is popped out
      */
     manageGroups(mode, popOut) {
+        // If trying to use the pop out, check if one actually exists first
+        if (popOut && !document.querySelector("#combat-popout")) return;
+
         /** Suffix for pop out */
         const popOutSuffix = popOut ? "-popOut" : "";
 
