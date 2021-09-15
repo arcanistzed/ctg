@@ -132,7 +132,7 @@ export default class Ctg {
                 /** Name of the current group */
                 let groupNames = [];
 
-                // Go through each of the combatants at this position   
+                // Go through each of the combatants  
                 group.forEach((combatant, i, arr) => {
                     /** The DOM element of this combatant */
                     const element = document.querySelector(`[data-combatant-id="${combatant.id}"]`);
