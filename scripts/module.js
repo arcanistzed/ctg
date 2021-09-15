@@ -241,8 +241,8 @@ export default class Ctg {
     rollGroupInitiative() {
         // Listen for if any of the roll initiative buttons are clicked
         document.querySelectorAll(".combatant-control.roll").forEach(el => el.onpointerdown = ev => {
-            console.log(ev, ev.button, ev.ctrlKey, ev.shiftKey)
-            if (ev.ctrlKey || ev.shiftKey) {
+            // If the keybinding is held and "none" mode is not being used
+            if ((ev.ctrlKey || ev.shiftKey) && game.settings.get(Ctg.ID, "mode") !== "none") {
 
                 // Get the ID of the combatant
                 const id = ev.currentTarget.closest(".combatant").dataset.combatantId;
