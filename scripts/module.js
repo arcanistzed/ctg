@@ -39,8 +39,8 @@ export default class Ctg {
                             game.settings.set(Ctg.ID, "mode", mode);
                     }));
 
-                // Manage rolling initiative for the whole group at once
-                this.rollGroupInitiative();
+                // Manage rolling initiative for the whole group at once if GM
+                if (game.user.isGM) this.rollGroupInitiative();
             });
         });
 
