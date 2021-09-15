@@ -6,7 +6,11 @@ export default class Ctg {
                 config: false,
                 type: String,
                 default: () => game.i18n.localize("ctg.modes.initiative"),
-                onChange: mode => this.manageGroups(mode),
+                onChange: mode => {
+                    // Update the popout and non-popout combat tracker
+                    this.manageGroups(mode, true);
+                    this.manageGroups(mode, false);
+                },
             });
 
             // Localize modes
@@ -116,12 +120,15 @@ export default class Ctg {
         /** Suffix for pop out */
         const popOutSuffix = popOut ? "-popOut" : "";
 
+        /** The current parent html element */
+        const html = popOut ? document.querySelector("#combat-popout") : document.querySelector("#combat");
+
         // Remove any existing groups
-        document.querySelectorAll("details.ctg-toggle > li.combatant").forEach(combatant => document.querySelector("#combat-tracker").append(combatant));
-        document.querySelectorAll("details.ctg-toggle").forEach(toggle => toggle.remove());
+        html.querySelectorAll("details.ctg-toggle > li.combatant").forEach(combatant => html.querySelector("#combat-tracker").append(combatant));
+        html.querySelectorAll("details.ctg-toggle").forEach(toggle => toggle.remove());
 
         // Show current mode if GM and mode is defined
-        if (game.user.isGM && mode) document.querySelectorAll("#ctg-mode-radio-" + mode + ",#ctg-mode-radio-" + mode + popOutSuffix).forEach(e => e.checked = true);
+        if (game.user.isGM && mode) html.querySelectorAll("#ctg-mode-radio-" + mode + ",#ctg-mode-radio-" + mode + popOutSuffix).forEach(e => e.checked = true);
 
         if (mode !== "none") {
             // Get groups
@@ -137,7 +144,7 @@ export default class Ctg {
                 // Go through each of the combatants  
                 group.forEach((combatant, i, arr) => {
                     /** The DOM element of this combatant */
-                    const element = document.querySelector(`[data-combatant-id="${combatant.id}"]`);
+                    const element = html.querySelector(`[data-combatant-id="${combatant.id}"]`);
 
                     // Add the name of the current combatant to the names if it's not already there
                     if (!names.includes(combatant.name)) names.push(combatant.name);
@@ -179,7 +186,7 @@ export default class Ctg {
             });
 
             // Get the current toggle
-            const currentToggle = document.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`)?.parentElement
+            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`)?.parentElement
             // If a the combatant could be found in the DOM
             if (currentToggle) {
                 // Open the toggle for the current combatant
