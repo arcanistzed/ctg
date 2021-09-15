@@ -77,6 +77,7 @@ export default class Ctg {
      * @param {Boolean} popOut - Whether this Combat Tracker is popped out
      */
     createModes(html, popOut) {
+        /** Suffix for pop out */
         const popOutSuffix = popOut ? "-popOut" : "";
 
         /** Create container for mode selection boxes */
@@ -112,6 +113,7 @@ export default class Ctg {
      * @param {Boolean} popOut - Whether this Combat Tracker is popped out
      */
     manageGroups(mode, popOut) {
+        /** Suffix for pop out */
         const popOutSuffix = popOut ? "-popOut" : "";
 
         // Remove any existing groups
@@ -129,18 +131,18 @@ export default class Ctg {
                 /** Toggle which contains combatants */
                 const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle");
 
-                /** Name of the current group */
-                let groupNames = [];
+                /** Names in the current group */
+                let names = [];
 
                 // Go through each of the combatants  
                 group.forEach((combatant, i, arr) => {
                     /** The DOM element of this combatant */
                     const element = document.querySelector(`[data-combatant-id="${combatant.id}"]`);
 
-                    // Add the name of the current combatant to the group names if it's not already there
-                    if (!groupNames.includes(combatant.name)) groupNames.push(combatant.name);
+                    // Add the name of the current combatant to the names if it's not already there
+                    if (!names.includes(combatant.name)) names.push(combatant.name);
 
-                    // If it's the first entry
+                    // If it's the last entry
                     if (i === arr.length - 1) {
                         // Add the toggle here
                         element.before(toggle);
@@ -153,7 +155,7 @@ export default class Ctg {
                         const labelValue = document.createElement("div"); labelValue.classList.add("ctg-labelValue");
 
                         // Add the group name to the label
-                        labelName.innerText = groupNames.length < 3 ? groupNames.join(" and ") : groupNames.join(", ");
+                        labelName.innerText = names.length < 3 ? names.join(" and ") : names.join(", ");
                         // Add the value to the label if not in name mode
                         if (mode === "initiative") labelValue.innerText = getProperty(combatant, Ctg.MODES.find(m => m[0] === mode).at(-1));
                         // Add the count to the label
