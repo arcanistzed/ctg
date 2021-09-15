@@ -6,7 +6,7 @@ export default class Ctg {
                 config: false,
                 type: String,
                 default: () => game.i18n.localize("ctg.modes.initiative"),
-                onChange: mode => this.createGroups(mode),
+                onChange: mode => this.manageGroups(mode),
             });
 
             // Localize modes
@@ -23,15 +23,17 @@ export default class Ctg {
                 if (!options.combat) return;
 
                 // Create modes if GM
-                if (game.user.isGM) this.createModes(html[0]);
+                if (game.user.isGM) this.createModes(html[0], app.popOut);
                 // Create groups
-                this.createGroups(game.settings.get(Ctg.ID, "mode"));
+                this.manageGroups(game.settings.get(Ctg.ID, "mode"), app.popOut);
 
-                // Add a listener to the mode container to change modes if GM
-                if (game.user.isGM) document.querySelector("#ctg-modeContainer").addEventListener('click', event => {
-                    const mode = event.target.id?.replace("ctg-mode-radio-", "");
-                    if (Ctg.MODES.map(m => m[0]).includes(mode)) game.settings.set(Ctg.ID, "mode", mode);
-                });
+                // Add listener to the mode containers to update settings when changing modes
+                if (game.user.isGM) document.querySelectorAll("#ctg-modeContainer")
+                    .forEach(() => addEventListener('click', event => {
+                        const mode = event.target.id?.replace("ctg-mode-radio-", "").replace("-popOut", "");
+                        if (Ctg.MODES.map(m => m[0]).includes(mode))
+                            game.settings.set(Ctg.ID, "mode", mode);
+                    }));
 
                 // Manage rolling initiative for the whole group at once
                 this.rollGroupInitiative();
@@ -72,8 +74,11 @@ export default class Ctg {
     /**
      * Create Combat Tracker modes
      * @param {HTMLElement} html - The Combat Tracker's HTML
+     * @param {Boolean} popOut - Whether this Combat Tracker is popped out
      */
-    createModes(html) {
+    createModes(html, popOut) {
+        const popOutSuffix = popOut ? "-popOut" : "";
+
         /** Create container for mode selection boxes */
         const container = document.createElement("ul"); container.id = "ctg-modeContainer";
         html.querySelector("#combat > #combat-round").after(container);
@@ -85,12 +90,13 @@ export default class Ctg {
             container.append(modeBox);
 
             // Create a radio button
-            const radio = document.createElement("input"); radio.id = "ctg-mode-radio-" + mode[0];
-            radio.type = "radio"; radio.name = "ctg-mode-radio";
+            const radio = document.createElement("input");
+            radio.id = "ctg-mode-radio-" + mode[0] + popOutSuffix;
+            radio.type = "radio"; radio.name = "ctg-mode-radio" + popOutSuffix;
 
             // Create a label for the radio button
             const label = document.createElement("label"); label.id = "ctg-modeLabel";
-            label.htmlFor = "ctg-mode-radio-" + mode[0];
+            label.htmlFor = "ctg-mode-radio-" + mode[0] + popOutSuffix;
             label.title = "Group by " + mode[0].capitalize();
             label.innerText = mode[0].capitalize();
 
@@ -101,16 +107,19 @@ export default class Ctg {
     };
 
     /**
-     * Create Combat Tracker groups
+     * Manage and create Combat Tracker groups
      * @param {String} mode - The mode that is currently enabled @see {@link modes}
+     * @param {Boolean} popOut - Whether this Combat Tracker is popped out
      */
-    createGroups(mode) {
+    manageGroups(mode, popOut) {
+        const popOutSuffix = popOut ? "-popOut" : "";
+
         // Remove any existing groups
         document.querySelectorAll("details.ctg-toggle > li.combatant").forEach(combatant => document.querySelector("#combat-tracker").append(combatant));
         document.querySelectorAll("details.ctg-toggle").forEach(toggle => toggle.remove());
 
-        // Show current mode if GM
-        if (game.user.isGM) document.querySelector("#ctg-mode-radio-" + mode).checked = true;
+        // Show current mode if GM and mode is defined
+        if (game.user.isGM && mode) document.querySelectorAll("#ctg-mode-radio-" + mode + ",#ctg-mode-radio-" + mode + popOutSuffix).forEach(e => e.checked = true);
 
         if (mode !== "none") {
             // Get groups
