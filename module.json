@@ -1,7 +1,7 @@
 {
   "name": "ctg",
   "title": "Combat Tracker Groups",
-  "description": "Group combatants in the Combat Tracker",
+  "description": "Group combatants in the Combat Tracker and roll for group initiative.",
   "version": "This is auto replaced",
   "manifestPlusVersion": "1.2.0",
   "minimumCoreVersion": "0.8.9",
