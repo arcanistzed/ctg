@@ -56,4 +56,4 @@ You can submit bugs via [Github Issues](https://github.com/arcanistzed/ctg/issue
 
 ## Contact me
 
-Come hang out on my [my Discord server](https://discord.gg/AAkZWWqVav) or [click here to send me an email](mailto:arcanistzed@gmail.com?subject=Initiative%20Toggles%20module).
+Come hang out on my [my Discord server](https://discord.gg/AAkZWWqVav) or [click here to send me an email](mailto:arcanistzed@gmail.com?subject=Combat%20Tracker%20Groups%20module).
