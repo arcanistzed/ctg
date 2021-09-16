@@ -2,9 +2,9 @@
 
 ![Version](https://img.shields.io/github/v/tag/arcanistzed/ctg?label=Version&style=flat-square&color=2577a1) ![Latest Release Download Count](https://img.shields.io/github/downloads/arcanistzed/ctg/latest/module.zip?label=Downloads&style=flat-square&color=9b43a8) ![Supported Foundry Versions](https://img.shields.io/endpoint?url=https://foundryshields.com/version?url=https://raw.githubusercontent.com/arcanistzed/ctg/main/module.json&style=flat-square&color=ff6400) [![Discord Server](https://img.shields.io/badge/-Discord-%232c2f33?style=flat-square&logo=discord)](https://discord.gg/AAkZWWqVav) [![Patreon](https://img.shields.io/badge/-Patreon-%23141518?style=flat-square&logo=patreon)](https://www.patreon.com/bePatron?u=15896855)
 
-Group combatants in the combat tracker and roll for group initiative.
+Group combatants in the Combat Tracker and roll for group initiative.
 
-https://user-images.githubusercontent.com/82790112/133531295-f31f0fd0-09aa-48fb-b01e-68cd827ca233.mp4
+<https://user-images.githubusercontent.com/82790112/133531295-f31f0fd0-09aa-48fb-b01e-68cd827ca233.mp4>
 
 ## Installation
 
@@ -38,7 +38,7 @@ Combatants are grouped by a custom selection. You can decide this by using the t
 
 Once toggled on, whenever you select any tokens in the scene, they'll be added to the same group. It's recommended to toggle this control off after you are satisfied with the groups you've created.
 
-https://user-images.githubusercontent.com/82790112/133531297-d55892c0-41b3-4117-9f85-be0b2750c32a.mp4
+<https://user-images.githubusercontent.com/82790112/133531297-d55892c0-41b3-4117-9f85-be0b2750c32a.mp4>
 
 ### Players
 
