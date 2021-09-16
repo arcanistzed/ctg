@@ -34,7 +34,7 @@ Combatants are alphabetically grouped by their name.
 
 Combatants are grouped by a custom selection. You can decide this by using the tool in the Token Scene controls toolbar:
 
-![controls](../../../Pictures/Modules/ctg/controls.png)
+![controls](https://i.imgur.com/3jtS1UI.png)
 
 Once toggled on, whenever you select any tokens in the scene, they'll be added to the same group. It's recommended to toggle this control off after you are satisfied with the groups you've created.
 
