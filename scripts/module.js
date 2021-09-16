@@ -226,7 +226,8 @@ export default class Ctg {
                 // Add the same flag to each combatant in batch
                 let updates = [];
                 canvas.tokens.controlled.forEach(token => {
-                    updates.push({
+                    // Check if token is in combat and if the combatant is already in the updates list
+                    if (token.inCombat && !updates.some(u => u._id === token.combatant.id)) updates.push({
                         _id: token.combatant.id,
                         ["flags.ctg.group"]: uid
                     });
