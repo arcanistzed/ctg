@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2 - 16 Sept 2021
+
+* Fixed an error when selecting combatants which aren't in the combat
+* Improved performance by updating each combatant less times during selection
+
 ## 0.2.1 - 16 Sept 2021
 
 Fix invalid default mode setting
