@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 - 15 Sept 2021
+## 0.2.0 - 15 Sept 2021 - Early access
 
 * Added "None", "Selection", and "Player" grouping modes
 * New selection tool
