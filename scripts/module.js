@@ -5,7 +5,7 @@ export default class Ctg {
                 scope: "world",
                 config: false,
                 type: String,
-                default: () => game.i18n.localize("ctg.modes.initiative"),
+                default: "initiative",
                 onChange: mode => {
                     // Update the popout and non-popout combat tracker
                     this.manageGroups(mode, true);
