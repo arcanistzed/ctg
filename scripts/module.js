@@ -165,7 +165,7 @@ export default class Ctg {
                         // Add the group name to the label
                         labelName.innerText = names.length < 3 ? names.join(" and ") : names.join(", ");
                         // Add the value to the label if not in name mode
-                        if (mode === "initiative") labelValue.innerText = getProperty(combatant, Ctg.MODES.find(m => m[0] === mode).at(-1));
+                        if (mode === "initiative") labelValue.innerText = getProperty(combatant, Ctg.MODES.find(m => m[0] === mode).slice(-1)[0]);
                         // Add the count to the label
                         labelCount.innerText = arr.length;
 
