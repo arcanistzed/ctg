@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3 - 17 Sept 2021
+
+Fixed an error on some browsers related to using the new `Array.prototype.at()`, replacing it with a polyfill
+
 ## 0.2.2 - 16 Sept 2021
 
 * Fixed an error when selecting combatants which aren't in the combat
