@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.3 - 17 Sept 2021
+## 0.2.4 - 17 Sept 2021
 
 Fixed an error on some browsers related to using the new `Array.prototype.at()`, replacing it with a polyfill
 

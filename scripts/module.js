@@ -206,7 +206,7 @@ export default class Ctg {
      */
     static groups(mode) {
         // Get the path for this mode
-        const path = Ctg.MODES.find(m => m[0] === mode).at(-1);
+        const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
         return Object.values(game.combat.turns.reduce((accumulator, current) => {
             accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
             return accumulator;
