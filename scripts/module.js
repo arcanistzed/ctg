@@ -19,7 +19,8 @@ export default class Ctg {
                 [game.i18n.localize("ctg.modes.initiative"), "initiative"],
                 [game.i18n.localize("ctg.modes.name"), "name"],
                 [game.i18n.localize("ctg.modes.selection"), "data.flags.ctg.group"],
-                [game.i18n.localize("ctg.modes.players"), "players"]
+                [game.i18n.localize("ctg.modes.players"), "players"],
+                [game.i18n.localize("ctg.modes.mob"), ""]
             ];
 
             Hooks.on("renderCombatTracker", (app, html, options) => {
@@ -64,11 +65,7 @@ export default class Ctg {
     /** Grouping Modes
      * The first item is the name and the second is the path
      */
-    static MODES = [
-        ["initiative"],
-        ["name"],
-        ["selection", "data.flags.ctg.group"]
-    ];
+    static MODES = [];
 
     /** Whether the user is currently selecting groups */
     static selectGroups = false;
@@ -153,7 +150,7 @@ export default class Ctg {
                     // If it's the last entry
                     if (i === arr.length - 1) {
                         // Add the toggle here
-                        element.before(toggle);
+                        element?.before(toggle);
 
                         // Create a label for the toggle
                         const labelBox = document.createElement("summary"); labelBox.classList.add("ctg-labelBox");
@@ -189,7 +186,7 @@ export default class Ctg {
             // Get the current toggle
             const currentToggle = html.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`)?.parentElement
             // If a the combatant could be found in the DOM
-            if (currentToggle) {
+            if (currentToggle && currentToggle.querySelector(".ctg-labelBox")) {
                 // Open the toggle for the current combatant
                 currentToggle.open = true;
                 // Darken the current toggle's label box
@@ -205,12 +202,24 @@ export default class Ctg {
      * @memberof Ctg
      */
     static groups(mode) {
-        // Get the path for this mode
-        const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
-        return Object.values(game.combat.turns.reduce((accumulator, current) => {
-            accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
-            return accumulator;
-        }, {}));
+        // Special behavior for if Mob Attack Tool is enabled
+        if (mode === "mob") {
+            const sortByTurns = (a, b) => game.combat.turns.indexOf(a) - game.combat.turns.indexOf(b);
+
+            // Get groups from MAT mobs
+            return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
+                .map(mob => mob.selectedTokenIds
+                    .map(id => game.scenes.active.tokens.get(id).combatant))
+                .map(arr => arr.sort(sortByTurns))
+                .sort(arr => arr.sort(sortByTurns));
+        } else {
+            // Get the path for this mode
+            const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
+            return Object.values(game.combat.turns.reduce((accumulator, current) => {
+                accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
+                return accumulator;
+            }, {}));
+        };
     };
 
     /** Manage grouping of selected tokens */
