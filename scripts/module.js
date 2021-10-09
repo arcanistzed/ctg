@@ -187,8 +187,24 @@ export default class Ctg {
                         labelFlex.prepend(labelName);
                         // Insert the count into the label flex
                         labelFlex.append(labelCount);
-                        // Insert the value into the label flex
-                        labelFlex.append(labelValue);
+                        // Insert the value into the label flex if there is one
+                        if (labelValue.innerText) labelFlex.append(labelValue);
+
+                        if (game.modules.get("mob-attack-tool")?.active) {
+                            // Create a button and it to the label flex
+                            const saveMob = document.createElement("div"); saveMob.classList.add("ctg-saveMob");
+                            saveMob.innerHTML = "<i class='fas fa-save'></i>";
+                            saveMob.title = "Save as MAT mob";
+                            labelFlex.append(saveMob);
+
+                            saveMob.addEventListener("click", async () => {
+                                let actorList = Ctg.groups(mode)[index].map(combatant => combatant.actor);
+                                let selectedTokenIds = Ctg.groups(mode)[index].map(combatant => combatant.token.id);
+                                let numSelected = Ctg.groups(mode)[index].length;
+
+                                await MobAttacks.saveMob(labelName.innerText, actorList, selectedTokenIds, numSelected);
+                            })
+                        }
                     };
 
                     // Move the element into the toggle
