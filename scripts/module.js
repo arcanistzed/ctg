@@ -283,7 +283,7 @@ export default class Ctg {
      */
     rollGroupInitiative() {
         // Listen for if any of the roll initiative buttons are clicked
-        document.querySelectorAll(".combatant-control.roll").forEach(el => el.onpointerdown = ev => {
+        document.querySelectorAll(".combatant-control.roll, .combatant-control > .fa-dice-d20").forEach(el => el.onpointerdown = ev => {
             // If the keybinding is held and "none" mode is not being used
             if ((ev.ctrlKey || ev.shiftKey) && game.settings.get(Ctg.ID, "mode") !== "none") {
 
