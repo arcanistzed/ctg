@@ -30,6 +30,14 @@ export default class Ctg {
                 // Exit if there is no combat
                 if (!options.combat) return;
 
+                // Module-specific modes
+                if (game.modules.get("mob-attack-tool")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.mob"))) Ctg.MODES.push([game.i18n.localize("ctg.modes.mob"), ""]);
+                if (game.modules.get("lancer-initiative")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.lancer"))) Ctg.MODES.push([game.i18n.localize("ctg.modes.lancer"), "activations.value"]);
+                if (game.modules.get("scs")?.active) Ctg.MODES.findSplice(m => m[0] === "initiative");
+
+                // Change mode if saved one no longer exists
+                if (!Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode"))) game.settings.set(Ctg.ID, "mode", "none");
+
                 // Create modes if GM
                 if (game.user.isGM) this.createModes(html[0], app.popOut);
                 // Create groups
