@@ -10,6 +10,8 @@ export default class Ctg {
                     // Update the popout and non-popout combat tracker
                     this.manageGroups(mode, true);
                     this.manageGroups(mode, false);
+                    // Call hook for mode update
+                    Hooks.call("ctgModeUpdate", mode);
                 },
             });
 
@@ -131,6 +133,8 @@ export default class Ctg {
         if (mode !== "none") {
             // Get groups
             const groups = Ctg.groups(mode);
+            // Call group update hook
+            Hooks.call("ctgGroupUpdate", groups, mode, popOut);
             // Go through each of the groups
             groups.forEach(group => {
                 /** Toggle which contains combatants */
@@ -242,6 +246,9 @@ export default class Ctg {
                     });
                 });
                 game.combat.updateEmbeddedDocuments("Combatant", updates);
+
+                // Call selection hook
+                Hooks.call("ctgSelection", updates);
             };
         });
     };
@@ -278,6 +285,9 @@ export default class Ctg {
 
                         // Update the combatants
                         await game.combat.updateEmbeddedDocuments("Combatant", updates);
+                        // Call roll group initiative hook
+                        // (the ID is of the combatant that is rolled for normally)
+                        Hooks.call("ctgRoll", updates, id);
                     };
                 });
             };
