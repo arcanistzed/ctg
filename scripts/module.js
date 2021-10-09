@@ -258,9 +258,8 @@ export default class Ctg {
             // Generate a unique ID
             const uid = randomID(16);
 
-            // If controlling more than one token, a new token is being controlled, and the user is in select groups mode
-            if (canvas.tokens.controlled.length > 1 && controlled && Ctg.selectGroups) {
-
+            // If controlling at least one token, a new token is being controlled, and the user is in select groups mode
+            if (canvas.tokens.controlled.length > 0 && controlled && Ctg.selectGroups) {
                 // Add the same flag to each combatant in batch
                 let updates = [];
                 canvas.tokens.controlled.forEach(token => {
