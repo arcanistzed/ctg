@@ -64,7 +64,7 @@ export default class Ctg {
                 title: "ctg.selectControl",
                 icon: "fas fa-users",
                 toggle: true,
-                active: Ctg.selectGroups || false,
+                active: Ctg.selectGroups ?? false,
                 onClick: toggled => Ctg.selectGroups = toggled,
             });
         });
@@ -147,14 +147,14 @@ export default class Ctg {
             // Call group update hook
             Hooks.call("ctgGroupUpdate", groups, mode, popOut);
             // Go through each of the groups
-            groups.forEach(group => {
+            groups.forEach((group, index) => {
                 /** Toggle which contains combatants */
                 const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle");
 
                 /** Names in the current group */
                 let names = [];
 
-                // Go through each of the combatants  
+                // Go through each of the combatants
                 group.forEach((combatant, i, arr) => {
                     /** The DOM element of this combatant */
                     const element = html.querySelector(`[data-combatant-id="${combatant.id}"]`);
@@ -229,7 +229,7 @@ export default class Ctg {
     /** Group Combatants
      * @static
      * @param {String} mode - The current mode
-     * @return {Array} An array of groupings  
+     * @return {Array} An array of groupings
      * @memberof Ctg
      */
     static groups(mode) {
