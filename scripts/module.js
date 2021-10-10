@@ -22,7 +22,6 @@ export default class Ctg {
                 [game.i18n.localize("ctg.modes.name"), "name"],
                 [game.i18n.localize("ctg.modes.selection"), "data.flags.ctg.group"],
                 [game.i18n.localize("ctg.modes.players"), "players"],
-                [game.i18n.localize("ctg.modes.mob"), ""],
                 [game.i18n.localize("ctg.modes.actor"), "data.actorId"]
             ];
 
