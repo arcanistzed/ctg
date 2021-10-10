@@ -238,8 +238,8 @@ export default class Ctg {
             // Get groups from MAT mobs
             return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
                 .map(mob => mob.selectedTokenIds
-                    .map(id => game.scenes.active.tokens.get(id).combatant))
-                .map(arr => arr.sort(sortByTurns))
+                    .map(id => canvas.scene.tokens.get(id)?.combatant))
+                .map(arr => arr.sort(sortByTurns).filter(x => x))
                 .sort(arr => arr.sort(sortByTurns));
         } else {
             // Get the path for this mode
