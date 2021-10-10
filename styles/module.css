@@ -96,6 +96,19 @@
   text-overflow: ellipsis;
 }
 
+.ctg-saveMob {
+  flex: 0;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  padding: 0 5px;
+  cursor: pointer;
+}
+
+.ctg-saveMob:hover {
+  filter:brightness(1.25);
+}
+
 .ctg-toggle > li.combatant {
   padding-left: 20px;
 }
