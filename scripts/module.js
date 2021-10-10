@@ -51,6 +51,9 @@ export default class Ctg {
                 // Manage rolling initiative for the whole group at once if GM
                 if (game.user.isGM) this.rollGroupInitiative();
             });
+
+            // Re-render Combat Tracker when mobs update
+            Hooks.on("matMobUpdate", () => ui.combat.render(true));
         });
 
         // Manage group selection
