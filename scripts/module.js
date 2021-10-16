@@ -15,6 +15,17 @@ export default class Ctg {
                 },
             });
 
+            game.settings.register(Ctg.ID, "skip", {
+                name: "Skip",
+                hint: "asd",
+                scope: "world",
+                config: true,
+                type: Boolean,
+                default: true,
+                onChange: skip => {
+                },
+            });
+
             // Localize modes
             Ctg.MODES = [
                 [game.i18n.localize("ctg.modes.none"), ""],
@@ -54,6 +65,19 @@ export default class Ctg {
 
             // Re-render Combat Tracker when mobs update
             Hooks.on("matMobUpdate", () => ui.combat.render(true));
+
+            // Skip
+            Hooks.on("preUpdateCombat", (document, change) => {
+                if (game.settings.get(Ctg.ID, "skip")) {
+                    console.log("HELLO", document, change)
+                    const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
+                    groups.forEach(group => {
+                        if (group.findIndex(c => c === document.combatant) < group.length) {
+                            document.update({ turn: change.turn + group.length - 1 });
+                        };
+                    });
+                };
+            });
         });
 
         // Manage group selection
@@ -149,7 +173,7 @@ export default class Ctg {
             // Go through each of the groups
             groups.forEach((group, index) => {
                 /** Toggle which contains combatants */
-                const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle");
+                const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle", "directory-item");
 
                 /** Names in the current group */
                 let names = [];
@@ -219,7 +243,8 @@ export default class Ctg {
             // If a the combatant could be found in the DOM
             if (currentToggle && currentToggle.querySelector(".ctg-labelBox")) {
                 // Open the toggle for the current combatant
-                currentToggle.open = true;
+                if (!game.settings.get(Ctg.ID, "skip")) currentToggle.open = true;
+                currentToggle.classList.add("active");
                 // Darken the current toggle's label box
                 currentToggle.querySelector(".ctg-labelBox").style.filter = "brightness(0.5)";
             };
