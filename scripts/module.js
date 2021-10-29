@@ -15,12 +15,19 @@ export default class Ctg {
                 },
             });
 
-            game.settings.register(Ctg.ID, "skip", {
-                name: "Skip",
-                hint: "asd",
+            game.settings.register(Ctg.ID, "groupSkipping", {
+                name: game.i18n.localize("ctg.settings.groupSkipping.name"),
+                hint: game.i18n.localize("ctg.settings.groupSkipping.hint"),
                 scope: "world",
                 config: true,
                 type: Boolean,
+                default: false,
+                onChange: () => {
+                    ui.combat.render(true);
+                    game.combat.update({ turn: 0 });
+                }
+            });
+
             game.settings.register(Ctg.ID, "openToggles", {
                 name: game.i18n.localize("ctg.settings.openToggles.name"),
                 hint: game.i18n.localize("ctg.settings.openToggles.hint"),
@@ -70,18 +77,8 @@ export default class Ctg {
             // Re-render Combat Tracker when mobs update
             Hooks.on("matMobUpdate", () => ui.combat.render(true));
 
-            // Skip
-            Hooks.on("preUpdateCombat", (document, change) => {
-                if (game.settings.get(Ctg.ID, "skip")) {
-                    console.log("HELLO", document, change)
-                    const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
-                    groups.forEach(group => {
-                        if (group.findIndex(c => c === document.combatant) < group.length) {
-                            document.update({ turn: change.turn + group.length - 1 });
-                        };
-                    });
-                };
-            });
+            // Run group skipping code
+            this.groupSkipping();
         });
 
         // Manage group selection
@@ -346,6 +343,42 @@ export default class Ctg {
                         Hooks.call("ctgRoll", updates, id);
                     };
                 });
+            };
+        });
+    };
+
+    /** Manage skipping over groups
+     * @memberof Ctg
+     */
+    groupSkipping() {
+        // Hook into the combat update to manage skipping    
+        Hooks.on("preUpdateCombat", (document, change) => {
+            if (
+                document.current.turn < change?.turn // If this update is for a forward change of turn
+                && (document.current.turn !== 0 || change.turn === 1) // If we aren't at the start (except when the turn is being advanced)
+                && game.settings.get(Ctg.ID, "groupSkipping") // If the user has the setting enabled
+                && !change.groupSkipping // If this is not marked as an update from here
+            ) {
+                // Get the groups
+                const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
+
+                // Go through each group and skip to the beginning of the group after the one containing the current combatant
+                groups.some(group => {
+
+                    // If the current combatant is the first in this group
+                    if (group.findIndex(c => c === document.combatant) === 0) {
+
+                        // Mutate the turn change to skip to the start of the next group
+                        change.turn = (change.turn + group.length - 1) % game.combat.turns.length;
+
+                        // Mark this as an update from here
+                        change.groupSkipping = true;
+
+                        return true; // break
+                    };
+                });
+                // Return mutated data if there is group skipping
+                if (change.groupSkipping = true) return (document, change);
             };
         });
     };
