@@ -21,9 +21,13 @@ export default class Ctg {
                 scope: "world",
                 config: true,
                 type: Boolean,
-                default: true,
-                onChange: skip => {
-                },
+            game.settings.register(Ctg.ID, "openToggles", {
+                name: game.i18n.localize("ctg.settings.openToggles.name"),
+                hint: game.i18n.localize("ctg.settings.openToggles.hint"),
+                scope: "world",
+                config: true,
+                type: Boolean,
+                default: true
             });
 
             // Localize modes
@@ -242,11 +246,9 @@ export default class Ctg {
             const currentToggle = html.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`)?.parentElement
             // If a the combatant could be found in the DOM
             if (currentToggle && currentToggle.querySelector(".ctg-labelBox")) {
-                // Open the toggle for the current combatant
-                if (!game.settings.get(Ctg.ID, "skip")) currentToggle.open = true;
+                // Open the toggle for the current combatant if enabled
+                if (game.settings.get(Ctg.ID, "openToggles")) currentToggle.open = true;
                 currentToggle.classList.add("active");
-                // Darken the current toggle's label box
-                currentToggle.querySelector(".ctg-labelBox").style.filter = "brightness(0.5)";
             };
         };
     };
