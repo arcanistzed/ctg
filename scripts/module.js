@@ -163,7 +163,7 @@ export default class Ctg {
         const html = popOut ? document.querySelector("#combat-popout") : document.querySelector("#combat");
 
         // Remove any existing groups
-        html.querySelectorAll("details.ctg-toggle > li.combatant").forEach(combatant => html.querySelector("#combat-tracker").append(combatant));
+        html.querySelectorAll("details.ctg-toggle li.combatant").forEach(combatant => html.querySelector("#combat-tracker").append(combatant));
         html.querySelectorAll("details.ctg-toggle").forEach(toggle => toggle.remove());
 
         // Show current mode if GM and mode is defined
@@ -176,8 +176,11 @@ export default class Ctg {
             Hooks.call("ctgGroupUpdate", groups, mode, popOut);
             // Go through each of the groups
             groups.forEach((group, index) => {
-                /** Toggle which contains combatants */
-                const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle", "directory-item");
+                /** Toggle element */
+                const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle", "directory-item", "folder");
+                /** A subdirectory in the toggle which contains Combatants */
+                const subdirectory = document.createElement("ol"); subdirectory.classList.add("subdirectory");
+                toggle.append(subdirectory);
 
                 /** Names in the current group */
                 let names = [];
@@ -193,12 +196,12 @@ export default class Ctg {
                     // If it's the last entry
                     if (i === arr.length - 1) {
                         // Add the toggle here
-                        element?.before(toggle);
+                        element.before(toggle);
 
                         // Create a label for the toggle
-                        const labelBox = document.createElement("summary"); labelBox.classList.add("ctg-labelBox");
+                        const labelBox = document.createElement("summary"); labelBox.classList.add("ctg-labelBox"); labelBox.classList.add("folder-header");
                         const labelFlex = document.createElement("div"); labelFlex.classList.add("ctg-labelFlex");
-                        const labelName = document.createElement("div"); labelName.classList.add("ctg-labelName");
+                        const labelName = document.createElement("h3"); labelName.classList.add("ctg-labelName");
                         const labelCount = document.createElement("div"); labelCount.classList.add("ctg-labelCount");
                         const labelValue = document.createElement("div"); labelValue.classList.add("ctg-labelValue");
 
@@ -237,13 +240,13 @@ export default class Ctg {
                         }
                     };
 
-                    // Move the element into the toggle
-                    toggle.append(element);
+                    // Move the element into the subdirectory
+                    subdirectory.append(element);
                 });
             });
 
             // Get the current toggle
-            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`)?.parentElement
+            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`)?.parentElement.parentElement;
             // If a the combatant could be found in the DOM
             if (currentToggle && currentToggle.querySelector(".ctg-labelBox")) {
                 // Open the toggle for the current combatant if enabled
