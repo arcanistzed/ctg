@@ -29,7 +29,7 @@
 }
 
 #ctg-modeLabel {
-  border: solid white 1px;
+  border: solid var(--color-border-light-1, #ddd) 1px;
   border-radius: 3px;
   cursor: pointer;
   padding: 5px;
@@ -42,7 +42,7 @@
 .ctg-toggle.directory-item.active:not([open]) {
   border-top: solid 1px;
   border-bottom: solid 1px;
-  border-color: var(--color-border-highlight);
+  border-color: var(--color-border-highlight, #ff6400);
 }
 
 .ctg-toggle[open] > .ctg-labelBox {
@@ -52,11 +52,11 @@
 .ctg-labelBox {
   text-shadow: 1px 1px 4px var(--color-shadow-dark, #000);
   cursor: pointer;
-  line-height: calc(var(--sidebar-item-height) / 2);
+  line-height: calc(var(--sidebar-item-height, 48px) / 2);
   padding: 0 6px;
   background: rgba(0, 0, 0, 0.5);
-  border-top: 1px solid var(--color-border-dark);
-  border-bottom: 1px solid var(--color-border-dark);
+  border-top: 1px solid var(--color-border-dark, #000);
+  border-bottom: 1px solid var(--color-border-dark, #000);
 }
 
 .ctg-labelFlex {
@@ -95,7 +95,7 @@
 
 .ctg-labelCount::before,
 .ctg-labelCount::after {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--color-text-light-4, #bbb);
 }
 
 .ctg-labelValue {
