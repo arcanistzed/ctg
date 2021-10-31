@@ -15,6 +15,28 @@ export default class Ctg {
                 },
             });
 
+            game.settings.register(Ctg.ID, "groupSkipping", {
+                name: game.i18n.localize("ctg.settings.groupSkipping.name"),
+                hint: game.i18n.localize("ctg.settings.groupSkipping.hint"),
+                scope: "world",
+                config: true,
+                type: Boolean,
+                default: false,
+                onChange: () => {
+                    ui.combat.render(true);
+                    game.combat.update({ turn: 0 });
+                }
+            });
+
+            game.settings.register(Ctg.ID, "openToggles", {
+                name: game.i18n.localize("ctg.settings.openToggles.name"),
+                hint: game.i18n.localize("ctg.settings.openToggles.hint"),
+                scope: "world",
+                config: true,
+                type: Boolean,
+                default: true
+            });
+
             // Localize modes
             Ctg.MODES = [
                 [game.i18n.localize("ctg.modes.none"), ""],
@@ -54,6 +76,9 @@ export default class Ctg {
 
             // Re-render Combat Tracker when mobs update
             Hooks.on("matMobUpdate", () => ui.combat.render(true));
+
+            // Run group skipping code
+            this.groupSkipping();
         });
 
         // Manage group selection
@@ -135,7 +160,7 @@ export default class Ctg {
         const html = popOut ? document.querySelector("#combat-popout") : document.querySelector("#combat");
 
         // Remove any existing groups
-        html.querySelectorAll("details.ctg-toggle > li.combatant").forEach(combatant => html.querySelector("#combat-tracker").append(combatant));
+        html.querySelectorAll("details.ctg-toggle li.combatant").forEach(combatant => html.querySelector("#combat-tracker").append(combatant));
         html.querySelectorAll("details.ctg-toggle").forEach(toggle => toggle.remove());
 
         // Show current mode if GM and mode is defined
@@ -148,8 +173,11 @@ export default class Ctg {
             Hooks.call("ctgGroupUpdate", groups, mode, popOut);
             // Go through each of the groups
             groups.forEach((group, index) => {
-                /** Toggle which contains combatants */
-                const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle");
+                /** Toggle element */
+                const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle", "directory-item", "folder");
+                /** A subdirectory in the toggle which contains Combatants */
+                const subdirectory = document.createElement("ol"); subdirectory.classList.add("subdirectory");
+                toggle.append(subdirectory);
 
                 /** Names in the current group */
                 let names = [];
@@ -179,12 +207,12 @@ export default class Ctg {
                     // If it's the last entry
                     if (i === arr.length - 1) {
                         // Add the toggle here
-                        element?.before(toggle);
+                        element.before(toggle);
 
                         // Create a label for the toggle
-                        const labelBox = document.createElement("summary"); labelBox.classList.add("ctg-labelBox");
+                        const labelBox = document.createElement("summary"); labelBox.classList.add("ctg-labelBox"); labelBox.classList.add("folder-header");
                         const labelFlex = document.createElement("div"); labelFlex.classList.add("ctg-labelFlex");
-                        const labelName = document.createElement("div"); labelName.classList.add("ctg-labelName");
+                        const labelName = document.createElement("h3"); labelName.classList.add("ctg-labelName");
                         const labelCount = document.createElement("div"); labelCount.classList.add("ctg-labelCount");
                         const labelValue = document.createElement("div"); labelValue.classList.add("ctg-labelValue");
 
@@ -223,19 +251,18 @@ export default class Ctg {
                         }
                     };
 
-                    // Move the element into the toggle
-                    toggle.append(element);
+                    // Move the element into the subdirectory
+                    subdirectory.append(element);
                 });
             });
 
             // Get the current toggle
-            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`)?.parentElement
+            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`)?.parentElement.parentElement;
             // If a the combatant could be found in the DOM
             if (currentToggle && currentToggle.querySelector(".ctg-labelBox")) {
-                // Open the toggle for the current combatant
-                currentToggle.open = true;
-                // Darken the current toggle's label box
-                currentToggle.querySelector(".ctg-labelBox").style.filter = "brightness(0.5)";
+                // Open the toggle for the current combatant if enabled
+                if (game.settings.get(Ctg.ID, "openToggles")) currentToggle.open = true;
+                currentToggle.classList.add("active");
             };
         };
     };
@@ -330,6 +357,42 @@ export default class Ctg {
                         Hooks.call("ctgRoll", updates, id);
                     };
                 });
+            };
+        });
+    };
+
+    /** Manage skipping over groups
+     * @memberof Ctg
+     */
+    groupSkipping() {
+        // Hook into the combat update to manage skipping    
+        Hooks.on("preUpdateCombat", (document, change) => {
+            if (
+                document.current.turn < change?.turn // If this update is for a forward change of turn
+                && (document.current.turn !== 0 || change.turn === 1) // If we aren't at the start (except when the turn is being advanced)
+                && game.settings.get(Ctg.ID, "groupSkipping") // If the user has the setting enabled
+                && !change.groupSkipping // If this is not marked as an update from here
+            ) {
+                // Get the groups
+                const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
+
+                // Go through each group and skip to the beginning of the group after the one containing the current combatant
+                groups.some(group => {
+
+                    // If the current combatant is the first in this group
+                    if (group.findIndex(c => c === document.combatant) === 0) {
+
+                        // Mutate the turn change to skip to the start of the next group
+                        change.turn = (change.turn + group.length - 1) % game.combat.turns.length;
+
+                        // Mark this as an update from here
+                        change.groupSkipping = true;
+
+                        return true; // break
+                    };
+                });
+                // Return mutated data if there is group skipping
+                if (change.groupSkipping = true) return (document, change);
             };
         });
     };

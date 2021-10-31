@@ -10,6 +10,16 @@
       "lancer": "lancer",
       "actor": "actor"
     },
-    "selectControl": "Select Combat Groups"
+    "selectControl": "Select Combat Groups",
+    "settings": {
+      "groupSkipping": {
+        "hint": "Skip over each group",
+        "name": "Skip"
+      },
+      "openToggles": {
+        "name": "Open Toggles",
+        "hint": "Automatically open the toggle for the current group"
+      }
+    }
   }
 }

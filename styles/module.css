@@ -39,15 +39,24 @@
 
 /* Toggles */
 
-.ctg-labelBox:hover {
-  background: rgba(255, 255, 255, 0.08);
+.ctg-toggle.directory-item.active:not([open]) {
+  border-top: solid 1px;
+  border-bottom: solid 1px;
+  border-color: var(--color-border-highlight);
+}
+
+.ctg-toggle[open] > .ctg-labelBox {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .ctg-labelBox {
-  font-size: 20px;
   text-shadow: 1px 1px 4px var(--color-shadow-dark, #000);
-  padding: 5px;
   cursor: pointer;
+  line-height: calc(var(--sidebar-item-height) / 2);
+  padding: 0 6px;
+  background: rgba(0, 0, 0, 0.5);
+  border-top: 1px solid var(--color-border-dark);
+  border-bottom: 1px solid var(--color-border-dark);
 }
 
 .ctg-labelFlex {
@@ -56,6 +65,7 @@
   justify-content: flex-start;
   gap: 5px;
   cursor: default;
+  padding: 6px 0;
 }
 
 .ctg-labelFlex > * {
@@ -72,11 +82,9 @@
   flex-basis: 2em;
   text-align: center;
 }
-
 .ctg-labelCount::before {
   content: "(";
 }
-
 .ctg-labelCount::after {
   content: ")";
 }
@@ -107,14 +115,10 @@
 }
 
 .ctg-saveMob:hover {
-  filter:brightness(1.25);
+  filter: brightness(1.25);
 }
 
-.ctg-toggle > li.combatant {
-  padding-left: 20px;
-}
-
-.ctg-toggle[open] > .ctg-labelBox + .active {
+.ctg-toggle[open] > .ctg-labelBox > .active {
   animation: fadein 0.25s ease-in;
 }
 
