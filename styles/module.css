@@ -5,9 +5,11 @@
   display: flex;
   list-style-type: none;
   padding: 5px;
+  border-bottom: 2px groove var(--color-border-dark-4, #444);
   margin: 0;
   gap: 5px;
   flex-wrap: wrap;
+  text-shadow: 1px 1px 4px var(--color-shadow-dark, #000);
 }
 
 #ctg-modeBox {
@@ -48,6 +50,7 @@
 }
 
 .ctg-labelBox {
+  text-shadow: 1px 1px 4px var(--color-shadow-dark, #000);
   cursor: pointer;
   line-height: calc(var(--sidebar-item-height) / 2);
   padding: 0 6px;

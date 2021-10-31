@@ -187,8 +187,22 @@ export default class Ctg {
                     /** The DOM element of this combatant */
                     const element = html.querySelector(`[data-combatant-id="${combatant.id}"]`);
 
-                    // Add the name of the current combatant to the names if it's not already there
-                    if (!names.includes(combatant.name)) names.push(combatant.name);
+                    /** The name of this combatant in the Tracker */
+                    const trackerName = element.querySelector(".token-name > h4").textContent;
+                    console.log(trackerName)
+                    // Check if the name of the current combatant is already added
+                    if (!names.includes(combatant.name)
+                        // Check whether it's being hidden by CUB
+                        && !(game.settings.get("combat-utility-belt", "enableHideNPCNames")
+                            && (
+                                (game.settings.get("combat-utility-belt", "enableHideHostileNames") && trackerName === game.settings.get("combat-utility-belt", "hostileNameReplacement"))
+                                || (game.settings.get("combat-utility-belt", "enableHideNeutralNames") && trackerName === game.settings.get("combat-utility-belt", "neutralNameReplacement"))
+                                || (game.settings.get("combat-utility-belt", "enableHideFriendlyNames") && trackerName === game.settings.get("combat-utility-belt", "friendlyNameReplacement"))
+                            )
+                        )
+                    )
+                        // If not, dd the name of the current combatant to the names
+                        names.push(combatant.name);
 
                     // If it's the last entry
                     if (i === arr.length - 1) {
