@@ -189,7 +189,6 @@ export default class Ctg {
 
                     /** The name of this combatant in the Tracker */
                     const trackerName = element.querySelector(".token-name > h4").textContent;
-                    console.log(trackerName)
                     // Check if the name of the current combatant is already added
                     if (!names.includes(combatant.name)
                         // Check whether it's being hidden by CUB
