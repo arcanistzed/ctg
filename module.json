@@ -5,7 +5,7 @@
   "version": "This is auto replaced",
   "manifestPlusVersion": "1.2.0",
   "minimumCoreVersion": "0.8.9",
-  "compatibleCoreVersion": "0.8.9",
+  "compatibleCoreVersion": 9,
   "author": "arcanist",
   "authors": [
     {
@@ -17,8 +17,7 @@
     }
   ],
   "esmodules": [
-    "scripts/module.js",
-    "scripts/gi.js"
+    "scripts/module.js"
   ],
   "styles": [
     "styles/module.css"
