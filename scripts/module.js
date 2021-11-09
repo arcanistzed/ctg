@@ -189,20 +189,18 @@ export default class Ctg {
 
                     /** The name of this combatant in the Tracker */
                     const trackerName = element.querySelector(".token-name > h4").textContent;
-                    // Check if the name of the current combatant is already added
-                    if (!names.includes(combatant.name)
-                        // Check whether it's being hidden by CUB
-                        && !( // Don't include if the setting is enabled
-                            game.modules.get("combat-utility-belt")?.active && game.settings.get("combat-utility-belt", "enableHideNPCNames")
-                            && ( // and this name is being hidden
-                                (game.settings.get("combat-utility-belt", "enableHideHostileNames") && trackerName === game.settings.get("combat-utility-belt", "hostileNameReplacement"))
-                                || (game.settings.get("combat-utility-belt", "enableHideNeutralNames") && trackerName === game.settings.get("combat-utility-belt", "neutralNameReplacement"))
-                                || (game.settings.get("combat-utility-belt", "enableHideFriendlyNames") && trackerName === game.settings.get("combat-utility-belt", "friendlyNameReplacement"))
-                            )
+
+                    // Add the name of the current combatant if it is not already
+                    if (!names.includes(combatant.name)) names.push((
+                        // Compatibility with CUB Hide Actor Names: check whether the name is being hidden by CUB
+                        game.modules.get("combat-utility-belt")?.active && game.settings.get("combat-utility-belt", "enableHideNPCNames")
+                        && (
+                            (game.settings.get("combat-utility-belt", "enableHideHostileNames") && trackerName === game.settings.get("combat-utility-belt", "hostileNameReplacement"))
+                            || (game.settings.get("combat-utility-belt", "enableHideNeutralNames") && trackerName === game.settings.get("combat-utility-belt", "neutralNameReplacement"))
+                            || (game.settings.get("combat-utility-belt", "enableHideFriendlyNames") && trackerName === game.settings.get("combat-utility-belt", "friendlyNameReplacement"))
                         )
-                    )
-                        // If not, add the name of the current combatant to the names
-                        names.push(combatant.name);
+                        // Add the name in the tracker instead if it has been hidden
+                    ) ? trackerName : combatant.name);
 
                     // If it's the last entry
                     if (i === arr.length - 1) {
