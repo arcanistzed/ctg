@@ -12,9 +12,11 @@ In the setup screen, use the URL `https://github.com/arcanistzed/ctg/releases/la
 
 ## Usage
 
-After creating a new combat, the combatants in the Combat Tracker will be instantly grouped and put into toggles. The toggles will open when they contain the current combatant.
+After creating a new combat, the combatants in the Combat Tracker will be instantly grouped and put into toggles. The toggles will open when they contain the current combatant unless this is disabled in settings.
 
 This module also allows for an easy way to roll group initiative. If you hold the `Control` or `Shift` key while rolling the initiative of any of the combatants from the tracker, it will automatically give all of the combatants in the same group the initiative value rolled. *Please note that this doesn't work in "None" or "Initiative" mode and you **must** roll from the tracker for this to work.*
+
+The Skip over Groups feature makes Foundry skip over the rest of combatants in the current group when advancing the turn tracker.
 
 The way that the groups are created depends on the selected mode which you can change near the top of the Combat Tracker by clicking on one of the boxes. Here's how each mode works:
 
@@ -24,7 +26,9 @@ This doesn't apply any groupings.
 
 ### Initiative
 
-The default mode where combatants are grouped by their initiative value.
+*Hidden for the [Simultaneous Combat System](https://foundryvtt.com/packages/scs)*
+
+This is the default mode. Combatants are grouped by their initiative value.
 
 ### Name
 
@@ -43,6 +47,44 @@ Once toggled on, whenever you select any tokens in the scene, they'll be added t
 ### Players
 
 Combatants are grouped by the players that have `Owner` permission for the associated Actor. If multiple players have ownership over an Actor, the associated combatant(s) will be grouped together with any other combatant which the same exact players have ownership over.
+
+### Actor
+
+Group combatants by their associated Actor which allows you to group together Combatants which are from the same Actor, but have different names (such as when using [Token Mold](https://foundryvtt.com/packages/token-mold)).
+
+### Mob
+
+*Requires [Mob Attack Tool](https://foundryvtt.com/packages/mob-attack-tool))*
+
+This mode is only shown when Group combatants by MAT's saved mobs.
+
+### Lancer
+
+*Requires [Lancer Initiative](https://foundryvtt.com/packages/lancer-initiative)*
+
+Group combatants by their [Lancer Initiative](https://foundryvtt.com/packages/lancer-initiative) activations value.
+
+## Module integration
+
+### [Simultaneous Combat System](https://foundryvtt.com/packages/scs)
+
+The "Initiative" mode is hidden when the Simultaneous Combat System module is enabled.
+
+### [Mob Attack Tool](https://foundryvtt.com/packages/mob-attack-tool)
+
+When enabled, a new "Mob" mode is added allowing you to group combatants by their MAT mob.
+
+There is also a button beside each group allowing you to save it as a MAT mob.
+
+### [Combat Utility Belt](https://foundryvtt.com/packages/combat-utility-belt)
+
+When the "Hide Actor Names" functionality of CUB is enabled, the group names reflect the replacement names.
+
+### [Lancer Initiative](https://foundryvtt.com/packages/lancer-initiative)
+
+When enabled, there is a mode which allows you to group combatants by their Lancer Initiative activations value.
+
+When Lancer Initiative's initiative rolling button setting is enabled, you can use it's small d20 icon to roll group initiative as normal.
 
 ## License
 
