@@ -193,8 +193,7 @@ export default class Ctg {
                     if (!names.includes(combatant.name)
                         // Check whether it's being hidden by CUB
                         && !( // Don't include if the setting is enabled
-                        && !(game.settings.get("combat-utility-belt", "enableHideNPCNames")
-                            && (
+                            game.modules.get("combat-utility-belt")?.active && game.settings.get("combat-utility-belt", "enableHideNPCNames")
                             && ( // and this name is being hidden
                                 (game.settings.get("combat-utility-belt", "enableHideHostileNames") && trackerName === game.settings.get("combat-utility-belt", "hostileNameReplacement"))
                                 || (game.settings.get("combat-utility-belt", "enableHideNeutralNames") && trackerName === game.settings.get("combat-utility-belt", "neutralNameReplacement"))
