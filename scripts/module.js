@@ -192,8 +192,10 @@ export default class Ctg {
                     // Check if the name of the current combatant is already added
                     if (!names.includes(combatant.name)
                         // Check whether it's being hidden by CUB
+                        && !( // Don't include if the setting is enabled
                         && !(game.settings.get("combat-utility-belt", "enableHideNPCNames")
                             && (
+                            && ( // and this name is being hidden
                                 (game.settings.get("combat-utility-belt", "enableHideHostileNames") && trackerName === game.settings.get("combat-utility-belt", "hostileNameReplacement"))
                                 || (game.settings.get("combat-utility-belt", "enableHideNeutralNames") && trackerName === game.settings.get("combat-utility-belt", "neutralNameReplacement"))
                                 || (game.settings.get("combat-utility-belt", "enableHideFriendlyNames") && trackerName === game.settings.get("combat-utility-belt", "friendlyNameReplacement"))
@@ -280,12 +282,14 @@ export default class Ctg {
             // Get groups from MAT mobs
             return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
                 .map(mob => mob.selectedTokenIds
-                    .map(id => canvas.scene.tokens.get(id)?.combatant))
-                .map(arr => arr.sort(sortByTurns).filter(x => x))
-                .sort(arr => arr.sort(sortByTurns));
+                    .map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
+                .map(arr => arr.sort(sortByTurns).filter(x => x)) // Sort combatants within each group and filter out tokens without combatants
+                .sort(arr => arr.sort(sortByTurns)); // Sort each group by the turn order
         } else {
             // Get the path for this mode
             const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
+
+            // Reduce combat turns into an array of groups by matching a given property path
             return Object.values(game.combat.turns.reduce((accumulator, current) => {
                 if (current.visible) accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
                 return accumulator;
