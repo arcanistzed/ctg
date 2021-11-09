@@ -200,7 +200,7 @@ export default class Ctg {
                             )
                         )
                     )
-                        // If not, dd the name of the current combatant to the names
+                        // If not, add the name of the current combatant to the names
                         names.push(combatant.name);
 
                     // If it's the last entry
