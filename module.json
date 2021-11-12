@@ -17,10 +17,10 @@
     }
   ],
   "esmodules": [
-    "scripts/module.js"
+    "scripts/ctg.js"
   ],
   "styles": [
-    "styles/module.css"
+    "styles/ctg.css"
   ],
   "languages": [
     {
