@@ -86,6 +86,62 @@ When enabled, there is a mode which allows you to group combatants by their Lanc
 
 When Lancer Initiative's initiative rolling button setting is enabled, you can use it's small d20 icon to roll group initiative as normal.
 
+## API
+
+The module provides various hooks and methods which other developers can use to integrate with the module:
+
+### Hooks
+
+#### `ctgModeUpdate`
+
+Fires whenever the mode is updated with the only argument as the new mode.
+
+#### `ctgGroupUpdate`
+
+Fires whenever the groups are updated with the following arguments: the new groups, the current mode, and whether this update is being done with a popOut Combat Tracker.
+
+#### `ctgSelection`
+
+This fires immediately after a new group is created by selection. The only argument is the array of new Combatant ID & CTG Group ID pairs.
+
+#### `ctgRollAll` / `ctgRollNPC` / `ctgRoll`
+
+These hooks fire whenever group initiative is rolled. The first two are associated with the "Roll All" and "Roll NPCs" header buttons, while the third hook is called when the group initiative roll is triggered for only one group.
+
+The arguments for these hooks are: an array with the Combatant IDs and the new initiative values, the Roll Object, and the IDs of the Combatant(s) who triggered the roll (this is only used for the `ctgRoll` hook).
+
+### Variables & Methods
+
+These methods can be found under `game.modules.get("ctg").api`:
+
+#### `ID`
+
+The module's ID: `ctg`
+
+#### `MODES`
+
+An array of grouping modes which are used by the module. You can push or remove items from this in order to create custom or different modes. All items must be arrays and must only have two elements: the name of the mode and followed by the "path" to this data relative to the Combatant.
+
+Ex: You could use this code in order to create a mode called "NPC", allowing Combatants to be grouped by whether ot not they are NPCs:
+
+```js
+game.modules.get("ctg").api.MODES.push(["NPC", "isNPC"]);
+```
+
+If you think you have a good idea for a grouping mode, feel free to suggest it and it could be added to the module for everyone!
+
+#### `selectGroups`
+
+This boolean tracks whether or not to allow groups to be created for the "selection" mode.
+
+#### `getDisplayName`
+
+This method generates the name which is displayed for a given group (an array of Combatants).
+
+#### `groups`
+
+This method reduces the combat turns (or maps the MAT mobs) into an array of groups (which are arrays of Combatants). You must pass a valid mode when calling this and the groups will be created based on the path.
+
 ## License
 
 Copyright © 2021 arcanist
