@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0 - 15 Nov 2021
+
+### Added
+
+* New API docs! Read the [README docs](https://foundryvtt.com/packages/ctg) for details
+* Added support for "Roll All" and "Roll NPC" buttons for rolling Group Initiative (now requires libWrapper)
+
+### Fixed
+
+* UI improvements
+* Temporary "fix" for [MAT bug](https://github.com/Stendarpaval/mob-attack-tool/issues/46).The groups aren't instantly updated when Mobs are changed if Autosave CTG groups is enabled in MAT.
+* Check if MAT is active before trying to get it's settings
+* Verify if the mode is valid before grouping
+
 ## 0.3.1 - 8 Nov 2021
 
 ### Added
