@@ -10,7 +10,7 @@
 ### Fixed
 
 * UI improvements
-* Temporary "fix" for [MAT bug](https://github.com/Stendarpaval/mob-attack-tool/issues/46).The groups aren't instantly updated when Mobs are changed if Autosave CTG groups is enabled in MAT.
+* Temporary "fix" for [MAT bug](https://github.com/Stendarpaval/mob-attack-tool/issues/46). The groups aren't instantly updated when Mobs are changed if Autosave CTG groups is enabled in MAT.
 * Check if MAT is active before trying to get it's settings
 * Verify if the mode is valid before grouping
 
