@@ -290,6 +290,9 @@ export default class Ctg {
      * @memberof Ctg
      */
     static groups(mode) {
+        // Exit if invalid mode
+        if (!Ctg.MODES.map(m => m[0]).includes(mode)) { ui.notifications.error(`CTG | Grouping not possible because ${mode} is not a valid mode.`); return; };
+
         // Special behavior for if Mob Attack Tool is enabled
         if (mode === "mob") {
             const sortByTurns = (a, b) => game.combat.turns.indexOf(a) - game.combat.turns.indexOf(b);
