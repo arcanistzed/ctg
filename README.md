@@ -18,7 +18,8 @@ After creating a new combat, the combatants in the Combat Tracker will be instan
 
 This module also allows for an easy way to roll group initiative.
 If you hold the `Control` or `Shift` key while rolling the initiative of any of the combatants from the tracker, it will automatically give all of the combatants in the same group the initiative value rolled.
-This module also allows for an easy way to roll group initiative. If you hold the `Control` or `Shift` key while rolling the initiative of any of the combatants from the tracker, it will automatically give all of the combatants in the same group the initiative value rolled. *Please note that this doesn't work in "None" or "Initiative" mode and you **must** roll from the tracker for this to work.*
+If you use the "Roll All" button, all groups will be rolled for.
+If you use the "Roll NPCs" button, all groups with only NPCs will be rolled for.
 
 *Please note that this doesn't work in "None" mode and you **must** roll from the tracker for this to work.*
 
