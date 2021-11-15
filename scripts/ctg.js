@@ -1,6 +1,9 @@
 export default class Ctg {
     constructor() {
         Hooks.on("ready", () => {
+
+            console.log("%cCombat Tracker Groups", "font-size: 48px; font-family: 'Signika'; text-shadow: 0 0 10px rgb(255, 100, 0)", "\nBy Arcanist", "\n\nSupport me on Patreon: https://patreon.com/arcanistzed", "\nVisit my Website for more info: https://arcanist.me/");
+
             game.settings.register(Ctg.ID, "mode", {
                 scope: "world",
                 config: false,
