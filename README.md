@@ -14,27 +14,37 @@ In the setup screen, use the URL `https://github.com/arcanistzed/ctg/releases/la
 
 After creating a new combat, the combatants in the Combat Tracker will be instantly grouped and put into toggles. The toggles will open when they contain the current combatant unless this is disabled in settings.
 
+### Rolling Group Initiative
+
+This module also allows for an easy way to roll group initiative.
+If you hold the `Control` or `Shift` key while rolling the initiative of any of the combatants from the tracker, it will automatically give all of the combatants in the same group the initiative value rolled.
 This module also allows for an easy way to roll group initiative. If you hold the `Control` or `Shift` key while rolling the initiative of any of the combatants from the tracker, it will automatically give all of the combatants in the same group the initiative value rolled. *Please note that this doesn't work in "None" or "Initiative" mode and you **must** roll from the tracker for this to work.*
+
+*Please note that this doesn't work in "None" mode and you **must** roll from the tracker for this to work.*
+
+### Skip Over Groups
 
 The Skip over Groups feature makes Foundry skip over the rest of combatants in the current group when advancing the turn tracker.
 
+### Grouping modes
+
 The way that the groups are created depends on the selected mode which you can change near the top of the Combat Tracker by clicking on one of the boxes. Here's how each mode works:
 
-### None
+#### None
 
 This doesn't apply any groupings.
 
-### Initiative
+#### Initiative
 
 *Hidden for the [Simultaneous Combat System](https://foundryvtt.com/packages/scs)*
 
 This is the default mode. Combatants are grouped by their initiative value.
 
-### Name
+#### Name
 
 Combatants are alphabetically grouped by their name.
 
-### Selection
+#### Selection
 
 Combatants are grouped by a custom selection. You can decide this by using the tool in the Token Scene controls toolbar:
 
@@ -44,21 +54,21 @@ Once toggled on, whenever you select any tokens in the scene, they'll be added t
 
 <https://user-images.githubusercontent.com/82790112/133531297-d55892c0-41b3-4117-9f85-be0b2750c32a.mp4>
 
-### Players
+#### Players
 
 Combatants are grouped by the players that have `Owner` permission for the associated Actor. If multiple players have ownership over an Actor, the associated combatant(s) will be grouped together with any other combatant which the same exact players have ownership over.
 
-### Actor
+#### Actor
 
 Group combatants by their associated Actor which allows you to group together Combatants which are from the same Actor, but have different names (such as when using [Token Mold](https://foundryvtt.com/packages/token-mold)).
 
-### Mob
+#### Mob
 
 *Requires [Mob Attack Tool](https://foundryvtt.com/packages/mob-attack-tool))*
 
 This mode is only shown when Group combatants by MAT's saved mobs.
 
-### Lancer
+#### Lancer
 
 *Requires [Lancer Initiative](https://foundryvtt.com/packages/lancer-initiative)*
 
