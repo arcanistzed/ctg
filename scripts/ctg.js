@@ -342,41 +342,65 @@ export default class Ctg {
      * @memberof Ctg
      */
     rollGroupInitiative() {
-        // Listen for if any of the roll initiative buttons are clicked
-        document.querySelectorAll(".combatant-control.roll, .combatant-control > .fa-dice-d20").forEach(el => el.onpointerdown = ev => {
-            // If the keybinding is held and "none" mode is not being used
-            if ((ev.ctrlKey || ev.shiftKey) && game.settings.get(Ctg.ID, "mode") !== "none") {
+        // Verify libWrapper is enabled
+        if (!game.modules.get("lib-wrapper")?.active) {
+            ui.notifications.warn("libWrapper must be enabled to use the group initiative rolling functionality");
+            return;
+        };
 
-                // Get the ID of the combatant
-                const id = ev.currentTarget.closest(".combatant").dataset.combatantId;
+        // Check whether group initiative should be rolled
+        const isRollForGroupInitiative = () =>
+            // Don't roll in "none" mode
+            game.settings.get(Ctg.ID, "mode") !== "none"
+            // Only Roll if the keybinding is being held down
+            && game.keyboard._downKeys.has("Control") || game.keyboard._downKeys.has("Shift");
 
-                // The next time the combatant is updated
-                Hooks.once("updateCombatant", async (_app, change) => {
-                    // If this was a change to their initiative
-                    if (change.initiative) {
+        // Wrap initiative rolling methods
+        libWrapper.register(Ctg.ID, "Combat.prototype.rollAll", groupInitiativeWrapper.bind(null, "rollAll"), "MIXED");
+        libWrapper.register(Ctg.ID, "Combat.prototype.rollNPC", groupInitiativeWrapper.bind(null, "rollNPC"), "MIXED");
+        libWrapper.register(Ctg.ID, "Combat.prototype.rollInitiative", groupInitiativeWrapper.bind(null, "roll"), "MIXED");
+
+        /** Wrapper fot group initiative
+         * @param {String} context - The type of group initiative roll being made
+         * @param {Function} wrapped - The wrapped function
+         * @param {Array<String>} [ids=[""]] - An array containing the Combatant IDs passed to `rollInitiative`
+         */
+        function groupInitiativeWrapper(context, wrapped, ids = [""]) {
+            // Check if this is a roll for Group Initiative
+            if (isRollForGroupInitiative()) {
+                // Loop through the IDs in case there are multiple (should be unusual)
+                ids.forEach(id => {
+                    // Go through all of the groups
+                    Ctg.groups(game.settings.get(Ctg.ID, "mode")).forEach(async group => {
+                        // What happens depends on the context of this roll:
+                        if (context === "rollAll" // Roll for every group
+                            || (context === "rollNPC" && group.every(combatant => combatant.isNPC)) // Roll only for groups which are all NPCs 
+                            || (context === "roll" && group.some(combatant => combatant.id === id)) // Roll for groups which contain the current combatant
+                        ) {
+                            // Roll initiative for the first combatant in the group
+                            const roll = await group[0].getInitiativeRoll().evaluate({ async: true });
+                            roll.toMessage({ flavor: `"${Ctg.getDisplayName(group)}" group rolls for Initiative!` });
+
+                        // Update all of the combatants in this group with that roll total as their new initiative
                         let updates = [];
-
-                        // Go through the list of the groups
-                        Ctg.groups(game.settings.get(Ctg.ID, "mode")).forEach(group => {
-                            // Go through each group that contains this combatant
-                            if (group.some(combatant => combatant.id === id)) group.forEach(combatant => {
-                                // Give all of the combatants in this group the new initiative value
-                                updates.push({
+                            group.forEach(combatant => updates.push({
                                     _id: combatant.id,
-                                    initiative: change.initiative
-                                });
-                            });
-                        });
+                                initiative: roll.total,
+                            }));
 
                         // Update the combatants
                         await game.combat.updateEmbeddedDocuments("Combatant", updates);
-                        // Call roll group initiative hook
-                        // (the ID is of the combatant that is rolled for normally)
-                        Hooks.call("ctgRoll", updates, id);
+
+                            // Log to console and call hook
+                            console.log(`CTG | Rolling Initiative for${context === "rollAll" ? " everyone" : context === "rollNPC" ? " NPCs" : ""} in group "${Ctg.getDisplayName(group)}"`);
+                            Hooks.call(`ctg${context.capitalize()}`, updates, roll, id);
+                        } else {
+                            console.log(`CTG | Initiative not rolled for group "${Ctg.getDisplayName(group)}"`)
                     };
                 });
-            };
         });
+            } else { wrapped(ids); };
+        };
     };
 
     /** Manage skipping over groups
