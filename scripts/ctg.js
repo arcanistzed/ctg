@@ -73,10 +73,10 @@ export default class Ctg {
                     const mode = event.target.id?.replace("ctg-mode-radio-", "").replace("-popOut", "");
                     if (Ctg.MODES.map(m => m[0]).includes(mode)) game.settings.set(Ctg.ID, "mode", mode);
                 }));
-
-                // Manage rolling initiative for the whole group at once if GM
-                if (game.user.isGM) this.rollGroupInitiative();
             });
+
+            // Manage rolling initiative for the whole group at once if GM
+            if (game.user.isGM) this.rollGroupInitiative();
 
             // Re-render Combat Tracker when mobs update not from autosave (FIXME: a re-render is needed, but is not being included to avoid a MAT bug. See https://github.com/Stendarpaval/mob-attack-tool/issues/46)
             if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat.render(true));
@@ -175,10 +175,12 @@ export default class Ctg {
             const groups = Ctg.groups(mode);
             // Call group update hook
             Hooks.call("ctgGroupUpdate", groups, mode, popOut);
+
             // Go through each of the groups
-            groups.forEach((group, index) => {
+            groups?.forEach((group, index) => {
                 /** Toggle element */
                 const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle", "directory-item", "folder");
+
                 /** A subdirectory in the toggle which contains Combatants */
                 const subdirectory = document.createElement("ol"); subdirectory.classList.add("subdirectory");
                 toggle.append(subdirectory);
@@ -205,6 +207,7 @@ export default class Ctg {
 
                         // Add the value to the label if not in name mode
                         if (mode === "initiative") labelValue.innerText = getProperty(combatant, Ctg.MODES.find(m => m[0] === mode).slice(-1)[0]);
+
                         // Add the count to the label
                         labelCount.innerText = arr.length;
 
@@ -304,6 +307,7 @@ export default class Ctg {
             // Get groups from MAT mobs
             return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
                 .map(mob => mob.selectedTokenIds
+                    // FIXME: Don't add a combatant to more than one group
                     .map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
                 .map(arr => arr.sort(sortByTurns).filter(x => x)) // Sort combatants within each group and filter out tokens without combatants
                 .sort(arr => arr.sort(sortByTurns)); // Sort each group by the turn order
@@ -391,7 +395,7 @@ export default class Ctg {
                         // Update all of the combatants in this group with that roll total as their new initiative
                         let updates = [];
                             group.forEach(combatant => updates.push({
-                                    _id: combatant.id,
+                                _id: combatant.id,
                                 initiative: roll.total,
                             }));
 
@@ -403,9 +407,9 @@ export default class Ctg {
                             Hooks.call(`ctg${context.capitalize()}`, updates, roll, id);
                         } else {
                             console.log(`CTG | Initiative not rolled for group "${Ctg.getDisplayName(group)}"`)
-                    };
+                        };
+                    });
                 });
-        });
             } else { wrapped(ids); };
         };
     };
@@ -426,7 +430,7 @@ export default class Ctg {
                 const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
 
                 // Go through each group and skip to the beginning of the group after the one containing the current combatant
-                groups.some(group => {
+                groups?.some(group => {
 
                     // If the current combatant is the first in this group
                     if (group.findIndex(c => c === document.combatant) === 0) {
