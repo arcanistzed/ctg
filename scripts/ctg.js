@@ -389,8 +389,7 @@ export default class Ctg {
                             || (context === "roll" && group.some(combatant => combatant.id === id)) // Roll for groups which contain the current combatant
                         ) {
                             // Roll initiative for the first combatant in the group
-                            const roll = await group[0].getInitiativeRoll().evaluate({ async: true });
-                            roll.toMessage({ flavor: `"${Ctg.getDisplayName(group)}" group rolls for Initiative!` });
+                            const roll = await group[0].getInitiativeRoll().toMessage({ flavor: `"${Ctg.getDisplayName(group)}" group rolls for Initiative!` });
 
                         // Update all of the combatants in this group with that roll total as their new initiative
                         let updates = [];
