@@ -389,13 +389,13 @@ export default class Ctg {
                             || (context === "roll" && group.some(combatant => combatant.id === id)) // Roll for groups which contain the current combatant
                         ) {
                             // Roll initiative for the first combatant in the group
-                            const roll = await group[0].getInitiativeRoll().toMessage({ flavor: `"${Ctg.getDisplayName(group)}" group rolls for Initiative!` });
+                            const message = await group[0].getInitiativeRoll().toMessage({ flavor: `"${Ctg.getDisplayName(group)}" group rolls for Initiative!` });
 
                         // Update all of the combatants in this group with that roll total as their new initiative
                         let updates = [];
                             group.forEach(combatant => updates.push({
                                 _id: combatant.id,
-                                initiative: roll.total,
+                                initiative: message.roll.total,
                             }));
 
                         // Update the combatants
@@ -403,7 +403,7 @@ export default class Ctg {
 
                             // Log to console and call hook
                             console.log(`CTG | Rolling Initiative for${context === "rollAll" ? " everyone" : context === "rollNPC" ? " NPCs" : ""} in group "${Ctg.getDisplayName(group)}"`);
-                            Hooks.call(`ctg${context.capitalize()}`, updates, roll, id);
+                            Hooks.call(`ctg${context.capitalize()}`, updates, message.roll, id);
                         } else {
                             console.log(`CTG | Initiative not rolled for group "${Ctg.getDisplayName(group)}"`)
                         };
