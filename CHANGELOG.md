@@ -1,6 +1,18 @@
 # Changelog
 
+## 0.4.3 - 15 Nov 2021
+
+Fix roll not saving due to changes in 0.4.2
+
 ## 0.4.2 - 15 Nov 2021
+
+Fix for bug on 0.8.x with Group Initiative roll being evaluated too early
+
+## 0.4.1 - 15 Nov 2021
+
+Fix file naming mistake
+
+## 0.4.0 - 15 Nov 2021
 
 ### Added
 
