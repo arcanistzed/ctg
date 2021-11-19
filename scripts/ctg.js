@@ -341,7 +341,7 @@ export default class Ctg {
                         ["flags.ctg.group"]: uid
                     });
                 });
-                game.combat.updateEmbeddedDocuments("Combatant", updates);
+                game.combat?.updateEmbeddedDocuments("Combatant", updates);
 
                 // Call selection hook
                 Hooks.call("ctgSelection", updates);
