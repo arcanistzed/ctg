@@ -1,5 +1,15 @@
 # Changelog
 
+## unreleased
+
+### Added
+
+v9d2 keybindings are used for Group Initiative, if available
+
+### Fixed
+
+Using selection tool without any active combats no longer causes console error
+
 ## 0.4.3 - 15 Nov 2021
 
 Fix roll not saving due to changes in 0.4.2

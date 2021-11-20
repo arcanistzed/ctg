@@ -145,6 +145,10 @@ If you think you have a good idea for a grouping mode, feel free to suggest it a
 
 This boolean tracks whether or not to allow groups to be created for the "selection" mode.
 
+#### `groupInitiativeKeybind`
+
+This boolean tracks whether or not the user is currently holding down the group initiative rolling keybind (the default for that is `SHIFT` or `CONTROL`).
+
 #### `getDisplayName`
 
 This method generates the name which is displayed for a given group (an array of Combatants).

@@ -85,6 +85,22 @@ export default class Ctg {
             this.groupSkipping();
         });
 
+        // Register Group Initiative keybind
+        Hooks.on("init", () => game.keybindings.register(Ctg.ID, "rollGroupInitiative", {
+            name: "Roll Group Initiative",
+            hint: "When pressed down, clicking on any of the initiative rolling buttons in the Combat Tracker will result in a Group Initiative roll.",
+            editable: [
+                {
+                    key: "SHIFT"
+                },
+                {
+                    key: "CONTROL"
+                }
+            ],
+            onDown: () => { Ctg.groupInitiativeKeybind = true; },
+            onUp: () => { Ctg.groupInitiativeKeybind = false; },
+        }));
+
         // Manage group selection
         Hooks.on("getSceneControlButtons", controls => {
             // Add a scene control under the tokens menu if GM
@@ -111,6 +127,9 @@ export default class Ctg {
 
     /** Whether the user is currently selecting groups */
     static selectGroups = false;
+
+    /** Whether the user is currently holding down the Group Initiative rolling keybind */
+    static groupInitiativeKeybind = false;
 
     /**
      * Create Combat Tracker modes
@@ -364,7 +383,9 @@ export default class Ctg {
             // Don't roll in "none" mode
             game.settings.get(Ctg.ID, "mode") !== "none"
             // Only Roll if the keybinding is being held down
-            && game.keyboard._downKeys.has("Control") || game.keyboard._downKeys.has("Shift");
+            && (game.keyboard._downKeys.has("Control") || game.keyboard._downKeys.has("Shift")
+                // Use keybinding in v9d2 and later
+                || Ctg.groupInitiativeKeybind);
 
         // Wrap initiative rolling methods
         libWrapper.register(Ctg.ID, "Combat.prototype.rollAll", groupInitiativeWrapper.bind(null, "rollAll"), "MIXED");
