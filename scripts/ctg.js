@@ -89,7 +89,7 @@ export default class Ctg {
         Hooks.on("init", () => game.keybindings.register(Ctg.ID, "rollGroupInitiative", {
             name: "Roll Group Initiative",
             hint: "When pressed down, clicking on any of the initiative rolling buttons in the Combat Tracker will result in a Group Initiative roll.",
-            editable: [
+            uneditable: [
                 {
                     key: "SHIFT"
                 },
