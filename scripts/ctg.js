@@ -443,8 +443,6 @@ export default class Ctg {
                         return true; // break
                     };
                 });
-                // Return mutated data if there is group skipping
-                if (change.groupSkipping = true) return (document, change);
             };
         });
     };
