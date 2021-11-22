@@ -3,7 +3,7 @@ export default class Ctg {
         Hooks.on("ready", () => {
             game.modules.get("ctg").api = Ctg;
 
-            console.log("%cCombat Tracker Groups", "font-size: 48px; font-family: 'Signika'; text-shadow: 0 0 10px rgb(255, 100, 0)", "\nBy Arcanist", "\n\nSupport me on Patreon: https://patreon.com/arcanistzed", "\nVisit my Website for more info: https://arcanist.me/");
+            console.log(`%c${game.i18n.localize("ctg.welcome.name")}`, "font-size: 48px; font-family: 'Signika'; text-shadow: 0 0 10px rgb(255, 100, 0)", `\n${game.i18n.localize("ctg.welcome.author")}`, `\n\n${game.i18n.localize("ctg.welcome.support")}: https://patreon.com/arcanistzed`, `\n${game.i18n.localize("ctg.welcome.site")} https://arcanist.me/`);
 
             game.settings.register(Ctg.ID, "mode", {
                 scope: "world",
@@ -87,8 +87,8 @@ export default class Ctg {
 
         // Register Group Initiative keybind
         Hooks.on("init", () => game.keybindings.register(Ctg.ID, "rollGroupInitiative", {
-            name: "Roll Group Initiative",
-            hint: "When pressed down, clicking on any of the initiative rolling buttons in the Combat Tracker will result in a Group Initiative roll.",
+            name: game.i18n.localize("ctg.settings.rollGroupInitiative.name"),
+            hint: game.i18n.localize("ctg.settings.rollGroupInitiative.hint"),
             uneditable: [
                 {
                     key: "SHIFT"
@@ -97,8 +97,8 @@ export default class Ctg {
                     key: "CONTROL"
                 }
             ],
-            onDown: () => { Ctg.groupInitiativeKeybind = true; },
-            onUp: () => { Ctg.groupInitiativeKeybind = false; },
+            onDown: () => { console.log("DOWN"); Ctg.groupInitiativeKeybind = true; },
+            onUp: () => { console.log("UP"); Ctg.groupInitiativeKeybind = false; },
         }));
 
         // Manage group selection
@@ -317,7 +317,7 @@ export default class Ctg {
      */
     static groups(mode) {
         // Exit if invalid mode
-        if (!Ctg.MODES.map(m => m[0]).includes(mode)) { ui.notifications.error(`CTG | Grouping not possible because ${mode} is not a valid mode.`); return; };
+        if (!Ctg.MODES.map(m => m[0]).includes(mode)) { ui.notifications.error(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.invalidMode", { mode })}`); return; };
 
         // Special behavior for if Mob Attack Tool is enabled
         if (mode === "mob") {
@@ -374,7 +374,7 @@ export default class Ctg {
     rollGroupInitiative() {
         // Verify libWrapper is enabled
         if (!game.modules.get("lib-wrapper")?.active) {
-            ui.notifications.warn("libWrapper must be enabled to use the group initiative rolling functionality");
+            ui.notifications.warn(game.i18n.localize("ctg.notifications.libWrapperRequired"));
             return;
         };
 
@@ -412,21 +412,22 @@ export default class Ctg {
                             // Roll initiative for the first combatant in the group
                             const message = await group[0].getInitiativeRoll().toMessage({ flavor: `"${Ctg.getDisplayName(group)}" group rolls for Initiative!` });
 
-                        // Update all of the combatants in this group with that roll total as their new initiative
-                        let updates = [];
+                            // Update all of the combatants in this group with that roll total as their new initiative
+                            let updates = [];
                             group.forEach(combatant => updates.push({
                                 _id: combatant.id,
                                 initiative: message.roll.total,
                             }));
 
-                        // Update the combatants
-                        await game.combat.updateEmbeddedDocuments("Combatant", updates);
+                            // Update the combatants
+                            await game.combat.updateEmbeddedDocuments("Combatant", updates);
 
                             // Log to console and call hook
-                            console.log(`CTG | Rolling Initiative for${context === "rollAll" ? " everyone" : context === "rollNPC" ? " NPCs" : ""} in group "${Ctg.getDisplayName(group)}"`);
+                            const who = context === "rollAll" ? " everyone in" : context === "rollNPC" ? " NPCs in" : "";
+                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.success", { who: who, group: Ctg.getDisplayName(group) })}`);
                             Hooks.call(`ctg${context.capitalize()}`, updates, message.roll, id);
                         } else {
-                            console.log(`CTG | Initiative not rolled for group "${Ctg.getDisplayName(group)}"`)
+                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: Ctg.getDisplayName(group) })}`)
                         };
                     });
                 });
