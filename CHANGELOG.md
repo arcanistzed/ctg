@@ -4,11 +4,13 @@
 
 ### Added
 
-v9d2 keybindings are used for Group Initiative, if available
+* v9d2 keybindings are used for Group Initiative, if available
+* Localization for everything
 
 ### Fixed
 
-Using selection tool without any active combats no longer causes console error
+* Using selection tool without any active combats no longer causes console error
+* Minor bugs fixed with refactors & formatting
 
 ## 0.4.3 - 15 Nov 2021
 

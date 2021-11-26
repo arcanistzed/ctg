@@ -3,7 +3,14 @@ export default class Ctg {
         Hooks.on("ready", () => {
             game.modules.get("ctg").api = Ctg;
 
-            console.log(`%c${game.i18n.localize("ctg.welcome.name")}`, "font-size: 48px; font-family: 'Signika'; text-shadow: 0 0 10px rgb(255, 100, 0)", `\n${game.i18n.localize("ctg.welcome.author")}`, `\n\n${game.i18n.localize("ctg.welcome.support")}: https://patreon.com/arcanistzed`, `\n${game.i18n.localize("ctg.welcome.site")} https://arcanist.me/`);
+            // Console art
+            console.log(
+                `%c${game.i18n.localize("ctg.welcome.name")}`,
+                "font-size: 48px; font-family: 'Signika'; text-shadow: 0 0 10px rgb(255, 100, 0)",
+                `\n${game.i18n.localize("ctg.welcome.author")}`,
+                `\n\n${game.i18n.localize("ctg.welcome.support")}: https://patreon.com/arcanistzed`,
+                `\n${game.i18n.localize("ctg.welcome.site")} https://arcanist.me/`
+            );
 
             game.settings.register(Ctg.ID, "mode", {
                 scope: "world",
@@ -27,8 +34,8 @@ export default class Ctg {
                 type: Boolean,
                 default: false,
                 onChange: () => {
-                    ui.combat.render(true);
-                    game.combat.update({ turn: 0 });
+                    ui.combat?.render(true);
+                    game.combat?.update({ turn: 0 });
                 }
             });
 
@@ -51,9 +58,9 @@ export default class Ctg {
                 [game.i18n.localize("ctg.modes.actor"), "data.actorId"]
             ];
 
-            Hooks.on("renderCombatTracker", (app, html, options) => {
+            Hooks.on("renderCombatTracker", (app, html, data) => {
                 // Exit if there is no combat
-                if (!options.combat) return;
+                if (!data.combat) return;
 
                 // Module-specific modes
                 if (game.modules.get("mob-attack-tool")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.mob"))) Ctg.MODES.push([game.i18n.localize("ctg.modes.mob"), ""]);
@@ -64,22 +71,22 @@ export default class Ctg {
                 if (!Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode"))) game.settings.set(Ctg.ID, "mode", "none");
 
                 // Create modes if GM
-                if (game.user.isGM) this.createModes(html[0], app.popOut);
+                if (game.user?.isGM) this.createModes(html[0], app.popOut);
                 // Create groups
                 this.manageGroups(game.settings.get(Ctg.ID, "mode"), app.popOut);
 
                 // Add listener to the mode containers to update settings when changing modes
-                if (game.user.isGM) document.querySelectorAll("#ctg-modeContainer").forEach(el => el.addEventListener("click", event => {
-                    const mode = event.target.id?.replace("ctg-mode-radio-", "").replace("-popOut", "");
+                if (game.user?.isGM) document.querySelectorAll("#ctg-modeContainer").forEach(el => el.addEventListener("click", event => {
+                    const mode = event.target?.id?.replace("ctg-mode-radio-", "").replace("-popOut", "");
                     if (Ctg.MODES.map(m => m[0]).includes(mode)) game.settings.set(Ctg.ID, "mode", mode);
                 }));
             });
 
             // Manage rolling initiative for the whole group at once if GM
-            if (game.user.isGM) this.rollGroupInitiative();
+            if (game.user?.isGM) this.rollGroupInitiative();
 
             // Re-render Combat Tracker when mobs update not from autosave (FIXME: a re-render is needed, but is not being included to avoid a MAT bug. See https://github.com/Stendarpaval/mob-attack-tool/issues/46)
-            if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat.render(true));
+            if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat?.render(true));
 
             // Run group skipping code
             this.groupSkipping();
@@ -104,7 +111,7 @@ export default class Ctg {
         // Manage group selection
         Hooks.on("getSceneControlButtons", controls => {
             // Add a scene control under the tokens menu if GM
-            if (game.user.isGM) controls.find(c => c.name == "token").tools.push({
+            if (game.user?.isGM) controls.find(c => c.name == "token").tools.push({
                 name: "groups",
                 title: "ctg.selectControl",
                 icon: "fas fa-users",
@@ -122,6 +129,9 @@ export default class Ctg {
 
     /** Grouping Modes
      * The first item is the name and the second is the path
+     * @type {Array<Array<String>>}
+     * @property {String} name - The name of the mode
+     * @property {String} path - The path to the mode relative to the {@link CombatantData}
      */
     static MODES = [];
 
@@ -142,7 +152,7 @@ export default class Ctg {
 
         /** Create container for mode selection boxes */
         const container = document.createElement("ul"); container.id = "ctg-modeContainer";
-        html.querySelector("#combat > #combat-round").after(container);
+        html.querySelector("#combat > #combat-round")?.after(container);
 
         // For each mode that exists
         Ctg.MODES.forEach(mode => {
@@ -183,11 +193,11 @@ export default class Ctg {
         const html = popOut ? document.querySelector("#combat-popout") : document.querySelector("#combat");
 
         // Remove any existing groups
-        html.querySelectorAll("details.ctg-toggle li.combatant").forEach(combatant => html.querySelector("#combat-tracker").append(combatant));
-        html.querySelectorAll("details.ctg-toggle").forEach(toggle => toggle.remove());
+        html?.querySelectorAll("details.ctg-toggle li.combatant").forEach(combatant => html.querySelector("#combat-tracker")?.append(combatant));
+        html?.querySelectorAll("details.ctg-toggle").forEach(toggle => toggle.remove());
 
         // Show current mode if GM and mode is defined
-        if (game.user.isGM && mode) html.querySelectorAll("#ctg-mode-radio-" + mode + ",#ctg-mode-radio-" + mode + popOutSuffix).forEach(e => e.checked = true);
+        if (game.user?.isGM && mode) html?.querySelectorAll("#ctg-mode-radio-" + mode + ",#ctg-mode-radio-" + mode + popOutSuffix).forEach(e => e.checked = true);
 
         if (mode !== "none") {
             // Get groups
@@ -215,11 +225,21 @@ export default class Ctg {
                         element.before(toggle);
 
                         // Create a label for the toggle
-                        const labelBox = document.createElement("summary"); labelBox.classList.add("ctg-labelBox"); labelBox.classList.add("folder-header");
-                        const labelFlex = document.createElement("div"); labelFlex.classList.add("ctg-labelFlex");
-                        const labelName = document.createElement("h3"); labelName.classList.add("ctg-labelName");
-                        const labelCount = document.createElement("div"); labelCount.classList.add("ctg-labelCount");
-                        const labelValue = document.createElement("div"); labelValue.classList.add("ctg-labelValue");
+                        const labelBox = document.createElement("summary");
+                        labelBox.classList.add("ctg-labelBox");
+                        labelBox.classList.add("folder-header");
+
+                        const labelFlex = document.createElement("div");
+                        labelFlex.classList.add("ctg-labelFlex");
+
+                        const labelName = document.createElement("h3");
+                        labelName.classList.add("ctg-labelName");
+
+                        const labelCount = document.createElement("div");
+                        labelCount.classList.add("ctg-labelCount");
+
+                        const labelValue = document.createElement("div");
+                        labelValue.classList.add("ctg-labelValue");
 
                         // Add the group name to the label
                         labelName.innerText = Ctg.getDisplayName(group);
@@ -317,7 +337,10 @@ export default class Ctg {
      */
     static groups(mode) {
         // Exit if invalid mode
-        if (!Ctg.MODES.map(m => m[0]).includes(mode)) { ui.notifications.error(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.invalidMode", { mode })}`); return; };
+        if (!Ctg.MODES.map(m => m[0]).includes(mode)) {
+            ui.notifications.error(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.invalidMode", { mode })}`);
+            return;
+        };
 
         // Special behavior for if Mob Attack Tool is enabled
         if (mode === "mob") {
@@ -427,7 +450,7 @@ export default class Ctg {
                             console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.success", { who: who, group: Ctg.getDisplayName(group) })}`);
                             Hooks.call(`ctg${context.capitalize()}`, updates, message.roll, id);
                         } else {
-                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: Ctg.getDisplayName(group) })}`)
+                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: Ctg.getDisplayName(group) })}`);
                         };
                     });
                 });
@@ -470,4 +493,4 @@ export default class Ctg {
     };
 };
 
-new Ctg;
+new Ctg();
