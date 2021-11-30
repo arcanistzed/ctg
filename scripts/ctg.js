@@ -351,12 +351,12 @@ export default class Ctg {
             return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
                 .map(mob => mob.selectedTokenIds
                     .filter(id => {
+                         // Don't add a combatant to more than one group
                         const already = alreadyInMob.includes(id);
                         if (already) ui.notifications.warn(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.alreadyInMob", { id })}`);
                         alreadyInMob.push(id);
                         return already;
-                    }) // Don't add a combatant to more than one group
-                    .map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
+                    }).map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
                 .map(arr => arr.sort(sortByTurns).filter(x => x)) // Sort combatants within each group and filter out tokens without combatants
                 .sort(arr => arr.sort(sortByTurns)); // Sort each group by the turn order
         } else {
