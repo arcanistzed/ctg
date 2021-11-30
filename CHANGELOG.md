@@ -11,6 +11,7 @@
 
 * Using selection tool without any active combats no longer causes console error
 * Minor bugs fixed with refactors & formatting
+* No longer attemps to add Combatants whose tokens are in multiple MAT Mobs to multiple groups, causing some weird nested groups
 
 ## 0.4.3 - 15 Nov 2021
 

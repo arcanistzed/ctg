@@ -284,7 +284,7 @@ export default class Ctg {
             });
 
             // Get the current toggle
-            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat.current.combatantId}"]`)?.parentElement.parentElement;
+            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat?.current.combatantId}"]`)?.parentElement.parentElement;
             // If a the combatant could be found in the DOM
             if (currentToggle && currentToggle.querySelector(".ctg-labelBox")) {
                 // Open the toggle for the current combatant if enabled
@@ -344,12 +344,18 @@ export default class Ctg {
 
         // Special behavior for if Mob Attack Tool is enabled
         if (mode === "mob") {
-            const sortByTurns = (a, b) => game.combat.turns.indexOf(a) - game.combat.turns.indexOf(b);
+            const sortByTurns = (a, b) => game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
+            const alreadyInMob = [];
 
             // Get groups from MAT mobs
             return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
                 .map(mob => mob.selectedTokenIds
-                    // FIXME: Don't add a combatant to more than one group
+                    .filter(id => {
+                        const already = alreadyInMob.includes(id);
+                        if (already) ui.notifications.warn(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.alreadyInMob", { id })}`);
+                        alreadyInMob.push(id);
+                        return already;
+                    }) // Don't add a combatant to more than one group
                     .map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
                 .map(arr => arr.sort(sortByTurns).filter(x => x)) // Sort combatants within each group and filter out tokens without combatants
                 .sort(arr => arr.sort(sortByTurns)); // Sort each group by the turn order
@@ -358,7 +364,7 @@ export default class Ctg {
             const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
 
             // Reduce combat turns into an array of groups by matching a given property path
-            return Object.values(game.combat.turns.reduce((accumulator, current) => {
+            return Object.values(game.combat?.turns.reduce((accumulator, current) => {
                 if (current.visible) accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
                 return accumulator;
             }, {}));
@@ -443,7 +449,7 @@ export default class Ctg {
                             }));
 
                             // Update the combatants
-                            await game.combat.updateEmbeddedDocuments("Combatant", updates);
+                            await game.combat?.updateEmbeddedDocuments("Combatant", updates);
 
                             // Log to console and call hook
                             const who = context === "rollAll" ? " everyone in" : context === "rollNPC" ? " NPCs in" : "";
@@ -480,7 +486,7 @@ export default class Ctg {
                     if (group.findIndex(c => c === document.combatant) === 0) {
 
                         // Mutate the turn change to skip to the start of the next group
-                        change.turn = (change.turn + group.length - 1) % game.combat.turns.length;
+                        change.turn = (change.turn + group.length - 1) % game.combat?.turns.length;
 
                         // Mark this as an update from here
                         change.groupSkipping = true;
