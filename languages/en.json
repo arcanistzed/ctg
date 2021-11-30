@@ -35,7 +35,7 @@
         "notifications": {
             "libWrapperRequired": "libWrapper must be enabled to use the group initiative rolling functionality.w",
             "invalidMode": "Grouping not possible because {mode} is not a valid mode.",
-            "alreadyInMob": "Token with ID {id} is in multiple Mob Attack Tool Mobs, but will only show up in the last created Mob when grouped in the Combat Tracker."
+            "alreadyInMob": "Token with ID {id} is in multiple Mob Attack Tool Mobs, but will only show up in the first created Mob when grouped in the Combat Tracker."
         },
         "rollingGroupInitiative": {
             "success": "Rolling Initiative for{who} group \"{group}\"",
