@@ -415,7 +415,7 @@ export default class Ctg {
         libWrapper.register(Ctg.ID, "Combat.prototype.rollNPC", groupInitiativeWrapper.bind(null, "rollNPC"), "MIXED");
         libWrapper.register(Ctg.ID, "Combat.prototype.rollInitiative", groupInitiativeWrapper.bind(null, "roll"), "MIXED");
 
-        /** Wrapper fot group initiative
+        /** Wrapper for group initiative
          * @param {String} context - The type of group initiative roll being made
          * @param {Function} wrapped - The wrapped function
          * @param {Array<String>} [ids=[""]] - An array containing the Combatant IDs passed to `rollInitiative`
