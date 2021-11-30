@@ -355,7 +355,7 @@ export default class Ctg {
                         const already = alreadyInMob.includes(id);
                         if (already) ui.notifications.warn(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.alreadyInMob", { id })}`);
                         alreadyInMob.push(id);
-                        return already;
+                        return !already;
                     }).map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
                 .map(arr => arr.sort(sortByTurns).filter(x => x)) // Sort combatants within each group and filter out tokens without combatants
                 .sort(arr => arr.sort(sortByTurns)); // Sort each group by the turn order
