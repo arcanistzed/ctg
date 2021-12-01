@@ -471,8 +471,7 @@ export default class Ctg {
         // Hook into the combat update to manage skipping    
         Hooks.on("preUpdateCombat", (document, change) => {
             if (
-                document.current.turn < change?.turn // If this update is for a forward change of turn
-                && (document.current.turn !== 0 || change.turn === 1) // If we aren't at the start (except when the turn is being advanced)
+                document.current.turn > document.previous.turn // If this update is for a forward change of turn
                 && game.settings.get(Ctg.ID, "groupSkipping") // If the user has the setting enabled
                 && !change.groupSkipping // If this is not marked as an update from here
             ) {
@@ -484,6 +483,7 @@ export default class Ctg {
 
                     // If the current combatant is the first in this group
                     if (group.findIndex(c => c === document.combatant) === 0) {
+                        console.log(change.turn, group.length - 1, game.combat?.turns.length, (change.turn + group.length - 1) % game.combat?.turns.length);
 
                         // Mutate the turn change to skip to the start of the next group
                         change.turn = (change.turn + group.length - 1) % game.combat?.turns.length;
