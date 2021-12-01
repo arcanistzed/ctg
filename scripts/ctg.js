@@ -487,6 +487,7 @@ export default class Ctg {
 
                         // Mutate the turn change to skip to the start of the next group
                         change.turn = (change.turn + group.length - 1) % game.combat?.turns.length;
+                        if ((change.turn + group.length - 1) > game.combat?.turns.length) game.combat?.nextRound();
 
                         // Mark this as an update from here
                         change.groupSkipping = true;
