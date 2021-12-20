@@ -351,7 +351,7 @@ export default class Ctg {
             return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
                 .map(mob => mob.selectedTokenIds
                     .filter(id => {
-                         // Don't add a combatant to more than one group
+                        // Don't add a combatant to more than one group
                         const already = alreadyInMob.includes(id);
                         if (already) ui.notifications.warn(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.alreadyInMob", { id })}`);
                         alreadyInMob.push(id);
@@ -403,7 +403,7 @@ export default class Ctg {
     rollGroupInitiative() {
         // Verify libWrapper is enabled
         if (!game.modules.get("lib-wrapper")?.active) {
-            ui.notifications.warn(game.i18n.localize("ctg.notifications.libWrapperRequired"));
+            ui.notifications.warn(`${Ctg.ID} | ${game.i18n.format("ctg.notifications.libWrapperRequired"), { feature: game.i18n.localize("ctg.settings.rollGroupInitiative.name") }}`);
             return;
         };
 
@@ -469,32 +469,38 @@ export default class Ctg {
      */
     groupSkipping() {
         // Hook into the combat update to manage skipping    
-        Hooks.on("preUpdateCombat", (document, change) => {
+        Hooks.on("preUpdateCombat", async (document, change) => {
             if (
-                document.current.turn > document.previous.turn // If this update is for a forward change of turn
+                (change.turn > document.current.turn  // If this update is for a forward change of turn
+                    || (change.turn !== document.turns.length - 1 && document.current.turn === 0)) // Or if aanywhere other than the end with a turn of 0
                 && game.settings.get(Ctg.ID, "groupSkipping") // If the user has the setting enabled
+                && game.settings.get(Ctg.ID, "mode") !== "none" // If the mode is not "none"
                 && !change.groupSkipping // If this is not marked as an update from here
             ) {
                 // Get the groups
                 const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
 
                 // Go through each group and skip to the beginning of the group after the one containing the current combatant
-                groups?.some(group => {
+                for (const group of groups) {
+                    console.log(group);
 
                     // If the current combatant is the first in this group
-                    if (group.findIndex(c => c === document.combatant) === 0) {
-                        console.log(change.turn, group.length - 1, game.combat?.turns.length, (change.turn + group.length - 1) % game.combat?.turns.length);
+                    if (group.findIndex(c => c.id === document.combatant?.id) === 0) {
+
+                        // Go to the next round if at the end
+                        if ((change.turn + group.length - 1) >= document.turns.length) {
+                            document.nextRound();
+                        };
 
                         // Mutate the turn change to skip to the start of the next group
-                        change.turn = (change.turn + group.length - 1) % game.combat?.turns.length;
-                        if ((change.turn + group.length - 1) > game.combat?.turns.length) game.combat?.nextRound();
+                        change.turn = (change.turn + group.length - 1) % document.turns.length;
 
                         // Mark this as an update from here
                         change.groupSkipping = true;
 
-                        return true; // break
+                        break;
                     };
-                });
+                };
             };
         });
     };
