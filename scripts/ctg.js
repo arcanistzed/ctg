@@ -21,6 +21,8 @@ export default class Ctg {
                     // Update the popout and non-popout combat tracker
                     this.manageGroups(mode, true);
                     this.manageGroups(mode, false);
+                    // Setup the turns again
+                    game.combat.setupTurns();
                     // Call hook for mode update
                     Hooks.call("ctgModeUpdate", mode);
                 },
@@ -42,6 +44,15 @@ export default class Ctg {
             game.settings.register(Ctg.ID, "openToggles", {
                 name: game.i18n.localize("ctg.settings.openToggles.name"),
                 hint: game.i18n.localize("ctg.settings.openToggles.hint"),
+                scope: "world",
+                config: true,
+                type: Boolean,
+                default: true
+            });
+
+            game.settings.register(Ctg.ID, "sortCombatants", {
+                name: game.i18n.localize("ctg.settings.sortCombatants.name"),
+                hint: game.i18n.localize("ctg.settings.sortCombatants.hint"),
                 scope: "world",
                 config: true,
                 type: Boolean,
@@ -90,6 +101,9 @@ export default class Ctg {
 
             // Run group skipping code
             this.groupSkipping();
+
+            // Resort combatants
+            if (game.settings.get(Ctg.ID, "sortCombatants")) this.sortCombatants();
         });
 
         // Register Group Initiative keybind
@@ -503,6 +517,47 @@ export default class Ctg {
                 };
             };
         });
+    };
+
+    /** Sort the combatants by the current mode's path
+     * @memberof Ctg
+     */
+    sortCombatants() {
+        // Verify libWrapper is enabled
+        if (!game.modules.get("lib-wrapper")?.active) {
+            ui.notifications.warn(`${Ctg.ID} | ${game.i18n.format("ctg.notifications.libWrapperRequired"), { feature: game.i18n.localize("ctg.settings.sortCombatants.name") }}`);
+            return;
+        };
+
+        // Resister an OVERRIDE wrapper
+        libWrapper.register(Ctg.ID, "Combat.prototype._sortCombatants", function (a, b) {
+            // Get the path for the current mode
+            const path = Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")).slice(-1)[0];
+
+            // Get the values for the two combatants
+            let ia = getProperty(a, path);
+            let ib = getProperty(b, path);
+
+            // If they are numbers, sort numerically
+            if (Number.isNumeric(ia), Number.isNumeric(ib)) {
+                const ci = ib - ia;
+                if (ci !== 0) return ci;
+                return a.id > b.id ? 1 : -1;
+            } else if (typeof ia === "object" && typeof ib === "object") {
+                // Get the first item if it's an array
+                ia = Array.isArray(ia) ? ia[0] : ia;
+                ib = Array.isArray(ib) ? ib[0] : ib;
+                return ia?.id > ib?.id ? 1 : -1;
+            } else if (typeof ia === "string" && typeof ib === "string") {
+                // Otherwise, sort alphabetically
+                return ia.localeCompare(ib);
+            };
+            // Fallback to comparing the IDs
+            return a.id > b.id ? 1 : -1;
+        }, "OVERRIDE");
+
+        // Setup the turns again
+        game.combat.setupTurns();
     };
 };
 
