@@ -1,3 +1,6 @@
+import registerKeybindings from "./keybindings.js";
+import registerSettings from "./settings.js";
+
 export default class Ctg {
     constructor() {
         Hooks.on("ready", () => {
@@ -12,52 +15,7 @@ export default class Ctg {
                 `\n${game.i18n.localize("ctg.welcome.site")} https://arcanist.me/`
             );
 
-            game.settings.register(Ctg.ID, "mode", {
-                scope: "world",
-                config: false,
-                type: String,
-                default: "initiative",
-                onChange: mode => {
-                    // Update the popout and non-popout combat tracker
-                    this.manageGroups(mode, true);
-                    this.manageGroups(mode, false);
-                    // Setup the turns again
-                    game.combat.setupTurns();
-                    // Call hook for mode update
-                    Hooks.call("ctgModeUpdate", mode);
-                },
-            });
-
-            game.settings.register(Ctg.ID, "groupSkipping", {
-                name: game.i18n.localize("ctg.settings.groupSkipping.name"),
-                hint: game.i18n.localize("ctg.settings.groupSkipping.hint"),
-                scope: "world",
-                config: true,
-                type: Boolean,
-                default: false,
-                onChange: () => {
-                    ui.combat?.render(true);
-                    game.combat?.update({ turn: 0 });
-                }
-            });
-
-            game.settings.register(Ctg.ID, "openToggles", {
-                name: game.i18n.localize("ctg.settings.openToggles.name"),
-                hint: game.i18n.localize("ctg.settings.openToggles.hint"),
-                scope: "world",
-                config: true,
-                type: Boolean,
-                default: true
-            });
-
-            game.settings.register(Ctg.ID, "sortCombatants", {
-                name: game.i18n.localize("ctg.settings.sortCombatants.name"),
-                hint: game.i18n.localize("ctg.settings.sortCombatants.hint"),
-                scope: "world",
-                config: true,
-                type: Boolean,
-                default: true
-            });
+            registerSettings();
 
             // Localize modes
             Ctg.MODES = [
@@ -107,20 +65,7 @@ export default class Ctg {
         });
 
         // Register Group Initiative keybind
-        Hooks.on("init", () => game.keybindings.register(Ctg.ID, "rollGroupInitiative", {
-            name: game.i18n.localize("ctg.settings.rollGroupInitiative.name"),
-            hint: game.i18n.localize("ctg.settings.rollGroupInitiative.hint"),
-            uneditable: [
-                {
-                    key: "SHIFT"
-                },
-                {
-                    key: "CONTROL"
-                }
-            ],
-            onDown: () => { console.log("DOWN"); Ctg.groupInitiativeKeybind = true; },
-            onUp: () => { console.log("UP"); Ctg.groupInitiativeKeybind = false; },
-        }));
+        Hooks.on("init", registerKeybindings);
 
         // Manage group selection
         Hooks.on("getSceneControlButtons", controls => {
