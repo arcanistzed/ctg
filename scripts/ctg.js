@@ -314,7 +314,7 @@ export default class Ctg {
             });
 
             // Get the current toggle
-            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat?.current.combatantId}"]`)?.parentElement.parentElement;
+            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat.combatant.id}"]`)?.parentElement.parentElement;
             // If a the combatant could be found in the DOM
             if (currentToggle && currentToggle.querySelector(".ctg-labelBox")) {
                 // Open the toggle for the current combatant if enabled
