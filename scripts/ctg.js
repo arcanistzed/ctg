@@ -379,7 +379,6 @@ export default class Ctg {
 
                 // Go through each group and skip to the beginning of the group after the one containing the current combatant
                 for (const group of groups) {
-                    console.log(group);
 
                     // If the current combatant is the first in this group
                     if (group.findIndex(c => c.id === document.combatant?.id) === 0) {
