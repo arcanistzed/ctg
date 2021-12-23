@@ -3,7 +3,13 @@ import registerSettings from "./settings.js";
 
 export default class Ctg {
     constructor() {
+        Hooks.on("init", () => {
+            registerKeybindings();
+            registerSettings();
+        });
+
         Hooks.on("ready", () => {
+            // Initialize API
             game.modules.get("ctg").api = Ctg;
 
             // Console art
@@ -15,8 +21,6 @@ export default class Ctg {
                 `\n${game.i18n.localize("ctg.welcome.site")} https://arcanist.me/`
             );
 
-            registerSettings();
-
             // Localize modes
             Ctg.MODES = [
                 [game.i18n.localize("ctg.modes.none"), ""],
@@ -27,17 +31,24 @@ export default class Ctg {
                 [game.i18n.localize("ctg.modes.actor"), "data.actorId"]
             ];
 
+            // Re-render Combat Tracker when mobs update not from autosave (FIXME: a re-render is needed, but is not being included to avoid a MAT bug. See https://github.com/Stendarpaval/mob-attack-tool/issues/40)
+            if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat?.render(true));
+
+            // Resort combatants
+            if (game.settings.get(Ctg.ID, "sortCombatants")) this.sortCombatants();
+
+            // Run group skipping code
+            this.groupSkipping();
+
+            // Manage rolling initiative for the whole group at once if GM
+            if (game.user?.isGM) this.rollGroupInitiative();
+
+            // Group selection
+            this.groupSelection();
+
             Hooks.on("renderCombatTracker", (app, html, data) => {
                 // Exit if there is no combat
                 if (!data.combat) return;
-
-                // Module-specific modes
-                if (game.modules.get("mob-attack-tool")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.mob"))) Ctg.MODES.push([game.i18n.localize("ctg.modes.mob"), ""]);
-                if (game.modules.get("lancer-initiative")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.lancer"))) Ctg.MODES.push([game.i18n.localize("ctg.modes.lancer"), "activations.value"]);
-                if (game.modules.get("scs")?.active) Ctg.MODES.findSplice(m => m[0] === "initiative");
-
-                // Change mode if saved one no longer exists
-                if (!Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode"))) game.settings.set(Ctg.ID, "mode", "none");
 
                 // Create modes if GM
                 if (game.user?.isGM) this.createModes(html[0], app.popOut);
@@ -50,37 +61,7 @@ export default class Ctg {
                     if (Ctg.MODES.map(m => m[0]).includes(mode)) game.settings.set(Ctg.ID, "mode", mode);
                 }));
             });
-
-            // Manage rolling initiative for the whole group at once if GM
-            if (game.user?.isGM) this.rollGroupInitiative();
-
-            // Re-render Combat Tracker when mobs update not from autosave (FIXME: a re-render is needed, but is not being included to avoid a MAT bug. See https://github.com/Stendarpaval/mob-attack-tool/issues/40)
-            if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat?.render(true));
-
-            // Run group skipping code
-            this.groupSkipping();
-
-            // Resort combatants
-            if (game.settings.get(Ctg.ID, "sortCombatants")) this.sortCombatants();
         });
-
-        // Register Group Initiative keybind
-        Hooks.on("init", registerKeybindings);
-
-        // Manage group selection
-        Hooks.on("getSceneControlButtons", controls => {
-            // Add a scene control under the tokens menu if GM
-            if (game.user?.isGM) controls.find(c => c.name == "token").tools.push({
-                name: "groups",
-                title: "ctg.selectControl",
-                icon: "fas fa-users",
-                toggle: true,
-                active: Ctg.selectGroups ?? false,
-                onClick: toggled => Ctg.selectGroups = toggled,
-            });
-        });
-
-        this.groupSelected();
     };
 
     /** The module's ID */
@@ -99,6 +80,95 @@ export default class Ctg {
 
     /** Whether the user is currently holding down the Group Initiative rolling keybind */
     static groupInitiativeKeybind = false;
+
+    /** Group Combatants
+         * @static
+         * @param {String} mode - The current mode
+         * @return {Array} An array of groupings
+         */
+    static groups(mode) {
+        // Exit if invalid mode
+        if (!Ctg.MODES.map(m => m[0]).includes(mode)) {
+            ui.notifications.error(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.invalidMode", { mode })}`);
+            return;
+        };
+
+        // Special behavior for if Mob Attack Tool is enabled
+        if (mode === "mob") {
+            const sortByTurns = (a, b) => game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
+            const alreadyInMob = [];
+
+            // Get groups from MAT mobs
+            return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
+                .map(mob => mob.selectedTokenIds
+                    .filter(id => {
+                        // Don't add a combatant to more than one group
+                        const already = alreadyInMob.includes(id);
+                        if (already) ui.notifications.warn(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.alreadyInMob", { id })}`);
+                        alreadyInMob.push(id);
+                        return !already;
+                    }).map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
+                .map(arr => arr.sort(sortByTurns).filter(x => x)) // Sort combatants within each group and filter out tokens without combatants
+                .sort(arr => arr.sort(sortByTurns)); // Sort each group by the turn order
+        } else {
+            // Get the path for this mode
+            const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
+
+            // Reduce combat turns into an array of groups by matching a given property path
+            return Object.values(game.combat?.turns.reduce((accumulator, current) => {
+                if (current.visible) accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
+                return accumulator;
+            }, {}));
+        };
+    };
+
+    /** Get display name of a given group
+     * @static
+     * @param {Array<Combatant>} group - The group for which to return a name
+     * @return {String} Concatenated display name for this group 
+     */
+    static getDisplayName(group) {
+        /** Names in the current group */
+        let names = [];
+
+        // Go through all of the combatants in the group
+        group.forEach(combatant => {
+            /** The DOM element of this combatant */
+            const element = ui.combat.element[0].querySelector(`[data-combatant-id="${combatant?.id}"]`);
+
+            /** The name of this combatant in the Tracker */
+            const trackerName = element?.querySelector(".token-name > h4").textContent;
+
+            // Add the name of the current combatant if it is not already
+            if (!names.includes(combatant?.name)) names.push((
+                // Compatibility with CUB Hide Actor Names: check whether the name is being hidden by CUB
+                game.modules.get("combat-utility-belt")?.active && game.settings.get("combat-utility-belt", "enableHideNPCNames")
+                && (
+                    (game.settings.get("combat-utility-belt", "enableHideHostileNames") && trackerName === game.settings.get("combat-utility-belt", "hostileNameReplacement"))
+                    || (game.settings.get("combat-utility-belt", "enableHideNeutralNames") && trackerName === game.settings.get("combat-utility-belt", "neutralNameReplacement"))
+                    || (game.settings.get("combat-utility-belt", "enableHideFriendlyNames") && trackerName === game.settings.get("combat-utility-belt", "friendlyNameReplacement"))
+                )
+                // Add the name in the tracker instead if it has been hidden
+            ) ? trackerName : combatant?.name);
+        });
+
+        // Return a string with the names
+        return names.length < 3 ? names.join(" and ") : names.join(", ");
+    }
+
+    /** Manage available modes and switch away from invalid ones */
+    manageModes() {
+        if (game.modules.get("mob-attack-tool")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.mob")))
+            Ctg.MODES.push([game.i18n.localize("ctg.modes.mob"), ""]);
+        if (game.modules.get("lancer-initiative")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.lancer")))
+            Ctg.MODES.push([game.i18n.localize("ctg.modes.lancer"), "activations.value"]);
+        if (game.modules.get("scs")?.active)
+            Ctg.MODES.findSplice(m => m[0] === "initiative");
+
+        // Change mode if saved one no longer exists
+        if (!Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")))
+            game.settings?.set(Ctg.ID, "mode", "none");
+    }
 
     /**
      * Create Combat Tracker modes
@@ -228,9 +298,10 @@ export default class Ctg {
                             labelFlex.append(saveMob);
 
                             saveMob.addEventListener("click", async () => {
-                                let actorList = Ctg.groups(mode)[index].map(combatant => combatant.actor);
-                                let selectedTokenIds = Ctg.groups(mode)[index].map(combatant => combatant.token.id);
-                                let numSelected = Ctg.groups(mode)[index].length;
+                                const groups = Ctg.groups(mode);
+                                const actorList = groups[index].map(combatant => combatant.actor);
+                                const selectedTokenIds = groups[index].map(combatant => combatant.token.id);
+                                const numSelected = groups[index].length;
 
                                 await MobAttacks.saveMob(labelName.innerText, actorList, selectedTokenIds, numSelected);
                             })
@@ -253,179 +324,46 @@ export default class Ctg {
         };
     };
 
-    /** Get display name of a given group
-     * @static
-     * @param {Array<Combatant>} group - The group for which to return a name
-     * @return {String} Concatenated display name for this group 
-     * @memberof Ctg
-     */
-    static getDisplayName(group) {
-        /** Names in the current group */
-        let names = [];
-
-        // Go through all of the combatants in the group
-        group.forEach(combatant => {
-            /** The DOM element of this combatant */
-            const element = ui.combat.element[0].querySelector(`[data-combatant-id="${combatant?.id}"]`);
-
-            /** The name of this combatant in the Tracker */
-            const trackerName = element?.querySelector(".token-name > h4").textContent;
-
-            // Add the name of the current combatant if it is not already
-            if (!names.includes(combatant?.name)) names.push((
-                // Compatibility with CUB Hide Actor Names: check whether the name is being hidden by CUB
-                game.modules.get("combat-utility-belt")?.active && game.settings.get("combat-utility-belt", "enableHideNPCNames")
-                && (
-                    (game.settings.get("combat-utility-belt", "enableHideHostileNames") && trackerName === game.settings.get("combat-utility-belt", "hostileNameReplacement"))
-                    || (game.settings.get("combat-utility-belt", "enableHideNeutralNames") && trackerName === game.settings.get("combat-utility-belt", "neutralNameReplacement"))
-                    || (game.settings.get("combat-utility-belt", "enableHideFriendlyNames") && trackerName === game.settings.get("combat-utility-belt", "friendlyNameReplacement"))
-                )
-                // Add the name in the tracker instead if it has been hidden
-            ) ? trackerName : combatant?.name);
-        });
-
-        // Return a string with the names
-        return names.length < 3 ? names.join(" and ") : names.join(", ");
-    }
-
-    /** Group Combatants
-     * @static
-     * @param {String} mode - The current mode
-     * @return {Array} An array of groupings
-     * @memberof Ctg
-     */
-    static groups(mode) {
-        // Exit if invalid mode
-        if (!Ctg.MODES.map(m => m[0]).includes(mode)) {
-            ui.notifications.error(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.invalidMode", { mode })}`);
-            return;
-        };
-
-        // Special behavior for if Mob Attack Tool is enabled
-        if (mode === "mob") {
-            const sortByTurns = (a, b) => game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
-            const alreadyInMob = [];
-
-            // Get groups from MAT mobs
-            return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
-                .map(mob => mob.selectedTokenIds
-                    .filter(id => {
-                        // Don't add a combatant to more than one group
-                        const already = alreadyInMob.includes(id);
-                        if (already) ui.notifications.warn(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.alreadyInMob", { id })}`);
-                        alreadyInMob.push(id);
-                        return !already;
-                    }).map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
-                .map(arr => arr.sort(sortByTurns).filter(x => x)) // Sort combatants within each group and filter out tokens without combatants
-                .sort(arr => arr.sort(sortByTurns)); // Sort each group by the turn order
-        } else {
-            // Get the path for this mode
-            const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
-
-            // Reduce combat turns into an array of groups by matching a given property path
-            return Object.values(game.combat?.turns.reduce((accumulator, current) => {
-                if (current.visible) accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
-                return accumulator;
-            }, {}));
-        };
-    };
-
-    /** Manage grouping of selected tokens */
-    groupSelected() {
-        // Whenever the controlled token changes
-        Hooks.on("controlToken", (_token, controlled) => {
-            // Generate a unique ID
-            const uid = randomID(16);
-
-            // If controlling at least one token, a new token is being controlled, and the user is in select groups mode
-            if (canvas.tokens.controlled.length > 0 && controlled && Ctg.selectGroups) {
-                // Add the same flag to each combatant in batch
-                let updates = [];
-                canvas.tokens.controlled.forEach(token => {
-                    // Check if token is in combat and if the combatant is already in the updates list
-                    if (token.inCombat && !updates.some(u => u._id === token.combatant.id)) updates.push({
-                        _id: token.combatant.id,
-                        ["flags.ctg.group"]: uid
-                    });
-                });
-                game.combat?.updateEmbeddedDocuments("Combatant", updates);
-
-                // Call selection hook
-                Hooks.call("ctgSelection", updates);
-            };
-        });
-    };
-
-    /** Manage rolling for group initiative for all of the combatants in the group
-     * @memberof Ctg
-     */
-    rollGroupInitiative() {
+    /** Sort the combatants by the current mode's path */
+    sortCombatants() {
         // Verify libWrapper is enabled
         if (!game.modules.get("lib-wrapper")?.active) {
-            ui.notifications.warn(`${Ctg.ID} | ${game.i18n.format("ctg.notifications.libWrapperRequired"), { feature: game.i18n.localize("ctg.settings.rollGroupInitiative.name") }}`);
+            ui.notifications.warn(`${Ctg.ID} | ${game.i18n.format("ctg.notifications.libWrapperRequired", { feature: game.i18n.localize("ctg.settings.sortCombatants.name") })}`);
             return;
         };
 
-        // Check whether group initiative should be rolled
-        const isRollForGroupInitiative = () =>
-            // Don't roll in "none" mode
-            game.settings.get(Ctg.ID, "mode") !== "none"
-            // Only Roll if the keybinding is being held down
-            && (game.keyboard._downKeys.has("Control") || game.keyboard._downKeys.has("Shift")
-                // Use keybinding in v9d2 and later
-                || Ctg.groupInitiativeKeybind);
+        // Resister an OVERRIDE wrapper
+        libWrapper.register(Ctg.ID, "Combat.prototype._sortCombatants", function (a, b) {
+            // Get the path for the current mode
+            const path = Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")).slice(-1)[0];
 
-        // Wrap initiative rolling methods
-        libWrapper.register(Ctg.ID, "Combat.prototype.rollAll", groupInitiativeWrapper.bind(null, "rollAll"), "MIXED");
-        libWrapper.register(Ctg.ID, "Combat.prototype.rollNPC", groupInitiativeWrapper.bind(null, "rollNPC"), "MIXED");
-        libWrapper.register(Ctg.ID, "Combat.prototype.rollInitiative", groupInitiativeWrapper.bind(null, "roll"), "MIXED");
+            // Get the values for the two combatants
+            let ia = getProperty(a, path);
+            let ib = getProperty(b, path);
 
-        /** Wrapper for group initiative
-         * @param {String} context - The type of group initiative roll being made
-         * @param {Function} wrapped - The wrapped function
-         * @param {Array<String>} [ids=[""]] - An array containing the Combatant IDs passed to `rollInitiative`
-         */
-        function groupInitiativeWrapper(context, wrapped, ids = [""]) {
-            // Check if this is a roll for Group Initiative
-            if (isRollForGroupInitiative()) {
-                // Loop through the IDs in case there are multiple (should be unusual)
-                ids.forEach(id => {
-                    // Go through all of the groups
-                    Ctg.groups(game.settings.get(Ctg.ID, "mode")).forEach(async group => {
-                        // What happens depends on the context of this roll:
-                        if (context === "rollAll" // Roll for every group
-                            || (context === "rollNPC" && group.every(combatant => combatant.isNPC)) // Roll only for groups which are all NPCs 
-                            || (context === "roll" && group.some(combatant => combatant.id === id)) // Roll for groups which contain the current combatant
-                        ) {
-                            // Roll initiative for the first combatant in the group
-                            const message = await group[0].getInitiativeRoll().toMessage({ flavor: `"${Ctg.getDisplayName(group)}" group rolls for Initiative!` });
+            // If they are numbers, sort numerically
+            if (Number.isNumeric(ia), Number.isNumeric(ib)) {
+                const ci = ib - ia;
+                if (ci !== 0) return ci;
+                return a.id > b.id ? 1 : -1;
+            } else if (typeof ia === "object" && typeof ib === "object") {
+                // Get the first item if it's an array
+                ia = Array.isArray(ia) ? ia[0] : ia;
+                ib = Array.isArray(ib) ? ib[0] : ib;
+                return ia?.id > ib?.id ? 1 : -1;
+            } else if (typeof ia === "string" && typeof ib === "string") {
+                // Otherwise, sort alphabetically
+                return ia.localeCompare(ib);
+            };
+            // Fallback to comparing the IDs
+            return a.id > b.id ? 1 : -1;
+        }, "OVERRIDE");
 
-                            // Update all of the combatants in this group with that roll total as their new initiative
-                            let updates = [];
-                            group.forEach(combatant => updates.push({
-                                _id: combatant.id,
-                                initiative: message.roll.total,
-                            }));
-
-                            // Update the combatants
-                            await game.combat?.updateEmbeddedDocuments("Combatant", updates);
-
-                            // Log to console and call hook
-                            const who = context === "rollAll" ? " everyone in" : context === "rollNPC" ? " NPCs in" : "";
-                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.success", { who: who, group: Ctg.getDisplayName(group) })}`);
-                            Hooks.call(`ctg${context.capitalize()}`, updates, message.roll, id);
-                        } else {
-                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: Ctg.getDisplayName(group) })}`);
-                        };
-                    });
-                });
-            } else { wrapped(ids); };
-        };
+        // Setup the turns again
+        game.combat.setupTurns();
     };
 
-    /** Manage skipping over groups
-     * @memberof Ctg
-     */
+    /** Manage skipping over groups */
     groupSkipping() {
         // Hook into the combat update to manage skipping    
         Hooks.on("preUpdateCombat", async (document, change) => {
@@ -464,45 +402,110 @@ export default class Ctg {
         });
     };
 
-    /** Sort the combatants by the current mode's path
-     * @memberof Ctg
-     */
-    sortCombatants() {
+    /** Manage rolling for group initiative for all of the combatants in the group  */
+    rollGroupInitiative() {
         // Verify libWrapper is enabled
         if (!game.modules.get("lib-wrapper")?.active) {
-            ui.notifications.warn(`${Ctg.ID} | ${game.i18n.format("ctg.notifications.libWrapperRequired"), { feature: game.i18n.localize("ctg.settings.sortCombatants.name") }}`);
+            ui.notifications.warn(`${Ctg.ID} | ${game.i18n.format("ctg.notifications.libWrapperRequired", { feature: game.i18n.localize("ctg.settings.rollGroupInitiative.name") })}`);
             return;
         };
 
-        // Resister an OVERRIDE wrapper
-        libWrapper.register(Ctg.ID, "Combat.prototype._sortCombatants", function (a, b) {
-            // Get the path for the current mode
-            const path = Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")).slice(-1)[0];
+        // Check whether group initiative should be rolled
+        const isRollForGroupInitiative = () =>
+            // Don't roll in "none" mode
+            game.settings.get(Ctg.ID, "mode") !== "none"
+            // Only Roll if the keybinding is being held down
+            && (// Use keybinding in v9d2 and later
+                Ctg.groupInitiativeKeybind
+                // Otherwise, fallback to the old method
+                ?? (game.keyboard._downKeys.has("Control") || game.keyboard._downKeys.has("Shift"))
+            );
 
-            // Get the values for the two combatants
-            let ia = getProperty(a, path);
-            let ib = getProperty(b, path);
+        // Wrap initiative rolling methods
+        libWrapper.register(Ctg.ID, "Combat.prototype.rollAll", groupInitiativeWrapper.bind(null, "rollAll"), "MIXED");
+        libWrapper.register(Ctg.ID, "Combat.prototype.rollNPC", groupInitiativeWrapper.bind(null, "rollNPC"), "MIXED");
+        libWrapper.register(Ctg.ID, "Combat.prototype.rollInitiative", groupInitiativeWrapper.bind(null, "roll"), "MIXED");
 
-            // If they are numbers, sort numerically
-            if (Number.isNumeric(ia), Number.isNumeric(ib)) {
-                const ci = ib - ia;
-                if (ci !== 0) return ci;
-                return a.id > b.id ? 1 : -1;
-            } else if (typeof ia === "object" && typeof ib === "object") {
-                // Get the first item if it's an array
-                ia = Array.isArray(ia) ? ia[0] : ia;
-                ib = Array.isArray(ib) ? ib[0] : ib;
-                return ia?.id > ib?.id ? 1 : -1;
-            } else if (typeof ia === "string" && typeof ib === "string") {
-                // Otherwise, sort alphabetically
-                return ia.localeCompare(ib);
+        /** Wrapper for group initiative
+         * @param {String} context - The type of group initiative roll being made
+         * @param {Function} wrapped - The wrapped function
+         * @param {Array<String>} [ids=[""]] - An array containing the Combatant IDs passed to `rollInitiative`
+         */
+        function groupInitiativeWrapper(context, wrapped, ids = [""]) {
+            // Check if this is a roll for Group Initiative
+            if (isRollForGroupInitiative()) {
+                // Loop through the IDs in case there are multiple (should be unusual)
+                ids.forEach(id => {
+                    // Go through all of the groups
+                    Ctg.groups(game.settings.get(Ctg.ID, "mode")).forEach(async group => {
+                        // What happens depends on the context of this roll:
+                        if (context === "rollAll" // Roll for every group
+                            || (context === "rollNPC" && group.every(combatant => combatant.isNPC)) // Roll only for groups which are all NPCs 
+                            || (context === "roll" && group.some(combatant => combatant.id === id)) // Roll for groups which contain the current combatant
+                        ) {
+                            // Roll initiative for the first combatant in the group
+                            const message = await group[0].getInitiativeRoll().toMessage({ flavor: `"${Ctg.getDisplayName(group)}" group rolls for Initiative!` });
+
+                            // Update all of the combatants in this group with that roll total as their new initiative
+                            const updates = [];
+                            group.forEach(combatant => updates.push({
+                                _id: combatant.id,
+                                initiative: message.roll.total,
+                            }));
+
+                            // Update the combatants
+                            await game.combat?.updateEmbeddedDocuments("Combatant", updates);
+
+                            // Log to console and call hook
+                            const who = context === "rollAll" ? " everyone in" : context === "rollNPC" ? " NPCs in" : "";
+                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.success", { who: who, group: Ctg.getDisplayName(group) })}`);
+                            Hooks.call(`ctg${context.capitalize()}`, updates, message.roll, id);
+                        } else {
+                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: Ctg.getDisplayName(group) })}`);
+                        };
+                    });
+                });
+            } else { wrapped(ids); };
+        };
+    };
+
+    /** Manage grouping of selected tokens */
+    groupSelection() {
+        // Scene controls toggle button
+        Hooks.on("getSceneControlButtons", controls => {
+            // Add a scene control under the tokens menu if GM
+            if (game.user?.isGM) controls.find(c => c.name == "token").tools.push({
+                name: "groups",
+                title: "ctg.selectControl",
+                icon: "fas fa-users",
+                toggle: true,
+                active: Ctg.selectGroups ?? false,
+                onClick: toggled => Ctg.selectGroups = toggled,
+            });
+        });
+
+        // Do grouping whenever the controlled token changes
+        Hooks.on("controlToken", (_token, controlled) => {
+            // Generate a unique ID
+            const uid = randomID(16);
+
+            // If controlling at least one token, a new token is being controlled, and the user is in select groups mode
+            if (canvas.tokens.controlled.length > 0 && controlled && Ctg.selectGroups) {
+                // Add the same flag to each combatant in batch
+                const updates = [];
+                canvas.tokens.controlled.forEach(token => {
+                    // Check if token is in combat and if the combatant is already in the updates list
+                    if (token.inCombat && !updates.some(u => u._id === token.combatant.id)) updates.push({
+                        _id: token.combatant.id,
+                        ["flags.ctg.group"]: uid
+                    });
+                });
+                game.combat?.updateEmbeddedDocuments("Combatant", updates);
+
+                // Call selection hook
+                Hooks.call("ctgSelection", updates);
             };
-            // Fallback to comparing the IDs
-            return a.id > b.id ? 1 : -1;
-        }, "OVERRIDE");
-
-        // Setup the turns again
-        game.combat.setupTurns();
+        });
     };
 };
 
