@@ -34,9 +34,6 @@ export default class Ctg {
             // Re-render Combat Tracker when mobs update not from autosave (FIXME: a re-render is needed, but is not being included to avoid a MAT bug. See https://github.com/Stendarpaval/mob-attack-tool/issues/40)
             if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat?.render(true));
 
-            // Resort combatants
-            if (game.settings.get(Ctg.ID, "sortCombatants")) this.sortCombatants();
-
             // Run group skipping code
             this.groupSkipping();
 
@@ -114,12 +111,55 @@ export default class Ctg {
             // Get the path for this mode
             const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
 
+            // Setup turns the default way first to prepare
+            game.combat.setupTurns();
+
+            // FIXME
+            console.log(game.combat.turns, game.combat.turns.map(c => c.data.flags.ctg.test));
+
             // Reduce combat turns into an array of groups by matching a given property path
-            return Object.values(game.combat?.turns.reduce((accumulator, current) => {
+            const groups = Object.values(game.combat?.turns.reduce((accumulator, current) => {
                 if (current.visible) accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
                 return accumulator;
             }, {}));
+
+            // Sort each group
+            groups.forEach(group => group.sort(this.sortCombatants));
+            // If enabled, sort combatant turns
+            if (game.settings.get(Ctg.ID, "sortCombatants")) game.combat.turns = game.combat.turns.sort(this.sortCombatants);
+
+            // FIXME
+            console.log(game.combat.turns, game.combat.turns.map(c => c.data.flags.ctg.test))
+
+            return groups;
         };
+    };
+
+    /** Sort the combatants by the current mode's path */
+    static sortCombatants(a, b) {
+        // Get the path for the current mode
+        const path = Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")).slice(-1)[0];
+
+        // Get the values for the two combatants
+        let ia = getProperty(a, path);
+        let ib = getProperty(b, path);
+
+        // If they are numbers, sort numerically
+        if (Number.isNumeric(ia), Number.isNumeric(ib)) {
+            const ci = ib - ia;
+            if (ci !== 0) return ci;
+            return a.id > b.id ? 1 : -1;
+        } else if (typeof ia === "object" && typeof ib === "object") {
+            // Get the first item if it's an array
+            ia = Array.isArray(ia) ? ia[0] : ia;
+            ib = Array.isArray(ib) ? ib[0] : ib;
+            return ia?.id > ib?.id ? 1 : -1;
+        } else if (typeof ia === "string" && typeof ib === "string") {
+            // Otherwise, sort alphabetically
+            return ia.localeCompare(ib);
+        };
+        // Fallback to comparing the IDs
+        return a?.id > b?.id ? 1 : -1;
     };
 
     /** Get display name of a given group
@@ -322,45 +362,6 @@ export default class Ctg {
                 currentToggle.classList.add("active");
             };
         };
-    };
-
-    /** Sort the combatants by the current mode's path */
-    sortCombatants() {
-        // Verify libWrapper is enabled
-        if (!game.modules.get("lib-wrapper")?.active) {
-            ui.notifications.warn(`${Ctg.ID} | ${game.i18n.format("ctg.notifications.libWrapperRequired", { feature: game.i18n.localize("ctg.settings.sortCombatants.name") })}`);
-            return;
-        };
-
-        // Resister an OVERRIDE wrapper
-        libWrapper.register(Ctg.ID, "Combat.prototype._sortCombatants", function (a, b) {
-            // Get the path for the current mode
-            const path = Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")).slice(-1)[0];
-
-            // Get the values for the two combatants
-            let ia = getProperty(a, path);
-            let ib = getProperty(b, path);
-
-            // If they are numbers, sort numerically
-            if (Number.isNumeric(ia), Number.isNumeric(ib)) {
-                const ci = ib - ia;
-                if (ci !== 0) return ci;
-                return a.id > b.id ? 1 : -1;
-            } else if (typeof ia === "object" && typeof ib === "object") {
-                // Get the first item if it's an array
-                ia = Array.isArray(ia) ? ia[0] : ia;
-                ib = Array.isArray(ib) ? ib[0] : ib;
-                return ia?.id > ib?.id ? 1 : -1;
-            } else if (typeof ia === "string" && typeof ib === "string") {
-                // Otherwise, sort alphabetically
-                return ia.localeCompare(ib);
-            };
-            // Fallback to comparing the IDs
-            return a.id > b.id ? 1 : -1;
-        }, "OVERRIDE");
-
-        // Setup the turns again
-        game.combat.setupTurns();
     };
 
     /** Manage skipping over groups */
