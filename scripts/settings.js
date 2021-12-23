@@ -7,9 +7,8 @@ export default function registerSettings() {
         type: String,
         default: "initiative",
         onChange: mode => {
-            // Update the popout and non-popout combat tracker
-            this.manageGroups(mode, true);
-            this.manageGroups(mode, false);
+            // Re-render the combat tracker
+            ui.combat?.render(true);
             // Setup the turns again
             game.combat.setupTurns();
             // Call hook for mode update
