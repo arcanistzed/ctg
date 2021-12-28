@@ -354,7 +354,7 @@ export default class Ctg {
             });
 
             // Get the current toggle
-            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat.combatant.id}"]`)?.parentElement.parentElement;
+            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat.combatant?.id}"]`)?.parentElement.parentElement;
             // If a the combatant could be found in the DOM
             if (currentToggle && currentToggle.querySelector(".ctg-labelBox")) {
                 // Open the toggle for the current combatant if enabled
@@ -370,7 +370,7 @@ export default class Ctg {
         Hooks.on("preUpdateCombat", async (document, change) => {
             if (
                 (change.turn > document.current.turn  // If this update is for a forward change of turn
-                    || (change.turn !== document.turns.length - 1 && document.current.turn === 0)) // Or if aanywhere other than the end with a turn of 0
+                    || (change.turn !== document.turns.length - 1 && document.current.turn === 0)) // Or if anywhere other than the end with a turn of 0
                 && game.settings.get(Ctg.ID, "groupSkipping") // If the user has the setting enabled
                 && game.settings.get(Ctg.ID, "mode") !== "none" // If the mode is not "none"
                 && !change.groupSkipping // If this is not marked as an update from here
