@@ -210,7 +210,7 @@ export default class Ctg {
         // Change mode if saved one no longer exists
         if (!Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")))
             game.settings?.set(Ctg.ID, "mode", "none");
-    }
+    };
 
     /**
      * Create Combat Tracker modes
