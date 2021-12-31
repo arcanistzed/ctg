@@ -1,3 +1,4 @@
+import { recursiveGetPropertyAsString, getDisplayName } from "./helpers.js";
 import registerKeybindings from "./keybindings.js";
 import registerSettings from "./settings.js";
 
@@ -27,7 +28,7 @@ export default class Ctg {
                 [game.i18n.localize("ctg.modes.initiative"), "initiative"],
                 [game.i18n.localize("ctg.modes.name"), "name"],
                 [game.i18n.localize("ctg.modes.selection"), "data.flags.ctg.group"],
-                [game.i18n.localize("ctg.modes.players"), "players"],
+                [game.i18n.localize("ctg.modes.players"), "players.*.id"],
                 [game.i18n.localize("ctg.modes.actor"), "data.actorId"]
             ];
 
@@ -118,7 +119,7 @@ export default class Ctg {
 
             // Reduce combat turns into an array of groups by matching a given property path
             groups = Object.values(game.combat?.turns.reduce((accumulator, current) => {
-                if (current.visible) accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
+                if (current.visible) accumulator[recursiveGetPropertyAsString(current, path)] = [...accumulator[recursiveGetPropertyAsString(current, path)] || [], current];
                 return accumulator;
             }, {}));
         };
@@ -139,8 +140,8 @@ export default class Ctg {
             const path = Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")).slice(-1)[0];
 
             // Get the values for the two combatants
-            let ia = getProperty(a, path);
-            let ib = getProperty(b, path);
+            let ia = recursiveGetPropertyAsString(a, path);
+            let ib = recursiveGetPropertyAsString(b, path);
 
             // If they are numbers, sort numerically
             if (Number.isNumeric(ia), Number.isNumeric(ib)) {
@@ -380,7 +381,7 @@ export default class Ctg {
 
         // Temporary fix for Foundry VTT issue: https://gitlab.com/foundrynet/foundryvtt/-/issues/6404
         if (isNewerVersion(9.239, game.version ?? game.data.version)) // Not needed after v9s1
-        libWrapper.register("ctg", "KeyboardManager.prototype.hasFocus", () => document.querySelectorAll("input:focus, textarea:focus").length, "OVERRIDE");
+            libWrapper.register("ctg", "KeyboardManager.prototype.hasFocus", () => document.querySelectorAll("input:focus, textarea:focus").length, "OVERRIDE");
 
         // Check whether group initiative should be rolled
         const isRollForGroupInitiative = () =>
