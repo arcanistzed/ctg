@@ -164,40 +164,6 @@ export default class Ctg {
         };
     };
 
-    /** Get display name of a given group
-     * @static
-     * @param {Combatant[]} group - The group for which to return a name
-     * @return {String} Concatenated display name for this group 
-     */
-    static getDisplayName(group) {
-        /** Names in the current group */
-        let names = [];
-
-        // Go through all of the combatants in the group
-        group.forEach(combatant => {
-            /** The DOM element of this combatant */
-            const element = ui.combat.element[0].querySelector(`[data-combatant-id="${combatant?.id}"]`);
-
-            /** The name of this combatant in the Tracker */
-            const trackerName = element?.querySelector(".token-name > h4").textContent;
-
-            // Add the name of the current combatant if it is not already
-            if (!names.includes(combatant?.name)) names.push((
-                // Compatibility with CUB Hide Actor Names: check whether the name is being hidden by CUB
-                game.modules.get("combat-utility-belt")?.active && game.settings.get("combat-utility-belt", "enableHideNPCNames")
-                && (
-                    (game.settings.get("combat-utility-belt", "enableHideHostileNames") && trackerName === game.settings.get("combat-utility-belt", "hostileNameReplacement"))
-                    || (game.settings.get("combat-utility-belt", "enableHideNeutralNames") && trackerName === game.settings.get("combat-utility-belt", "neutralNameReplacement"))
-                    || (game.settings.get("combat-utility-belt", "enableHideFriendlyNames") && trackerName === game.settings.get("combat-utility-belt", "friendlyNameReplacement"))
-                )
-                // Add the name in the tracker instead if it has been hidden
-            ) ? trackerName : combatant?.name);
-        });
-
-        // Return a string with the names
-        return names.length < 3 ? names.join(" and ") : names.join(", ");
-    }
-
     /** Manage available modes and switch away from invalid ones */
     manageModes() {
         if (game.modules.get("mob-attack-tool")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.mob")))
@@ -313,7 +279,7 @@ export default class Ctg {
                         labelValue.classList.add("ctg-labelValue");
 
                         // Add the group name to the label
-                        labelName.innerText = Ctg.getDisplayName(group);
+                        labelName.innerText = getDisplayName(group);
 
                         // Add the value to the label if not in name mode
                         if (mode === "initiative") labelValue.innerText = getProperty(combatant, Ctg.MODES.find(m => m[0] === mode).slice(-1)[0]);
@@ -450,7 +416,7 @@ export default class Ctg {
                             || (context === "roll" && group.some(combatant => combatant.id === id)) // Roll for groups which contain the current combatant
                         ) {
                             // Roll initiative for the first combatant in the group
-                            const message = await group[0].getInitiativeRoll().toMessage({ flavor: `"${Ctg.getDisplayName(group)}" group rolls for Initiative!` });
+                            const message = await group[0].getInitiativeRoll().toMessage({ flavor: `"${getDisplayName(group)}" group rolls for Initiative!` });
 
                             // Update all of the combatants in this group with that roll total as their new initiative
                             const updates = [];
@@ -464,10 +430,10 @@ export default class Ctg {
 
                             // Log to console and call hook
                             const who = context === "rollAll" ? " everyone in" : context === "rollNPC" ? " NPCs in" : "";
-                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.success", { who: who, group: Ctg.getDisplayName(group) })}`);
+                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.success", { who: who, group: getDisplayName(group) })}`);
                             Hooks.call(`ctg${context.capitalize()}`, updates, message.roll, id);
                         } else {
-                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: Ctg.getDisplayName(group) })}`);
+                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: getDisplayName(group) })}`);
                         };
                     });
                 });
