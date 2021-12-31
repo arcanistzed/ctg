@@ -411,7 +411,7 @@ export default class Ctg {
         };
 
         // FIXME: Temporary fix for Foundry VTT issue: https://gitlab.com/foundrynet/foundryvtt/-/issues/6404
-        libWrapper.register("ctg", "KeyboardManager.prototype.hasFocus", () => document.querySelectorAll("input:focus, textarea:focus").length, "OVERRIDE");
+        libWrapper.register("ctg", "KeyboardManager.prototype.hasFocus", () => document.querySelectorAll("input:focus, textarea:focus").length > 0, "OVERRIDE");
 
         // Check whether group initiative should be rolled
         const isRollForGroupInitiative = () =>
