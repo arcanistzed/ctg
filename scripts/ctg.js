@@ -66,9 +66,9 @@ export default class Ctg {
 
     /** Grouping Modes
      * The first item is the name and the second is the path
-     * @type {String[][]}
-     * @property {String} name - The name of the mode
-     * @property {String} path - The path to the mode relative to the {@link CombatantData}
+     * @type {string[][]}
+     * @property {string} name - The name of the mode
+     * @property {string} path - The path to the mode relative to the {@link CombatantData}
      */
     static MODES = [];
 
@@ -80,7 +80,7 @@ export default class Ctg {
 
     /** Create Groups of Combatants
      * @static
-     * @param {String} mode - The current mode
+     * @param {string} mode - The current mode
      * @return {Combatant[][]} An array of groups
      */
     static groups(mode) {
@@ -215,7 +215,7 @@ export default class Ctg {
     /**
      * Create Combat Tracker modes
      * @param {HTMLElement} html - The Combat Tracker's HTML
-     * @param {Boolean} popOut - Whether this Combat Tracker is popped out
+     * @param {boolean} popOut - Whether this Combat Tracker is popped out
      */
     createModes(html, popOut) {
         /** Suffix for pop out */
@@ -250,8 +250,8 @@ export default class Ctg {
 
     /**
      * Manage and create Combat Tracker groups
-     * @param {String} mode - The mode that is currently enabled @see {@link modes}
-     * @param {Boolean} popOut - Whether this Combat Tracker is popped out
+     * @param {string} mode - The mode that is currently enabled @see {@link modes}
+     * @param {boolean} popOut - Whether this Combat Tracker is popped out
      */
     manageGroups(mode, popOut) {
         // If trying to use the pop out, check if one actually exists first
@@ -432,9 +432,9 @@ export default class Ctg {
         libWrapper.register(Ctg.ID, "Combat.prototype.rollInitiative", groupInitiativeWrapper.bind(null, "roll"), "MIXED");
 
         /** Wrapper for group initiative
-         * @param {String} context - The type of group initiative roll being made
+         * @param {string} context - The type of group initiative roll being made
          * @param {Function} wrapped - The wrapped function
-         * @param {String[]} [ids=[""]] - An array containing the Combatant IDs passed to `rollInitiative`
+         * @param {string[]} [ids=[""]] - An array containing the Combatant IDs passed to `rollInitiative`
          */
         function groupInitiativeWrapper(context, wrapped, ids = [""]) {
             // Check if this is a roll for Group Initiative
