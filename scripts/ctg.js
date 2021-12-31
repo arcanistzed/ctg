@@ -78,11 +78,11 @@ export default class Ctg {
     /** Whether the user is currently holding down the Group Initiative rolling keybind */
     static groupInitiativeKeybind = false;
 
-    /** Group Combatants
-         * @static
-         * @param {String} mode - The current mode
+    /** Create Groups of Combatants
+     * @static
+     * @param {String} mode - The current mode
      * @return {Combatant[][]} An array of groups
-         */
+     */
     static groups(mode) {
         // Exit if invalid mode
         if (!Ctg.MODES.map(m => m[0]).includes(mode)) {
@@ -91,12 +91,15 @@ export default class Ctg {
         };
 
         /** @type {Combatant[][]} */
+        let groups;
+
+        // Special behavior for creating groups in Mob mode
         if (mode === "mob") {
             const sortByTurns = (a, b) => game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
             const alreadyInMob = [];
 
             // Get groups from MAT mobs
-            return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
+            groups = Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
                 .map(mob => mob.selectedTokenIds
                     .filter(id => {
                         // Don't add a combatant to more than one group
@@ -105,8 +108,7 @@ export default class Ctg {
                         alreadyInMob.push(id);
                         return !already;
                     }).map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
-                .map(arr => arr.sort(sortByTurns).filter(x => x)) // Sort combatants within each group and filter out tokens without combatants
-                .sort(arr => arr.sort(sortByTurns)); // Sort each group by the turn order
+                .map(arr => arr.sort(sortByTurns).filter(x => x)); // Sort combatants within each group and filter out tokens without combatants
         } else {
             // Get the path for this mode
             const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
@@ -115,44 +117,51 @@ export default class Ctg {
             game.combat.setupTurns();
 
             // Reduce combat turns into an array of groups by matching a given property path
-            const groups = Object.values(game.combat?.turns.reduce((accumulator, current) => {
+            groups = Object.values(game.combat?.turns.reduce((accumulator, current) => {
                 if (current.visible) accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
                 return accumulator;
             }, {}));
+        };
 
-            // Sort each group
-            groups.forEach(group => group.sort(this.sortCombatants));
-            // If enabled, sort combatant turns
-            if (game.settings.get(Ctg.ID, "sortCombatants")) game.combat.turns = game.combat.turns.sort(this.sortCombatants);
+        // Sort each group
+        groups.forEach(group => group.sort(this.sortCombatants));
+        // If enabled, sort combatant turns
+        if (game.settings.get(Ctg.ID, "sortCombatants")) game.combat.turns = game.combat.turns.sort(this.sortCombatants);
 
-            return groups;
+        return groups;
     };
 
-    /** Sort the combatants by the current mode's path */
+    /** Sort the combatants */
     static sortCombatants(a, b) {
-        // Get the path for the current mode
-        const path = Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")).slice(-1)[0];
+        // Sort by the current mode's path
+        if (game.settings.get(Ctg.ID, "sortCombatants")) {
+            // Get the path for the current mode
+            const path = Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")).slice(-1)[0];
 
-        // Get the values for the two combatants
-        let ia = getProperty(a, path);
-        let ib = getProperty(b, path);
+            // Get the values for the two combatants
+            let ia = getProperty(a, path);
+            let ib = getProperty(b, path);
 
-        // If they are numbers, sort numerically
-        if (Number.isNumeric(ia), Number.isNumeric(ib)) {
-            const ci = ib - ia;
-            if (ci !== 0) return ci;
-            return a.id > b.id ? 1 : -1;
-        } else if (typeof ia === "object" && typeof ib === "object") {
-            // Get the first item if it's an array
-            ia = Array.isArray(ia) ? ia[0] : ia;
-            ib = Array.isArray(ib) ? ib[0] : ib;
-            return ia?.id > ib?.id ? 1 : -1;
-        } else if (typeof ia === "string" && typeof ib === "string") {
-            // Otherwise, sort alphabetically
-            return ia.localeCompare(ib);
+            // If they are numbers, sort numerically
+            if (Number.isNumeric(ia), Number.isNumeric(ib)) {
+                const ci = ib - ia;
+                if (ci !== 0) return ci;
+                return a.id > b.id ? 1 : -1;
+            } else if (typeof ia === "object" && typeof ib === "object") {
+                // Get the first item if it's an array
+                ia = Array.isArray(ia) ? ia[0] : ia;
+                ib = Array.isArray(ib) ? ib[0] : ib;
+                return ia?.id > ib?.id ? 1 : -1;
+            } else if (typeof ia === "string" && typeof ib === "string") {
+                // Otherwise, sort alphabetically
+                return ia.localeCompare(ib);
+            };
+            // Fallback to comparing the IDs
+            return a?.id > b?.id ? 1 : -1;
+        } else { // If disabled, sort by position in the existing turn order
+            // FIXME is minus or compare operator?
+            return game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
         };
-        // Fallback to comparing the IDs
-        return a?.id > b?.id ? 1 : -1;
     };
 
     /** Get display name of a given group
