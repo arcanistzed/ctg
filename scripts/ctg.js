@@ -1,6 +1,15 @@
+import registerKeybindings from "./keybindings.js";
+import registerSettings from "./settings.js";
+
 export default class Ctg {
     constructor() {
+        Hooks.on("init", () => {
+            registerKeybindings();
+            registerSettings();
+        });
+
         Hooks.on("ready", () => {
+            // Initialize API
             game.modules.get("ctg").api = Ctg;
 
             // Console art
@@ -12,42 +21,6 @@ export default class Ctg {
                 `\n${game.i18n.localize("ctg.welcome.site")} https://arcanist.me/`
             );
 
-            game.settings.register(Ctg.ID, "mode", {
-                scope: "world",
-                config: false,
-                type: String,
-                default: "initiative",
-                onChange: mode => {
-                    // Update the popout and non-popout combat tracker
-                    this.manageGroups(mode, true);
-                    this.manageGroups(mode, false);
-                    // Call hook for mode update
-                    Hooks.call("ctgModeUpdate", mode);
-                },
-            });
-
-            game.settings.register(Ctg.ID, "groupSkipping", {
-                name: game.i18n.localize("ctg.settings.groupSkipping.name"),
-                hint: game.i18n.localize("ctg.settings.groupSkipping.hint"),
-                scope: "world",
-                config: true,
-                type: Boolean,
-                default: false,
-                onChange: () => {
-                    ui.combat?.render(true);
-                    game.combat?.update({ turn: 0 });
-                }
-            });
-
-            game.settings.register(Ctg.ID, "openToggles", {
-                name: game.i18n.localize("ctg.settings.openToggles.name"),
-                hint: game.i18n.localize("ctg.settings.openToggles.hint"),
-                scope: "world",
-                config: true,
-                type: Boolean,
-                default: true
-            });
-
             // Localize modes
             Ctg.MODES = [
                 [game.i18n.localize("ctg.modes.none"), ""],
@@ -58,17 +31,21 @@ export default class Ctg {
                 [game.i18n.localize("ctg.modes.actor"), "data.actorId"]
             ];
 
+            // Re-render Combat Tracker when mobs update not from autosave (FIXME: a re-render is needed, but is not being included to avoid a MAT bug. See https://github.com/Stendarpaval/mob-attack-tool/issues/40)
+            if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat?.render(true));
+
+            // Run group skipping code
+            this.groupSkipping();
+
+            // Manage rolling initiative for the whole group at once if GM
+            if (game.user?.isGM) this.rollGroupInitiative();
+
+            // Group selection
+            this.groupSelection();
+
             Hooks.on("renderCombatTracker", (app, html, data) => {
                 // Exit if there is no combat
                 if (!data.combat) return;
-
-                // Module-specific modes
-                if (game.modules.get("mob-attack-tool")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.mob"))) Ctg.MODES.push([game.i18n.localize("ctg.modes.mob"), ""]);
-                if (game.modules.get("lancer-initiative")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.lancer"))) Ctg.MODES.push([game.i18n.localize("ctg.modes.lancer"), "activations.value"]);
-                if (game.modules.get("scs")?.active) Ctg.MODES.findSplice(m => m[0] === "initiative");
-
-                // Change mode if saved one no longer exists
-                if (!Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode"))) game.settings.set(Ctg.ID, "mode", "none");
 
                 // Create modes if GM
                 if (game.user?.isGM) this.createModes(html[0], app.popOut);
@@ -81,47 +58,7 @@ export default class Ctg {
                     if (Ctg.MODES.map(m => m[0]).includes(mode)) game.settings.set(Ctg.ID, "mode", mode);
                 }));
             });
-
-            // Manage rolling initiative for the whole group at once if GM
-            if (game.user?.isGM) this.rollGroupInitiative();
-
-            // Re-render Combat Tracker when mobs update not from autosave (FIXME: a re-render is needed, but is not being included to avoid a MAT bug. See https://github.com/Stendarpaval/mob-attack-tool/issues/46)
-            if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat?.render(true));
-
-            // Run group skipping code
-            this.groupSkipping();
         });
-
-        // Register Group Initiative keybind
-        Hooks.on("init", () => game.keybindings.register(Ctg.ID, "rollGroupInitiative", {
-            name: game.i18n.localize("ctg.settings.rollGroupInitiative.name"),
-            hint: game.i18n.localize("ctg.settings.rollGroupInitiative.hint"),
-            uneditable: [
-                {
-                    key: "SHIFT"
-                },
-                {
-                    key: "CONTROL"
-                }
-            ],
-            onDown: () => { console.log("DOWN"); Ctg.groupInitiativeKeybind = true; },
-            onUp: () => { console.log("UP"); Ctg.groupInitiativeKeybind = false; },
-        }));
-
-        // Manage group selection
-        Hooks.on("getSceneControlButtons", controls => {
-            // Add a scene control under the tokens menu if GM
-            if (game.user?.isGM) controls.find(c => c.name == "token").tools.push({
-                name: "groups",
-                title: "ctg.selectControl",
-                icon: "fas fa-users",
-                toggle: true,
-                active: Ctg.selectGroups ?? false,
-                onClick: toggled => Ctg.selectGroups = toggled,
-            });
-        });
-
-        this.groupSelected();
     };
 
     /** The module's ID */
@@ -140,6 +77,138 @@ export default class Ctg {
 
     /** Whether the user is currently holding down the Group Initiative rolling keybind */
     static groupInitiativeKeybind = false;
+
+    /** Group Combatants
+         * @static
+         * @param {String} mode - The current mode
+         * @return {Array} An array of groupings
+         */
+    static groups(mode) {
+        // Exit if invalid mode
+        if (!Ctg.MODES.map(m => m[0]).includes(mode)) {
+            ui.notifications.error(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.invalidMode", { mode })}`);
+            return;
+        };
+
+        // Special behavior for if Mob Attack Tool is enabled
+        if (mode === "mob") {
+            const sortByTurns = (a, b) => game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
+            const alreadyInMob = [];
+
+            // Get groups from MAT mobs
+            return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
+                .map(mob => mob.selectedTokenIds
+                    .filter(id => {
+                        // Don't add a combatant to more than one group
+                        const already = alreadyInMob.includes(id);
+                        if (already) ui.notifications.warn(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.alreadyInMob", { id })}`);
+                        alreadyInMob.push(id);
+                        return !already;
+                    }).map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
+                .map(arr => arr.sort(sortByTurns).filter(x => x)) // Sort combatants within each group and filter out tokens without combatants
+                .sort(arr => arr.sort(sortByTurns)); // Sort each group by the turn order
+        } else {
+            // Get the path for this mode
+            const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
+
+            // Setup turns the default way first to prepare
+            game.combat.setupTurns();
+
+            // FIXME
+            console.log(game.combat.turns, game.combat.turns.map(c => c.data.flags.ctg.test));
+
+            // Reduce combat turns into an array of groups by matching a given property path
+            const groups = Object.values(game.combat?.turns.reduce((accumulator, current) => {
+                if (current.visible) accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
+                return accumulator;
+            }, {}));
+
+            // Sort each group
+            groups.forEach(group => group.sort(this.sortCombatants));
+            // If enabled, sort combatant turns
+            if (game.settings.get(Ctg.ID, "sortCombatants")) game.combat.turns = game.combat.turns.sort(this.sortCombatants);
+
+            // FIXME
+            console.log(game.combat.turns, game.combat.turns.map(c => c.data.flags.ctg.test))
+
+            return groups;
+        };
+    };
+
+    /** Sort the combatants by the current mode's path */
+    static sortCombatants(a, b) {
+        // Get the path for the current mode
+        const path = Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")).slice(-1)[0];
+
+        // Get the values for the two combatants
+        let ia = getProperty(a, path);
+        let ib = getProperty(b, path);
+
+        // If they are numbers, sort numerically
+        if (Number.isNumeric(ia), Number.isNumeric(ib)) {
+            const ci = ib - ia;
+            if (ci !== 0) return ci;
+            return a.id > b.id ? 1 : -1;
+        } else if (typeof ia === "object" && typeof ib === "object") {
+            // Get the first item if it's an array
+            ia = Array.isArray(ia) ? ia[0] : ia;
+            ib = Array.isArray(ib) ? ib[0] : ib;
+            return ia?.id > ib?.id ? 1 : -1;
+        } else if (typeof ia === "string" && typeof ib === "string") {
+            // Otherwise, sort alphabetically
+            return ia.localeCompare(ib);
+        };
+        // Fallback to comparing the IDs
+        return a?.id > b?.id ? 1 : -1;
+    };
+
+    /** Get display name of a given group
+     * @static
+     * @param {Array<Combatant>} group - The group for which to return a name
+     * @return {String} Concatenated display name for this group 
+     */
+    static getDisplayName(group) {
+        /** Names in the current group */
+        let names = [];
+
+        // Go through all of the combatants in the group
+        group.forEach(combatant => {
+            /** The DOM element of this combatant */
+            const element = ui.combat.element[0].querySelector(`[data-combatant-id="${combatant?.id}"]`);
+
+            /** The name of this combatant in the Tracker */
+            const trackerName = element?.querySelector(".token-name > h4").textContent;
+
+            // Add the name of the current combatant if it is not already
+            if (!names.includes(combatant?.name)) names.push((
+                // Compatibility with CUB Hide Actor Names: check whether the name is being hidden by CUB
+                game.modules.get("combat-utility-belt")?.active && game.settings.get("combat-utility-belt", "enableHideNPCNames")
+                && (
+                    (game.settings.get("combat-utility-belt", "enableHideHostileNames") && trackerName === game.settings.get("combat-utility-belt", "hostileNameReplacement"))
+                    || (game.settings.get("combat-utility-belt", "enableHideNeutralNames") && trackerName === game.settings.get("combat-utility-belt", "neutralNameReplacement"))
+                    || (game.settings.get("combat-utility-belt", "enableHideFriendlyNames") && trackerName === game.settings.get("combat-utility-belt", "friendlyNameReplacement"))
+                )
+                // Add the name in the tracker instead if it has been hidden
+            ) ? trackerName : combatant?.name);
+        });
+
+        // Return a string with the names
+        return names.length < 3 ? names.join(" and ") : names.join(", ");
+    }
+
+    /** Manage available modes and switch away from invalid ones */
+    manageModes() {
+        if (game.modules.get("mob-attack-tool")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.mob")))
+            Ctg.MODES.push([game.i18n.localize("ctg.modes.mob"), ""]);
+        if (game.modules.get("lancer-initiative")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.lancer")))
+            Ctg.MODES.push([game.i18n.localize("ctg.modes.lancer"), "activations.value"]);
+        if (game.modules.get("scs")?.active)
+            Ctg.MODES.findSplice(m => m[0] === "initiative");
+
+        // Change mode if saved one no longer exists
+        if (!Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")))
+            game.settings?.set(Ctg.ID, "mode", "none");
+    }
 
     /**
      * Create Combat Tracker modes
@@ -269,9 +338,10 @@ export default class Ctg {
                             labelFlex.append(saveMob);
 
                             saveMob.addEventListener("click", async () => {
-                                let actorList = Ctg.groups(mode)[index].map(combatant => combatant.actor);
-                                let selectedTokenIds = Ctg.groups(mode)[index].map(combatant => combatant.token.id);
-                                let numSelected = Ctg.groups(mode)[index].length;
+                                const groups = Ctg.groups(mode);
+                                const actorList = groups[index].map(combatant => combatant.actor);
+                                const selectedTokenIds = groups[index].map(combatant => combatant.token.id);
+                                const numSelected = groups[index].length;
 
                                 await MobAttacks.saveMob(labelName.innerText, actorList, selectedTokenIds, numSelected);
                             })
@@ -284,7 +354,7 @@ export default class Ctg {
             });
 
             // Get the current toggle
-            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat?.current.combatantId}"]`)?.parentElement.parentElement;
+            const currentToggle = html.querySelector(`[data-combatant-id="${game.combat.combatant?.id}"]`)?.parentElement.parentElement;
             // If a the combatant could be found in the DOM
             if (currentToggle && currentToggle.querySelector(".ctg-labelBox")) {
                 // Open the toggle for the current combatant if enabled
@@ -294,127 +364,65 @@ export default class Ctg {
         };
     };
 
-    /** Get display name of a given group
-     * @static
-     * @param {Array<Combatant>} group - The group for which to return a name
-     * @return {String} Concatenated display name for this group 
-     * @memberof Ctg
-     */
-    static getDisplayName(group) {
-        /** Names in the current group */
-        let names = [];
+    /** Manage skipping over groups */
+    groupSkipping() {
+        // Hook into the combat update to manage skipping    
+        Hooks.on("preUpdateCombat", async (document, change) => {
+            if (
+                (change.turn > document.current.turn  // If this update is for a forward change of turn
+                    || (change.turn !== document.turns.length - 1 && document.current.turn === 0)) // Or if anywhere other than the end with a turn of 0
+                && game.settings.get(Ctg.ID, "groupSkipping") // If the user has the setting enabled
+                && game.settings.get(Ctg.ID, "mode") !== "none" // If the mode is not "none"
+                && !change.groupSkipping // If this is not marked as an update from here
+            ) {
+                // Get the groups
+                const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
 
-        // Go through all of the combatants in the group
-        group.forEach(combatant => {
-            /** The DOM element of this combatant */
-            const element = ui.combat.element[0].querySelector(`[data-combatant-id="${combatant?.id}"]`);
+                // Go through each group and skip to the beginning of the group after the one containing the current combatant
+                for (const group of groups) {
 
-            /** The name of this combatant in the Tracker */
-            const trackerName = element?.querySelector(".token-name > h4").textContent;
+                    // If the current combatant is the first in this group
+                    if (group.findIndex(c => c.id === document.combatant?.id) === 0) {
 
-            // Add the name of the current combatant if it is not already
-            if (!names.includes(combatant?.name)) names.push((
-                // Compatibility with CUB Hide Actor Names: check whether the name is being hidden by CUB
-                game.modules.get("combat-utility-belt")?.active && game.settings.get("combat-utility-belt", "enableHideNPCNames")
-                && (
-                    (game.settings.get("combat-utility-belt", "enableHideHostileNames") && trackerName === game.settings.get("combat-utility-belt", "hostileNameReplacement"))
-                    || (game.settings.get("combat-utility-belt", "enableHideNeutralNames") && trackerName === game.settings.get("combat-utility-belt", "neutralNameReplacement"))
-                    || (game.settings.get("combat-utility-belt", "enableHideFriendlyNames") && trackerName === game.settings.get("combat-utility-belt", "friendlyNameReplacement"))
-                )
-                // Add the name in the tracker instead if it has been hidden
-            ) ? trackerName : combatant?.name);
-        });
+                        // Go to the next round if at the end
+                        if ((change.turn + group.length - 1) >= document.turns.length) {
+                            document.nextRound();
+                        };
 
-        // Return a string with the names
-        return names.length < 3 ? names.join(" and ") : names.join(", ");
-    }
+                        // Mutate the turn change to skip to the start of the next group
+                        change.turn = (change.turn + group.length - 1) % document.turns.length;
 
-    /** Group Combatants
-     * @static
-     * @param {String} mode - The current mode
-     * @return {Array} An array of groupings
-     * @memberof Ctg
-     */
-    static groups(mode) {
-        // Exit if invalid mode
-        if (!Ctg.MODES.map(m => m[0]).includes(mode)) {
-            ui.notifications.error(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.invalidMode", { mode })}`);
-            return;
-        };
+                        // Mark this as an update from here
+                        change.groupSkipping = true;
 
-        // Special behavior for if Mob Attack Tool is enabled
-        if (mode === "mob") {
-            const sortByTurns = (a, b) => game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
-            const alreadyInMob = [];
-
-            // Get groups from MAT mobs
-            return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
-                .map(mob => mob.selectedTokenIds
-                    .filter(id => {
-                         // Don't add a combatant to more than one group
-                        const already = alreadyInMob.includes(id);
-                        if (already) ui.notifications.warn(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.alreadyInMob", { id })}`);
-                        alreadyInMob.push(id);
-                        return !already;
-                    }).map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
-                .map(arr => arr.sort(sortByTurns).filter(x => x)) // Sort combatants within each group and filter out tokens without combatants
-                .sort(arr => arr.sort(sortByTurns)); // Sort each group by the turn order
-        } else {
-            // Get the path for this mode
-            const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
-
-            // Reduce combat turns into an array of groups by matching a given property path
-            return Object.values(game.combat?.turns.reduce((accumulator, current) => {
-                if (current.visible) accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
-                return accumulator;
-            }, {}));
-        };
-    };
-
-    /** Manage grouping of selected tokens */
-    groupSelected() {
-        // Whenever the controlled token changes
-        Hooks.on("controlToken", (_token, controlled) => {
-            // Generate a unique ID
-            const uid = randomID(16);
-
-            // If controlling at least one token, a new token is being controlled, and the user is in select groups mode
-            if (canvas.tokens.controlled.length > 0 && controlled && Ctg.selectGroups) {
-                // Add the same flag to each combatant in batch
-                let updates = [];
-                canvas.tokens.controlled.forEach(token => {
-                    // Check if token is in combat and if the combatant is already in the updates list
-                    if (token.inCombat && !updates.some(u => u._id === token.combatant.id)) updates.push({
-                        _id: token.combatant.id,
-                        ["flags.ctg.group"]: uid
-                    });
-                });
-                game.combat?.updateEmbeddedDocuments("Combatant", updates);
-
-                // Call selection hook
-                Hooks.call("ctgSelection", updates);
+                        break;
+                    };
+                };
             };
         });
     };
 
-    /** Manage rolling for group initiative for all of the combatants in the group
-     * @memberof Ctg
-     */
+    /** Manage rolling for group initiative for all of the combatants in the group  */
     rollGroupInitiative() {
         // Verify libWrapper is enabled
         if (!game.modules.get("lib-wrapper")?.active) {
-            ui.notifications.warn(game.i18n.localize("ctg.notifications.libWrapperRequired"));
+            ui.notifications.warn(`${Ctg.ID} | ${game.i18n.format("ctg.notifications.libWrapperRequired", { feature: game.i18n.localize("ctg.settings.rollGroupInitiative.name") })}`);
             return;
         };
+
+        // FIXME: Temporary fix for Foundry VTT issue: https://gitlab.com/foundrynet/foundryvtt/-/issues/6404
+        libWrapper.register("ctg", "KeyboardManager.prototype.hasFocus", () => document.querySelectorAll("input:focus, textarea:focus").length, "OVERRIDE");
 
         // Check whether group initiative should be rolled
         const isRollForGroupInitiative = () =>
             // Don't roll in "none" mode
             game.settings.get(Ctg.ID, "mode") !== "none"
             // Only Roll if the keybinding is being held down
-            && (game.keyboard._downKeys.has("Control") || game.keyboard._downKeys.has("Shift")
-                // Use keybinding in v9d2 and later
-                || Ctg.groupInitiativeKeybind);
+            && (// Use keybinding in v9d2 and later
+                Ctg.groupInitiativeKeybind
+                // Otherwise, fallback to the old method
+                ?? (game.keyboard._downKeys.has("Control") || game.keyboard._downKeys.has("Shift"))
+            );
 
         // Wrap initiative rolling methods
         libWrapper.register(Ctg.ID, "Combat.prototype.rollAll", groupInitiativeWrapper.bind(null, "rollAll"), "MIXED");
@@ -442,7 +450,7 @@ export default class Ctg {
                             const message = await group[0].getInitiativeRoll().toMessage({ flavor: `"${Ctg.getDisplayName(group)}" group rolls for Initiative!` });
 
                             // Update all of the combatants in this group with that roll total as their new initiative
-                            let updates = [];
+                            const updates = [];
                             group.forEach(combatant => updates.push({
                                 _id: combatant.id,
                                 initiative: message.roll.total,
@@ -464,36 +472,41 @@ export default class Ctg {
         };
     };
 
-    /** Manage skipping over groups
-     * @memberof Ctg
-     */
-    groupSkipping() {
-        // Hook into the combat update to manage skipping    
-        Hooks.on("preUpdateCombat", (document, change) => {
-            if (
-                document.current.turn < change?.turn // If this update is for a forward change of turn
-                && (document.current.turn !== 0 || change.turn === 1) // If we aren't at the start (except when the turn is being advanced)
-                && game.settings.get(Ctg.ID, "groupSkipping") // If the user has the setting enabled
-                && !change.groupSkipping // If this is not marked as an update from here
-            ) {
-                // Get the groups
-                const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
+    /** Manage grouping of selected tokens */
+    groupSelection() {
+        // Scene controls toggle button
+        Hooks.on("getSceneControlButtons", controls => {
+            // Add a scene control under the tokens menu if GM
+            if (game.user?.isGM) controls.find(c => c.name == "token").tools.push({
+                name: "groups",
+                title: "ctg.selectControl",
+                icon: "fas fa-users",
+                toggle: true,
+                active: Ctg.selectGroups ?? false,
+                onClick: toggled => Ctg.selectGroups = toggled,
+            });
+        });
 
-                // Go through each group and skip to the beginning of the group after the one containing the current combatant
-                groups?.some(group => {
+        // Do grouping whenever the controlled token changes
+        Hooks.on("controlToken", (_token, controlled) => {
+            // Generate a unique ID
+            const uid = randomID(16);
 
-                    // If the current combatant is the first in this group
-                    if (group.findIndex(c => c === document.combatant) === 0) {
-
-                        // Mutate the turn change to skip to the start of the next group
-                        change.turn = (change.turn + group.length - 1) % game.combat?.turns.length;
-
-                        // Mark this as an update from here
-                        change.groupSkipping = true;
-
-                        return true; // break
-                    };
+            // If controlling at least one token, a new token is being controlled, and the user is in select groups mode
+            if (canvas.tokens.controlled.length > 0 && controlled && Ctg.selectGroups) {
+                // Add the same flag to each combatant in batch
+                const updates = [];
+                canvas.tokens.controlled.forEach(token => {
+                    // Check if token is in combat and if the combatant is already in the updates list
+                    if (token.inCombat && !updates.some(u => u._id === token.combatant.id)) updates.push({
+                        _id: token.combatant.id,
+                        ["flags.ctg.group"]: uid
+                    });
                 });
+                game.combat?.updateEmbeddedDocuments("Combatant", updates);
+
+                // Call selection hook
+                Hooks.call("ctgSelection", updates);
             };
         });
     };

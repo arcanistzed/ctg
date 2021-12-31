@@ -30,10 +30,14 @@
             "rollGroupInitiative": {
                 "name": "Roll Group Initiative",
                 "hint": "When pressed down, clicking on any of the initiative rolling buttons in the Combat Tracker will result in a Group Initiative roll."
+            },
+            "sortCombatants": {
+                "name": "Sort Combatants",
+                "hint": "Sort the combatants in the Combat Tracker in the same way as they are grouped. This will stop the tracker from jumping around when switching turns and is therefore recommended especially for users with Group Skipping enabled."
             }
         },
         "notifications": {
-            "libWrapperRequired": "libWrapper must be enabled to use the group initiative rolling functionality.w",
+            "libWrapperRequired": "libWrapper must be enabled to use the {feature} functionality.",
             "invalidMode": "Grouping not possible because {mode} is not a valid mode.",
             "alreadyInMob": "Token with ID {id} is in multiple Mob Attack Tool Mobs, but will only show up in the first created Mob when grouped in the Combat Tracker."
         },
