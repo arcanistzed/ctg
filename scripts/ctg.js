@@ -66,7 +66,7 @@ export default class Ctg {
 
     /** Grouping Modes
      * The first item is the name and the second is the path
-     * @type {Array<Array<String>>}
+     * @type {String[][]}
      * @property {String} name - The name of the mode
      * @property {String} path - The path to the mode relative to the {@link CombatantData}
      */
@@ -81,7 +81,7 @@ export default class Ctg {
     /** Group Combatants
          * @static
          * @param {String} mode - The current mode
-         * @return {Array} An array of groupings
+     * @return {Combatant[][]} An array of groups
          */
     static groups(mode) {
         // Exit if invalid mode
@@ -90,7 +90,7 @@ export default class Ctg {
             return;
         };
 
-        // Special behavior for if Mob Attack Tool is enabled
+        /** @type {Combatant[][]} */
         if (mode === "mob") {
             const sortByTurns = (a, b) => game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
             const alreadyInMob = [];
@@ -157,7 +157,7 @@ export default class Ctg {
 
     /** Get display name of a given group
      * @static
-     * @param {Array<Combatant>} group - The group for which to return a name
+     * @param {Combatant[]} group - The group for which to return a name
      * @return {String} Concatenated display name for this group 
      */
     static getDisplayName(group) {
@@ -425,7 +425,7 @@ export default class Ctg {
         /** Wrapper for group initiative
          * @param {String} context - The type of group initiative roll being made
          * @param {Function} wrapped - The wrapped function
-         * @param {Array<String>} [ids=[""]] - An array containing the Combatant IDs passed to `rollInitiative`
+         * @param {String[]} [ids=[""]] - An array containing the Combatant IDs passed to `rollInitiative`
          */
         function groupInitiativeWrapper(context, wrapped, ids = [""]) {
             // Check if this is a roll for Group Initiative
