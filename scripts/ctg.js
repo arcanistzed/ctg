@@ -114,9 +114,6 @@ export default class Ctg {
             // Setup turns the default way first to prepare
             game.combat.setupTurns();
 
-            // FIXME
-            console.log(game.combat.turns, game.combat.turns.map(c => c.data.flags.ctg.test));
-
             // Reduce combat turns into an array of groups by matching a given property path
             const groups = Object.values(game.combat?.turns.reduce((accumulator, current) => {
                 if (current.visible) accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
@@ -128,11 +125,7 @@ export default class Ctg {
             // If enabled, sort combatant turns
             if (game.settings.get(Ctg.ID, "sortCombatants")) game.combat.turns = game.combat.turns.sort(this.sortCombatants);
 
-            // FIXME
-            console.log(game.combat.turns, game.combat.turns.map(c => c.data.flags.ctg.test))
-
             return groups;
-        };
     };
 
     /** Sort the combatants by the current mode's path */
