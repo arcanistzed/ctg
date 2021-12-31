@@ -412,7 +412,8 @@ export default class Ctg {
             return;
         };
 
-        // FIXME: Temporary fix for Foundry VTT issue: https://gitlab.com/foundrynet/foundryvtt/-/issues/6404
+        // Temporary fix for Foundry VTT issue: https://gitlab.com/foundrynet/foundryvtt/-/issues/6404
+        if (isNewerVersion(9.239, game.version ?? game.data.version)) // Not needed after v9s1
         libWrapper.register("ctg", "KeyboardManager.prototype.hasFocus", () => document.querySelectorAll("input:focus, textarea:focus").length, "OVERRIDE");
 
         // Check whether group initiative should be rolled
