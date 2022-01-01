@@ -12,7 +12,6 @@
 ### Fixed
 
 * Using selection tool without any active combats no longer causes console error
-* Minor bugs fixed with refactors & formatting
 * No longer attempts to add Combatants whose tokens are in multiple MAT Mobs to multiple groups, causing some weird nested groups
 * Group Skipping now works properly (with certain modes, you'll need the new sorting to be enabled)
 * Auto opens the correct toggle more often
