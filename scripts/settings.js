@@ -57,6 +57,11 @@ export default function registerSettings() {
         config: true,
         type: Boolean,
         default: false,
+        onChange: () => {
+            ui.combat?.render(true);
+        },
+    });
+
     game.settings.register(Ctg.ID, "noGroupHidden", {
         name: game.i18n.localize("ctg.settings.noGroupHidden.name"),
         hint: game.i18n.localize("ctg.settings.noGroupHidden.hint"),
