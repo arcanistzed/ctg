@@ -20,8 +20,8 @@
         "selectControl": "Select Combat Groups",
         "settings": {
             "groupSkipping": {
-                "hint": "Skip over each group",
-                "name": "Skip"
+                "hint": "Skip over each whole group of Combatants at once",
+                "name": "Group Skipping"
             },
             "openToggles": {
                 "name": "Open Toggles",
