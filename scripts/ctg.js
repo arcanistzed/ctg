@@ -337,16 +337,17 @@ export default class Ctg {
     groupSkipping() {
         // Hook into the combat update to manage skipping    
         Hooks.on("preUpdateCombat", async (document, change) => {
+            // Get the groups
+            const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
+
             if (
                 (change.turn > document.current.turn  // If this update is for a forward change of turn
                     || (change.turn !== document.turns.length - 1 && document.current.turn === 0)) // Or if anywhere other than the end with a turn of 0
                 && game.settings.get(Ctg.ID, "groupSkipping") // If the user has the setting enabled
                 && game.settings.get(Ctg.ID, "mode") !== "none" // If the mode is not "none"
+                && groups.length > 1 // If there is more than one group
                 && !change.groupSkipping // If this is not marked as an update from here
             ) {
-                // Get the groups
-                const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
-
                 // Go through each group and skip to the beginning of the group after the one containing the current combatant
                 for (const group of groups) {
 
