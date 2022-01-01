@@ -44,7 +44,11 @@ export default class Ctg {
             this.manageModes();
 
             // Re-render Combat Tracker when mobs update not from autosave (FIXME: a re-render is needed, but is not being included to avoid a MAT bug. See https://github.com/Stendarpaval/mob-attack-tool/issues/40)
-            if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat?.render(true));
+            if (game.modules.get("mob-attack-tool")?.active) {
+                Hooks.on("matMobUpdate", () => {
+                    if (!game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) ui.combat?.render(true);
+                });
+            };
 
             // Manage rolling group initiative if GM
             if (game.user?.isGM) {
