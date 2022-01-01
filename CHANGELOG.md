@@ -1,17 +1,26 @@
 # Changelog
 
-## unreleased
+## 1.0.0 - 1 Jan 2022 - Public Release
 
 ### Added
 
-* v9d2 keybindings are used for Group Initiative, if available
+* v9 keybindings are used for rolling Group Initiative
 * Localization for everything
+* Add a new option for combatant sorting which improves the group skipping experience
+* Option to not group hidden combatants
 
 ### Fixed
 
 * Using selection tool without any active combats no longer causes console error
 * Minor bugs fixed with refactors & formatting
 * No longer attempts to add Combatants whose tokens are in multiple MAT Mobs to multiple groups, causing some weird nested groups
+* Group Skipping now works properly (with certain modes, you'll need the new sorting to be enabled)
+* Auto opens the correct toggle more often
+* Temp fix for [core issue](https://gitlab.com/foundrynet/foundryvtt/-/issues/6404)
+* Show group selection control initially on load (it was only visible after switching tools before)
+* Don't skip groups if there is only one group
+* Improved description of Group Skipping setting
+* Improve warning for when Combatants are in multiple Mob Attack Tool Mobs
 
 ## 0.4.3 - 15 Nov 2021
 
