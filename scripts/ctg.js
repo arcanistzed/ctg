@@ -5,7 +5,8 @@ import registerSettings from "./settings.js";
 export default class Ctg {
     constructor() {
         Hooks.on("init", () => {
-            registerKeybindings();
+            if (!isNewerVersion(9, game.version ?? game.data.version))
+                registerKeybindings();
             registerSettings();
         });
 
