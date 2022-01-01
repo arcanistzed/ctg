@@ -22,7 +22,7 @@ export default function registerSettings() {
         scope: "world",
         config: true,
         type: Boolean,
-        default: false,
+        default: true,
         onChange: () => {
             ui.combat?.render(true);
             game.combat?.update({ turn: 0 });
