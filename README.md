@@ -23,9 +23,13 @@ If you use the "Roll NPCs" button, all groups with only NPCs will be rolled for.
 
 *Please note that this doesn't work in "None" mode and you **must** roll from the tracker for this to work.*
 
-### Skip Over Groups
+### Group Skipping
 
-The Skip over Groups feature makes Foundry skip over the rest of combatants in the current group when advancing the turn tracker.
+The Group Skipping feature skips over the rest of combatants in the current group when advancing the turn tracker. It's recommended to use this with Combatant Sorting enabled.
+
+### Combatant Sorting
+
+When enabled, CTG attempts to sort combatants by their group which is the optimal order for group skipping. It compares numbers numerically (e.g. in Initiative mode), strings alphabetically (e.g. in Name mode), and the rest by ID (e.g. in Selection mode).
 
 ### Grouping modes
 
@@ -123,11 +127,7 @@ The arguments for these hooks are: an array with the Combatant IDs and the new i
 
 ### Variables & Methods
 
-These methods can be found under `game.modules.get("ctg").api`:
-
-#### `ID`
-
-The module's ID: `ctg`
+Among others, these are some useful methods that can be found under `game.modules.get("ctg").api`:
 
 #### `MODES`
 
@@ -141,21 +141,21 @@ game.modules.get("ctg").api.MODES.push(["NPC", "isNPC"]);
 
 If you think you have a good idea for a grouping mode, feel free to suggest it and it could be added to the module for everyone!
 
-#### `selectGroups`
+#### `getDisplayName`
 
-This boolean tracks whether or not to allow groups to be created for the "selection" mode.
+This method generates the name which is displayed for a given group (an array of Combatants).
 
 #### `groupInitiativeKeybind`
 
 This boolean tracks whether or not the user is currently holding down the group initiative rolling keybind (the default for that is `SHIFT` or `CONTROL`).
 
-#### `getDisplayName`
-
-This method generates the name which is displayed for a given group (an array of Combatants).
-
 #### `groups`
 
-This method reduces the combat turns (or maps the MAT mobs) into an array of groups (which are arrays of Combatants). You must pass a valid mode when calling this and the groups will be created based on the path.
+This method returns the current sorted array of groups (which are arrays of Combatants). You must pass a valid mode when calling this and the groups will be created based on it's path.
+
+#### `selectGroups`
+
+This boolean tracks whether or not to allow groups to be created for the "selection" mode.
 
 ## License
 
@@ -168,6 +168,12 @@ See the [Notice](./NOTICE.md) for attribution details.
 ## Bugs
 
 You can submit bugs via [Github Issues](https://github.com/arcanistzed/ctg/issues/new/choose) or on [my Discord server](https://discord.gg/AAkZWWqVav).
+
+### Known Issues
+
+- Not currently compatible with the old Group Initiative module or MAT's option which enables that
+- Sorting doesn't work with Mob mode
+- Lancer Initiative's context menu shows up on the group toggles
 
 ## Contact me
 
