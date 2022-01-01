@@ -38,7 +38,7 @@ export default function registerSettings() {
         scope: "world",
         config: true,
         type: Boolean,
-        default: true
+        default: true,
     });
 
     game.settings.register(Ctg.ID, "sortCombatants", {
@@ -47,7 +47,7 @@ export default function registerSettings() {
         scope: "world",
         config: true,
         type: Boolean,
-        default: true
+        default: true,
     });
 
     game.settings.register(Ctg.ID, "onlyShowGroupsForGM", {
