@@ -16,7 +16,10 @@ export default class Ctg {
 
         Hooks.on("ready", () => {
             // Initialize API
-            game.modules.get("ctg").api = Ctg;
+            game.modules.get("ctg").api = mergeObject(Ctg, {
+                recursiveGetPropertyAsString,
+                getDisplayName,
+            });
 
             // Console art
             console.log(
