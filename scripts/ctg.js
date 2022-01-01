@@ -119,7 +119,7 @@ export default class Ctg {
                     .filter(id => {
                         // Don't add a combatant to more than one group
                         const already = alreadyInMob.includes(id);
-                        if (already) ui.notifications.warn(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.alreadyInMob", { id })}`);
+                        if (already) console.warn(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.alreadyInMob", { id })}`);
                         alreadyInMob.push(id);
                         return !already;
                     }).map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
