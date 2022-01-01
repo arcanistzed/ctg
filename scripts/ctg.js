@@ -5,8 +5,12 @@ import registerSettings from "./settings.js";
 export default class Ctg {
     constructor() {
         Hooks.on("init", () => {
-            if (!isNewerVersion(9, game.version ?? game.data.version))
+            // Initialize keybindings in v9
+            if (!isNewerVersion(9, game.version ?? game.data.version)) {
                 registerKeybindings();
+                Ctg.groupInitiativeKeybind = false;
+            };
+            // Register settings
             registerSettings();
         });
 
@@ -36,7 +40,7 @@ export default class Ctg {
             // Re-render Combat Tracker when mobs update not from autosave (FIXME: a re-render is needed, but is not being included to avoid a MAT bug. See https://github.com/Stendarpaval/mob-attack-tool/issues/40)
             if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat?.render(true));
 
-            // Manage rolling initiative for the whole group at once if GM
+            // Manage rolling group initiative if GM
             if (game.user?.isGM) this.rollGroupInitiative();
 
             Hooks.on("renderCombatTracker", (app, html, data) => {
@@ -78,7 +82,7 @@ export default class Ctg {
     static selectGroups = false;
 
     /** Whether the user is currently holding down the Group Initiative rolling keybind */
-    static groupInitiativeKeybind = false;
+    static groupInitiativeKeybind;
 
     /** Create Groups of Combatants
      * @static
@@ -342,7 +346,8 @@ export default class Ctg {
             const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
 
             if (
-                (change.turn > document.current.turn  // If this update is for a forward change of turn
+                game.user?.isGM // If the user is a GM
+                && (change.turn > document.current.turn  // If this update is for a forward change of turn
                     || (change.turn !== document.turns.length - 1 && document.current.turn === 0)) // Or if anywhere other than the end with a turn of 0
                 && game.settings.get(Ctg.ID, "groupSkipping") // If the user has the setting enabled
                 && game.settings.get(Ctg.ID, "mode") !== "none" // If the mode is not "none"
