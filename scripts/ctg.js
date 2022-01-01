@@ -41,7 +41,16 @@ export default class Ctg {
             if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat?.render(true));
 
             // Manage rolling group initiative if GM
-            if (game.user?.isGM) this.rollGroupInitiative();
+            if (game.user?.isGM) {
+                this.rollGroupInitiative();
+            } else { // Hide keybindings for everyone else
+                const style = document.createElement("style");
+                style.innerHTML = `
+                #keybindings .ctg {
+                    display: none;
+                }`;
+                document.head.appendChild(style);
+            };
 
             Hooks.on("renderCombatTracker", (app, html, data) => {
                 // Exit if there is no combat
