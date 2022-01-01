@@ -133,7 +133,9 @@ export default class Ctg {
 
             // Reduce combat turns into an array of groups by matching a given property path
             groups = Object.values(game.combat?.turns.reduce((accumulator, current) => {
-                if (current.visible) accumulator[recursiveGetPropertyAsString(current, path)] = [...accumulator[recursiveGetPropertyAsString(current, path)] || [], current];
+                // If the combatant is visible and, if noGroupHidden is enabled, not hidden
+                if (current.visible && !(game.settings.get(Ctg.ID, "noGroupHidden") && current.hidden))
+                    accumulator[recursiveGetPropertyAsString(current, path)] = [...accumulator[recursiveGetPropertyAsString(current, path)] || [], current];
                 return accumulator;
             }, {}));
         };

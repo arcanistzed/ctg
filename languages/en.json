@@ -38,6 +38,10 @@
             "onlyShowGroupsForGM": {
                 "name": "Only Show Groups for GMs",
                 "hint": "When enabled, Combat Tracker groups are only created for GM users"
+            },
+            "noGroupHidden": {
+                "name": "Don't Group Hidden Combatants",
+                "hint": "If enabled, Combatants that are hidden are not grouped"
             }
         },
         "notifications": {
