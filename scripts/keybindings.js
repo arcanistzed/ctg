@@ -10,7 +10,7 @@ export default function registerKeybindings() {
             { key: "ControlLeft" },
             { key: "ControlRight" }
         ],
-        onDown: () => { console.log("DOWN"); Ctg.groupInitiativeKeybind = true; },
-        onUp: () => { console.log("UP"); Ctg.groupInitiativeKeybind = false; },
+        onDown: () => Ctg.groupInitiativeKeybind = true,
+        onUp: () => Ctg.groupInitiativeKeybind = false,
     });
 };
