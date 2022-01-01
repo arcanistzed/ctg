@@ -37,6 +37,9 @@ export default class Ctg {
                 [game.i18n.localize("ctg.modes.actor"), "data.actorId"]
             ];
 
+            // Manage modes
+            this.manageModes();
+
             // Re-render Combat Tracker when mobs update not from autosave (FIXME: a re-render is needed, but is not being included to avoid a MAT bug. See https://github.com/Stendarpaval/mob-attack-tool/issues/40)
             if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat?.render(true));
 
