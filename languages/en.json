@@ -34,6 +34,10 @@
             "sortCombatants": {
                 "name": "Sort Combatants",
                 "hint": "Sort the combatants in the Combat Tracker in the same way as they are grouped. This will stop the tracker from jumping around when switching turns and is therefore recommended especially for users with Group Skipping enabled."
+            },
+            "onlyShowGroupsForGM": {
+                "name": "Only Show Groups for GMs",
+                "hint": "When enabled, Combat Tracker groups are only created for GM users"
             }
         },
         "notifications": {

@@ -242,7 +242,8 @@ export default class Ctg {
         // Show current mode if GM and mode is defined
         if (game.user?.isGM && mode) html?.querySelectorAll("#ctg-mode-radio-" + mode + ",#ctg-mode-radio-" + mode + popOutSuffix).forEach(e => e.checked = true);
 
-        if (mode !== "none") {
+        // Don't group if mode is None or if onlyShowGroupsForGM is enabled and this is not a GM
+        if (!(mode === "none" || (game.settings.get(Ctg.ID, "onlyShowGroupsForGM") && !game.user?.isGM))) {
             // Get groups
             const groups = Ctg.groups(mode);
             // Call group update hook

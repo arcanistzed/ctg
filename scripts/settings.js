@@ -46,4 +46,13 @@ export default function registerSettings() {
         type: Boolean,
         default: true
     });
+
+    game.settings.register(Ctg.ID, "onlyShowGroupsForGM", {
+        name: game.i18n.localize("ctg.settings.onlyShowGroupsForGM.name"),
+        hint: game.i18n.localize("ctg.settings.onlyShowGroupsForGM.hint"),
+        scope: "world",
+        config: true,
+        type: Boolean,
+        default: false,
+    });
 };
