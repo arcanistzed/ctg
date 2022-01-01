@@ -179,8 +179,7 @@ export default class Ctg {
             // Fallback to comparing the IDs
             return a?.id > b?.id ? 1 : -1;
         } else { // If disabled, sort by position in the existing turn order
-            // FIXME is minus or compare operator?
-            return game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
+            return game.combat?.turns.indexOf(a) > game.combat?.turns.indexOf(b);
         };
     };
 
