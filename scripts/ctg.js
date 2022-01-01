@@ -1,3 +1,4 @@
+import { recursiveGetPropertyAsString, getDisplayName } from "./helpers.js";
 import registerKeybindings from "./keybindings.js";
 import registerSettings from "./settings.js";
 
@@ -27,21 +28,15 @@ export default class Ctg {
                 [game.i18n.localize("ctg.modes.initiative"), "initiative"],
                 [game.i18n.localize("ctg.modes.name"), "name"],
                 [game.i18n.localize("ctg.modes.selection"), "data.flags.ctg.group"],
-                [game.i18n.localize("ctg.modes.players"), "players"],
+                [game.i18n.localize("ctg.modes.players"), "players.*.id"],
                 [game.i18n.localize("ctg.modes.actor"), "data.actorId"]
             ];
 
             // Re-render Combat Tracker when mobs update not from autosave (FIXME: a re-render is needed, but is not being included to avoid a MAT bug. See https://github.com/Stendarpaval/mob-attack-tool/issues/40)
             if (game.modules.get("mob-attack-tool")?.active && !game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) Hooks.on("matMobUpdate", () => ui.combat?.render(true));
 
-            // Run group skipping code
-            this.groupSkipping();
-
             // Manage rolling initiative for the whole group at once if GM
             if (game.user?.isGM) this.rollGroupInitiative();
-
-            // Group selection
-            this.groupSelection();
 
             Hooks.on("renderCombatTracker", (app, html, data) => {
                 // Exit if there is no combat
@@ -59,6 +54,12 @@ export default class Ctg {
                 }));
             });
         });
+
+        // Run group skipping code
+        this.groupSkipping();
+
+        // Group selection
+        this.groupSelection();
     };
 
     /** The module's ID */
@@ -66,9 +67,9 @@ export default class Ctg {
 
     /** Grouping Modes
      * The first item is the name and the second is the path
-     * @type {Array<Array<String>>}
-     * @property {String} name - The name of the mode
-     * @property {String} path - The path to the mode relative to the {@link CombatantData}
+     * @type {string[][]}
+     * @property {string} name - The name of the mode
+     * @property {string} path - The path to the mode relative to the {@link CombatantData}
      */
     static MODES = [];
 
@@ -78,11 +79,11 @@ export default class Ctg {
     /** Whether the user is currently holding down the Group Initiative rolling keybind */
     static groupInitiativeKeybind = false;
 
-    /** Group Combatants
-         * @static
-         * @param {String} mode - The current mode
-         * @return {Array} An array of groupings
-         */
+    /** Create Groups of Combatants
+     * @static
+     * @param {string} mode - The current mode
+     * @return {Combatant[][]} An array of groups
+     */
     static groups(mode) {
         // Exit if invalid mode
         if (!Ctg.MODES.map(m => m[0]).includes(mode)) {
@@ -90,13 +91,16 @@ export default class Ctg {
             return;
         };
 
-        // Special behavior for if Mob Attack Tool is enabled
+        /** @type {Combatant[][]} */
+        let groups;
+
+        // Special behavior for creating groups in Mob mode
         if (mode === "mob") {
             const sortByTurns = (a, b) => game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
             const alreadyInMob = [];
 
             // Get groups from MAT mobs
-            return Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
+            groups = Object.values(game.settings.get("mob-attack-tool", "hiddenMobList"))
                 .map(mob => mob.selectedTokenIds
                     .filter(id => {
                         // Don't add a combatant to more than one group
@@ -105,8 +109,7 @@ export default class Ctg {
                         alreadyInMob.push(id);
                         return !already;
                     }).map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
-                .map(arr => arr.sort(sortByTurns).filter(x => x)) // Sort combatants within each group and filter out tokens without combatants
-                .sort(arr => arr.sort(sortByTurns)); // Sort each group by the turn order
+                .map(arr => arr.sort(sortByTurns).filter(x => x)); // Sort combatants within each group and filter out tokens without combatants
         } else {
             // Get the path for this mode
             const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
@@ -114,87 +117,53 @@ export default class Ctg {
             // Setup turns the default way first to prepare
             game.combat.setupTurns();
 
-            // FIXME
-            console.log(game.combat.turns, game.combat.turns.map(c => c.data.flags.ctg.test));
-
             // Reduce combat turns into an array of groups by matching a given property path
-            const groups = Object.values(game.combat?.turns.reduce((accumulator, current) => {
-                if (current.visible) accumulator[getProperty(current, path)] = [...accumulator[getProperty(current, path)] || [], current];
+            groups = Object.values(game.combat?.turns.reduce((accumulator, current) => {
+                if (current.visible) accumulator[recursiveGetPropertyAsString(current, path)] = [...accumulator[recursiveGetPropertyAsString(current, path)] || [], current];
                 return accumulator;
             }, {}));
-
-            // Sort each group
-            groups.forEach(group => group.sort(this.sortCombatants));
-            // If enabled, sort combatant turns
-            if (game.settings.get(Ctg.ID, "sortCombatants")) game.combat.turns = game.combat.turns.sort(this.sortCombatants);
-
-            // FIXME
-            console.log(game.combat.turns, game.combat.turns.map(c => c.data.flags.ctg.test))
-
-            return groups;
         };
+
+        // Sort each group
+        groups.forEach(group => group.sort(this.sortCombatants));
+        // If enabled, sort combatant turns
+        if (game.settings.get(Ctg.ID, "sortCombatants")) game.combat.turns = game.combat.turns.sort(this.sortCombatants);
+
+        return groups;
     };
 
-    /** Sort the combatants by the current mode's path */
+    /** Sort the combatants */
     static sortCombatants(a, b) {
-        // Get the path for the current mode
-        const path = Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")).slice(-1)[0];
+        // Sort by the current mode's path
+        if (game.settings.get(Ctg.ID, "sortCombatants")) {
+            // Get the path for the current mode
+            const path = Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")).slice(-1)[0];
 
-        // Get the values for the two combatants
-        let ia = getProperty(a, path);
-        let ib = getProperty(b, path);
+            // Get the values for the two combatants
+            let ia = recursiveGetPropertyAsString(a, path);
+            let ib = recursiveGetPropertyAsString(b, path);
 
-        // If they are numbers, sort numerically
-        if (Number.isNumeric(ia), Number.isNumeric(ib)) {
-            const ci = ib - ia;
-            if (ci !== 0) return ci;
-            return a.id > b.id ? 1 : -1;
-        } else if (typeof ia === "object" && typeof ib === "object") {
-            // Get the first item if it's an array
-            ia = Array.isArray(ia) ? ia[0] : ia;
-            ib = Array.isArray(ib) ? ib[0] : ib;
-            return ia?.id > ib?.id ? 1 : -1;
-        } else if (typeof ia === "string" && typeof ib === "string") {
-            // Otherwise, sort alphabetically
-            return ia.localeCompare(ib);
+            // If they are numbers, sort numerically
+            if (Number.isNumeric(ia), Number.isNumeric(ib)) {
+                const ci = ib - ia;
+                if (ci !== 0) return ci;
+                return a.id > b.id ? 1 : -1;
+            } else if (typeof ia === "object" && typeof ib === "object") {
+                // Get the first item if it's an array
+                ia = Array.isArray(ia) ? ia[0] : ia;
+                ib = Array.isArray(ib) ? ib[0] : ib;
+                return ia?.id > ib?.id ? 1 : -1;
+            } else if (typeof ia === "string" && typeof ib === "string") {
+                // Otherwise, sort alphabetically
+                return ia.localeCompare(ib);
+            };
+            // Fallback to comparing the IDs
+            return a?.id > b?.id ? 1 : -1;
+        } else { // If disabled, sort by position in the existing turn order
+            // FIXME is minus or compare operator?
+            return game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
         };
-        // Fallback to comparing the IDs
-        return a?.id > b?.id ? 1 : -1;
     };
-
-    /** Get display name of a given group
-     * @static
-     * @param {Array<Combatant>} group - The group for which to return a name
-     * @return {String} Concatenated display name for this group 
-     */
-    static getDisplayName(group) {
-        /** Names in the current group */
-        let names = [];
-
-        // Go through all of the combatants in the group
-        group.forEach(combatant => {
-            /** The DOM element of this combatant */
-            const element = ui.combat.element[0].querySelector(`[data-combatant-id="${combatant?.id}"]`);
-
-            /** The name of this combatant in the Tracker */
-            const trackerName = element?.querySelector(".token-name > h4").textContent;
-
-            // Add the name of the current combatant if it is not already
-            if (!names.includes(combatant?.name)) names.push((
-                // Compatibility with CUB Hide Actor Names: check whether the name is being hidden by CUB
-                game.modules.get("combat-utility-belt")?.active && game.settings.get("combat-utility-belt", "enableHideNPCNames")
-                && (
-                    (game.settings.get("combat-utility-belt", "enableHideHostileNames") && trackerName === game.settings.get("combat-utility-belt", "hostileNameReplacement"))
-                    || (game.settings.get("combat-utility-belt", "enableHideNeutralNames") && trackerName === game.settings.get("combat-utility-belt", "neutralNameReplacement"))
-                    || (game.settings.get("combat-utility-belt", "enableHideFriendlyNames") && trackerName === game.settings.get("combat-utility-belt", "friendlyNameReplacement"))
-                )
-                // Add the name in the tracker instead if it has been hidden
-            ) ? trackerName : combatant?.name);
-        });
-
-        // Return a string with the names
-        return names.length < 3 ? names.join(" and ") : names.join(", ");
-    }
 
     /** Manage available modes and switch away from invalid ones */
     manageModes() {
@@ -208,12 +177,12 @@ export default class Ctg {
         // Change mode if saved one no longer exists
         if (!Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")))
             game.settings?.set(Ctg.ID, "mode", "none");
-    }
+    };
 
     /**
      * Create Combat Tracker modes
      * @param {HTMLElement} html - The Combat Tracker's HTML
-     * @param {Boolean} popOut - Whether this Combat Tracker is popped out
+     * @param {boolean} popOut - Whether this Combat Tracker is popped out
      */
     createModes(html, popOut) {
         /** Suffix for pop out */
@@ -248,8 +217,8 @@ export default class Ctg {
 
     /**
      * Manage and create Combat Tracker groups
-     * @param {String} mode - The mode that is currently enabled @see {@link modes}
-     * @param {Boolean} popOut - Whether this Combat Tracker is popped out
+     * @param {string} mode - The mode that is currently enabled @see {@link modes}
+     * @param {boolean} popOut - Whether this Combat Tracker is popped out
      */
     manageGroups(mode, popOut) {
         // If trying to use the pop out, check if one actually exists first
@@ -311,7 +280,7 @@ export default class Ctg {
                         labelValue.classList.add("ctg-labelValue");
 
                         // Add the group name to the label
-                        labelName.innerText = Ctg.getDisplayName(group);
+                        labelName.innerText = getDisplayName(group);
 
                         // Add the value to the label if not in name mode
                         if (mode === "initiative") labelValue.innerText = getProperty(combatant, Ctg.MODES.find(m => m[0] === mode).slice(-1)[0]);
@@ -368,16 +337,17 @@ export default class Ctg {
     groupSkipping() {
         // Hook into the combat update to manage skipping    
         Hooks.on("preUpdateCombat", async (document, change) => {
+            // Get the groups
+            const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
+
             if (
                 (change.turn > document.current.turn  // If this update is for a forward change of turn
                     || (change.turn !== document.turns.length - 1 && document.current.turn === 0)) // Or if anywhere other than the end with a turn of 0
                 && game.settings.get(Ctg.ID, "groupSkipping") // If the user has the setting enabled
                 && game.settings.get(Ctg.ID, "mode") !== "none" // If the mode is not "none"
+                && groups.length > 1 // If there is more than one group
                 && !change.groupSkipping // If this is not marked as an update from here
             ) {
-                // Get the groups
-                const groups = Ctg.groups(game.settings.get(Ctg.ID, "mode"));
-
                 // Go through each group and skip to the beginning of the group after the one containing the current combatant
                 for (const group of groups) {
 
@@ -410,8 +380,9 @@ export default class Ctg {
             return;
         };
 
-        // FIXME: Temporary fix for Foundry VTT issue: https://gitlab.com/foundrynet/foundryvtt/-/issues/6404
-        libWrapper.register("ctg", "KeyboardManager.prototype.hasFocus", () => document.querySelectorAll("input:focus, textarea:focus").length > 0, "OVERRIDE");
+        // Temporary fix for Foundry VTT issue: https://gitlab.com/foundrynet/foundryvtt/-/issues/6404
+        if (isNewerVersion(9.239, game.version ?? game.data.version)) // Not needed after v9s1
+            libWrapper.register("ctg", "KeyboardManager.prototype.hasFocus", () => document.querySelectorAll("input:focus, textarea:focus").length > 0, "OVERRIDE");
 
         // Check whether group initiative should be rolled
         const isRollForGroupInitiative = () =>
@@ -430,9 +401,9 @@ export default class Ctg {
         libWrapper.register(Ctg.ID, "Combat.prototype.rollInitiative", groupInitiativeWrapper.bind(null, "roll"), "MIXED");
 
         /** Wrapper for group initiative
-         * @param {String} context - The type of group initiative roll being made
+         * @param {string} context - The type of group initiative roll being made
          * @param {Function} wrapped - The wrapped function
-         * @param {Array<String>} [ids=[""]] - An array containing the Combatant IDs passed to `rollInitiative`
+         * @param {string[]} [ids=[""]] - An array containing the Combatant IDs passed to `rollInitiative`
          */
         function groupInitiativeWrapper(context, wrapped, ids = [""]) {
             // Check if this is a roll for Group Initiative
@@ -447,7 +418,7 @@ export default class Ctg {
                             || (context === "roll" && group.some(combatant => combatant.id === id)) // Roll for groups which contain the current combatant
                         ) {
                             // Roll initiative for the first combatant in the group
-                            const message = await group[0].getInitiativeRoll().toMessage({ flavor: `"${Ctg.getDisplayName(group)}" group rolls for Initiative!` });
+                            const message = await group[0].getInitiativeRoll().toMessage({ flavor: `"${getDisplayName(group)}" group rolls for Initiative!` });
 
                             // Update all of the combatants in this group with that roll total as their new initiative
                             const updates = [];
@@ -461,10 +432,10 @@ export default class Ctg {
 
                             // Log to console and call hook
                             const who = context === "rollAll" ? " everyone in" : context === "rollNPC" ? " NPCs in" : "";
-                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.success", { who: who, group: Ctg.getDisplayName(group) })}`);
+                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.success", { who: who, group: getDisplayName(group) })}`);
                             Hooks.call(`ctg${context.capitalize()}`, updates, message.roll, id);
                         } else {
-                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: Ctg.getDisplayName(group) })}`);
+                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: getDisplayName(group) })}`);
                         };
                     });
                 });
