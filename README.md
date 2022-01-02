@@ -173,7 +173,7 @@ You can submit bugs via [Github Issues](https://github.com/arcanistzed/ctg/issue
 
 - Not currently compatible with the old Group Initiative module or MAT's option which enables that
 - Sorting doesn't work with Mob mode
-- Lancer Initiative's context menu shows up on the group toggles
+- Context menu shows up on the group toggles
 
 ## Contact me
 
