@@ -328,15 +328,9 @@ export default class Ctg {
                             saveMob.title = "Save as MAT mob";
                             labelFlex.append(saveMob);
 
-                            saveMob.addEventListener("click", async () => {
-                                const groups = Ctg.groups(mode);
-                                const actorList = groups[index].map(combatant => combatant.actor);
-                                const selectedTokenIds = groups[index].map(combatant => combatant.token.id);
-                                const numSelected = groups[index].length;
-
-                                await MobAttacks.saveMob(labelName.innerText, actorList, selectedTokenIds, numSelected);
-                            })
-                        }
+                            // Create a mob when the button is clicked
+                            saveMob.addEventListener("click", () => MobAttacks.createSavedMobsFromCTGgroups([Ctg.groups(mode)[index]]));
+                        };
                     };
 
                     // Move the element into the subdirectory
