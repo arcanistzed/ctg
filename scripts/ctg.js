@@ -173,8 +173,6 @@ export default class Ctg {
 
         // Sort each group
         groups.forEach(group => group.sort(this.sortCombatants));
-        // If enabled, sort combatant turns
-        if (game.settings.get(Ctg.ID, "sortCombatants")) game.combat.turns = game.combat.turns.sort(this.sortCombatants);
 
         return groups;
     }

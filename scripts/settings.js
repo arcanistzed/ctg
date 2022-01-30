@@ -7,10 +7,18 @@ export default function registerSettings() {
         type: String,
         default: "initiative",
         onChange: mode => {
+            Ctg.log(false, `Mode changed to "${mode}"`);
+
+            // If enabled, sort combatant turns
+            if (game.settings.get(Ctg.ID, "sortCombatants")) {
+                game.combat.turns = game.combat.turns.sort(Ctg.sortCombatants);
+            }
+
             // Setup the turns again
             game.combat.setupTurns();
             // Re-render the combat tracker
             ui.combat?.render(true);
+
             // Call hook for mode update
             Hooks.call("ctgModeUpdate", mode);
         },
