@@ -77,6 +77,12 @@ export default class Ctg {
                     const mode = event.target?.id?.replace("ctg-mode-radio-", "").replace("-popOut", "");
                     if (Ctg.MODES.map(m => m[0]).includes(mode)) game.settings.set(Ctg.ID, "mode", mode);
                 }));
+
+                // For debugging: expand all groups and show turn order
+                if (game.modules.get("_dev-mode")?.api?.getPackageDebugValue("ctg")) {
+                    html[0].querySelectorAll("details.ctg-toggle").forEach(el => el.open = true);
+                    html[0].querySelectorAll("li.combatant").forEach(el => el.append(game.combat.turns.findIndex(t => t.id === el.dataset.combatantId)));
+                }
             });
         });
 
