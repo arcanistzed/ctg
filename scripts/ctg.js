@@ -368,6 +368,7 @@ export default class Ctg {
                 // Open the toggle for the current combatant if enabled
                 if (game.settings.get(Ctg.ID, "openToggles")) currentToggle.open = true;
                 currentToggle.classList.add("active");
+                Ctg.log(false, currentToggle, game.combat.combatant?.id)
             }
         }
     }
