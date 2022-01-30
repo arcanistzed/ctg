@@ -42,6 +42,10 @@
             "noGroupHidden": {
                 "name": "Don't Group Hidden Combatants",
                 "hint": "If enabled, Combatants that are hidden are not grouped"
+            },
+            "noGroupPCs": {
+                "name": "Don't Group Combatants Owned by Players",
+                "hint": "If enabled, Combatants that are owned by players are not grouped"
             }
         },
         "notifications": {

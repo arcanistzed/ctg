@@ -81,4 +81,15 @@ export default function registerSettings() {
             ui.combat?.render(true);
         },
     });
+    game.settings.register(Ctg.ID, "noGroupPCs", {
+        name: game.i18n.localize("ctg.settings.noGroupPCs.name"),
+        hint: game.i18n.localize("ctg.settings.noGroupPCs.hint"),
+        scope: "world",
+        config: true,
+        type: Boolean,
+        default: false,
+        onChange: () => {
+            ui.combat?.render(true);
+        },
+    });
 }
