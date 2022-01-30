@@ -7,10 +7,10 @@ export default function registerSettings() {
         type: String,
         default: "initiative",
         onChange: mode => {
-            // Re-render the combat tracker
-            ui.combat?.render(true);
             // Setup the turns again
             game.combat.setupTurns();
+            // Re-render the combat tracker
+            ui.combat?.render(true);
             // Call hook for mode update
             Hooks.call("ctgModeUpdate", mode);
         },
