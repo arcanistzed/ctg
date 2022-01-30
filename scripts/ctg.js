@@ -27,7 +27,7 @@ export default class Ctg {
             });
 
             // Console art
-            Ctg.log(true,
+            console.log(
                 `%c${game.i18n.localize("ctg.welcome.name")}`,
                 "font-size: 48px; font-family: 'Signika'; text-shadow: 0 0 10px rgb(255, 100, 0)",
                 `\n${game.i18n.localize("ctg.welcome.author")}`,
