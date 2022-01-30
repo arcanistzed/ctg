@@ -85,6 +85,9 @@ export default class Ctg {
                     ui.sidebar.activateTab("combat");
                 }
             });
+
+            // Re-render the combat tracker in case the initial render was missed
+            ui.combat.render(true);
         });
 
         // Run group skipping code
