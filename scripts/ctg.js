@@ -103,7 +103,7 @@ export default class Ctg {
     static log(force, ...args) {
         const shouldLog = force || game.modules.get("_dev-mode")?.api?.getPackageDebugValue(Ctg.ID);
         if (shouldLog) {
-            console.log(Ctg.ID, "|", ...args);
+            console.log(game.i18n.localize("ctg.ID"), "|", ...args);
         }
     }
 
@@ -470,10 +470,10 @@ export default class Ctg {
 
                             // Log to console and call hook
                             const who = context === "rollAll" ? " everyone in" : context === "rollNPC" ? " NPCs in" : "";
-                            Ctg.log(false, `${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.success", { who: who, group: getDisplayName(group) })}`);
+                            Ctg.log(false, game.i18n.format("ctg.rollingGroupInitiative.success", { who: who, group: getDisplayName(group) }));
                             Hooks.call(`ctg${context.capitalize()}`, updates, message.roll, id);
                         } else {
-                            Ctg.log(false, `${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: getDisplayName(group) })}`);
+                            Ctg.log(false, game.i18n.format("ctg.rollingGroupInitiative.failure", { group: getDisplayName(group) }));
                         }
                     });
                 });
