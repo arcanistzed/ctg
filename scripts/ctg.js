@@ -14,6 +14,11 @@ export default class Ctg {
             registerSettings();
         });
 
+        // Register for DevMode
+        Hooks.once("devModeReady", ({ registerPackageDebugFlag }) => {
+            registerPackageDebugFlag(Ctg.ID);
+        });
+
         Hooks.on("ready", () => {
             // Initialize API
             game.modules.get("ctg").api = mergeObject(Ctg, {
@@ -22,7 +27,7 @@ export default class Ctg {
             });
 
             // Console art
-            console.log(
+            Ctg.log(true,
                 `%c${game.i18n.localize("ctg.welcome.name")}`,
                 "font-size: 48px; font-family: 'Signika'; text-shadow: 0 0 10px rgb(255, 100, 0)",
                 `\n${game.i18n.localize("ctg.welcome.author")}`,
@@ -85,6 +90,17 @@ export default class Ctg {
     /** The module's ID */
     static ID = "ctg";
 
+    /** DevMode logging helper
+     * @param {boolean} force - Whether to force logging
+     * @param {*} args - Arguments to log
+     */
+    static log(force, ...args) {
+        const shouldLog = force || game.modules.get("_dev-mode")?.api?.getPackageDebugValue(Ctg.ID);
+        if (shouldLog) {
+            console.log(Ctg.ID, "|", ...args);
+        };
+    };
+
     /** Grouping Modes
      * The first item is the name and the second is the path
      * @type {string[][]}
@@ -100,7 +116,6 @@ export default class Ctg {
     static groupInitiativeKeybind;
 
     /** Create Groups of Combatants
-     * @static
      * @param {string} mode - The current mode
      * @return {Combatant[][]} An array of groups
      */
@@ -449,10 +464,10 @@ export default class Ctg {
 
                             // Log to console and call hook
                             const who = context === "rollAll" ? " everyone in" : context === "rollNPC" ? " NPCs in" : "";
-                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.success", { who: who, group: getDisplayName(group) })}`);
+                            Ctg.log(false, `${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.success", { who: who, group: getDisplayName(group) })}`);
                             Hooks.call(`ctg${context.capitalize()}`, updates, message.roll, id);
                         } else {
-                            console.log(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: getDisplayName(group) })}`);
+                            Ctg.log(false, `${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: getDisplayName(group) })}`);
                         };
                     });
                 });
