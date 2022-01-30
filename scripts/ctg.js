@@ -82,6 +82,7 @@ export default class Ctg {
                 if (game.modules.get("_dev-mode")?.api?.getPackageDebugValue("ctg")) {
                     html[0].querySelectorAll("details.ctg-toggle").forEach(el => el.open = true);
                     html[0].querySelectorAll("li.combatant").forEach(el => el.append(game.combat.turns.findIndex(t => t.id === el.dataset.combatantId)));
+                    ui.sidebar.activateTab("combat");
                 }
             });
         });
