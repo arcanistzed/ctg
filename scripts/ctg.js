@@ -295,7 +295,7 @@ export default class Ctg {
             // Go through each of the groups
             groups?.forEach((group, index) => {
                 /** Toggle element */
-                const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle", "directory-item", "folder");
+                const toggle = document.createElement("details"); toggle.classList.add("ctg-toggle", "folder");
 
                 /** A subdirectory in the toggle which contains Combatants */
                 const subdirectory = document.createElement("ol"); subdirectory.classList.add("subdirectory");
