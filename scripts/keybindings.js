@@ -13,4 +13,4 @@ export default function registerKeybindings() {
         onDown: () => Ctg.groupInitiativeKeybind = true,
         onUp: () => Ctg.groupInitiativeKeybind = false,
     });
-};
+}

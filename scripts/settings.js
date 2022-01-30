@@ -73,4 +73,4 @@ export default function registerSettings() {
             ui.combat?.render(true);
         },
     });
-};
+}

@@ -9,7 +9,7 @@ export default class Ctg {
             if (!isNewerVersion(9, game.version ?? game.data.version)) {
                 registerKeybindings();
                 Ctg.groupInitiativeKeybind = false;
-            };
+            }
             // Register settings
             registerSettings();
         });
@@ -61,7 +61,7 @@ export default class Ctg {
                     display: none;
                 }`;
                 document.head.appendChild(style);
-            };
+            }
 
             Hooks.on("renderCombatTracker", (app, html, data) => {
                 // Exit if there is no combat
@@ -85,7 +85,7 @@ export default class Ctg {
 
         // Group selection
         this.groupSelection();
-    };
+    }
 
     /** The module's ID */
     static ID = "ctg";
@@ -98,8 +98,8 @@ export default class Ctg {
         const shouldLog = force || game.modules.get("_dev-mode")?.api?.getPackageDebugValue(Ctg.ID);
         if (shouldLog) {
             console.log(Ctg.ID, "|", ...args);
-        };
-    };
+        }
+    }
 
     /** Grouping Modes
      * The first item is the name and the second is the path
@@ -124,7 +124,7 @@ export default class Ctg {
         if (!Ctg.MODES.map(m => m[0]).includes(mode)) {
             ui.notifications.error(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.invalidMode", { mode })}`);
             return;
-        };
+        }
 
         /** @type {Combatant[][]} */
         let groups;
@@ -159,7 +159,7 @@ export default class Ctg {
                     accumulator[recursiveGetPropertyAsString(current, path)] = [...accumulator[recursiveGetPropertyAsString(current, path)] || [], current];
                 return accumulator;
             }, {}));
-        };
+        }
 
         // Sort each group
         groups.forEach(group => group.sort(this.sortCombatants));
@@ -167,7 +167,7 @@ export default class Ctg {
         if (game.settings.get(Ctg.ID, "sortCombatants")) game.combat.turns = game.combat.turns.sort(this.sortCombatants);
 
         return groups;
-    };
+    }
 
     /** Sort the combatants */
     static sortCombatants(a, b) {
@@ -193,13 +193,13 @@ export default class Ctg {
             } else if (typeof ia === "string" && typeof ib === "string") {
                 // Otherwise, sort alphabetically
                 return ia.localeCompare(ib);
-            };
+            }
             // Fallback to comparing the IDs
             return a?.id > b?.id ? 1 : -1;
         } else { // If disabled, sort by position in the existing turn order
             return game.combat?.turns.indexOf(a) > game.combat?.turns.indexOf(b);
-        };
-    };
+        }
+    }
 
     /** Manage available modes and switch away from invalid ones */
     manageModes() {
@@ -213,7 +213,7 @@ export default class Ctg {
         // Change mode if saved one no longer exists
         if (!Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")))
             game.settings?.set(Ctg.ID, "mode", "none");
-    };
+    }
 
     /**
      * Create Combat Tracker modes
@@ -249,7 +249,7 @@ export default class Ctg {
             modeBox.append(radio);
             modeBox.append(label);
         });
-    };
+    }
 
     /**
      * Manage and create Combat Tracker groups
@@ -345,8 +345,8 @@ export default class Ctg {
 
                             // Create a mob when the button is clicked
                             saveMob.addEventListener("click", () => MobAttacks.createSavedMobsFromCTGgroups([Ctg.groups(mode)[index]]));
-                        };
-                    };
+                        }
+                    }
 
                     // Move the element into the subdirectory
                     subdirectory.append(element);
@@ -360,9 +360,9 @@ export default class Ctg {
                 // Open the toggle for the current combatant if enabled
                 if (game.settings.get(Ctg.ID, "openToggles")) currentToggle.open = true;
                 currentToggle.classList.add("active");
-            };
-        };
-    };
+            }
+        }
+    }
 
     /** Manage skipping over groups */
     groupSkipping() {
@@ -389,7 +389,7 @@ export default class Ctg {
                         // Go to the next round if at the end
                         if ((change.turn + group.length - 1) >= document.turns.length) {
                             document.nextRound();
-                        };
+                        }
 
                         // Mutate the turn change to skip to the start of the next group
                         change.turn = (change.turn + group.length - 1) % document.turns.length;
@@ -398,11 +398,11 @@ export default class Ctg {
                         change.groupSkipping = true;
 
                         break;
-                    };
-                };
-            };
+                    }
+                }
+            }
         });
-    };
+    }
 
     /** Manage rolling for group initiative for all of the combatants in the group  */
     rollGroupInitiative() {
@@ -410,7 +410,7 @@ export default class Ctg {
         if (!game.modules.get("lib-wrapper")?.active) {
             ui.notifications.warn(`${Ctg.ID} | ${game.i18n.format("ctg.notifications.libWrapperRequired", { feature: game.i18n.localize("ctg.settings.rollGroupInitiative.name") })}`);
             return;
-        };
+        }
 
         // Temporary fix for Foundry VTT issue: https://gitlab.com/foundrynet/foundryvtt/-/issues/6404
         if (isNewerVersion(9.239, game.version ?? game.data.version)) // Not needed after v9s1
@@ -468,12 +468,12 @@ export default class Ctg {
                             Hooks.call(`ctg${context.capitalize()}`, updates, message.roll, id);
                         } else {
                             Ctg.log(false, `${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.rollingGroupInitiative.failure", { group: getDisplayName(group) })}`);
-                        };
+                        }
                     });
                 });
-            } else { wrapped(ids); };
-        };
-    };
+            } else { wrapped(ids); }
+        }
+    }
 
     /** Manage grouping of selected tokens */
     groupSelection() {
@@ -510,9 +510,9 @@ export default class Ctg {
 
                 // Call selection hook
                 Hooks.call("ctgSelection", updates);
-            };
+            }
         });
-    };
-};
+    }
+}
 
 new Ctg();

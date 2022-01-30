@@ -7,10 +7,10 @@
  */
 export function recursiveGetProperty(object, key, l = 0) {
     const target = getProperty(object, key.split(".*.")[l]);
-    const nextTarget = getProperty(object, key.split(".*.")[l + 1])
-    const descend = () => { l++; return target.map(t => recursiveGetProperty(t, key, l)) };
+    const nextTarget = getProperty(object, key.split(".*.")[l + 1]);
+    const descend = () => { l++; return target.map(t => recursiveGetProperty(t, key, l)); }
     return Array.isArray(target) && target && nextTarget ? descend() : target;
-};
+}
 
 /** A wrapper around the `recursiveGetProperty` helper above which always gives a string
  * @param {object} object - The object to traverse
@@ -20,7 +20,7 @@ export function recursiveGetProperty(object, key, l = 0) {
 export function recursiveGetPropertyAsString(object, key) {
     const target = recursiveGetProperty(object, key);
     return Array.isArray(target) ? target.sort().deepFlatten().join("") : target;
-};
+}
 
 /** Get display name of a given group
  * @param {Combatant[]} group - The group for which to return a name
@@ -53,4 +53,4 @@ export function getDisplayName(group) {
 
     // Return a string with the names
     return names.length < 3 ? names.join(" and ") : names.join(", ");
-};
+}
