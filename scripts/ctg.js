@@ -21,7 +21,7 @@ export default class Ctg {
 
         Hooks.on("ready", () => {
             // Initialize API
-            game.modules.get("ctg").api = mergeObject(Ctg, {
+            game.modules.get(Ctg.ID).api = mergeObject(Ctg, {
                 recursiveGetPropertyAsString,
                 getDisplayName,
             });
@@ -79,7 +79,7 @@ export default class Ctg {
                 }));
 
                 // For debugging: expand all groups and show turn order
-                if (game.modules.get("_dev-mode")?.api?.getPackageDebugValue("ctg")) {
+                if (game.modules.get("_dev-mode")?.api?.getPackageDebugValue(Ctg.ID)) {
                     html[0].querySelectorAll("details.ctg-toggle").forEach(el => el.open = true);
                     html[0].querySelectorAll("li.combatant").forEach(el => el.append(game.combat.turns.findIndex(t => t.id === el.dataset.combatantId)));
                     ui.sidebar.activateTab("combat");
@@ -169,7 +169,7 @@ export default class Ctg {
                     && !(game.settings.get(Ctg.ID, "noGroupHidden") && current.hidden)
                     && !(game.settings.get(Ctg.ID, "noGroupPCs") && current.hasPlayerOwner)
                 )
-                // Group by the property
+                    // Group by the property
                     accumulator[recursiveGetPropertyAsString(current, path)] = [...accumulator[recursiveGetPropertyAsString(current, path)] || [], current];
                 return accumulator;
             }, {}));
@@ -427,7 +427,7 @@ export default class Ctg {
 
         // Temporary fix for Foundry VTT issue: https://gitlab.com/foundrynet/foundryvtt/-/issues/6404
         if (isNewerVersion(9.239, game.version ?? game.data.version)) // Not needed after v9s1
-            libWrapper.register("ctg", "KeyboardManager.prototype.hasFocus", () => document.querySelectorAll("input:focus, textarea:focus").length > 0, "OVERRIDE");
+            libWrapper.register(Ctg.ID, "KeyboardManager.prototype.hasFocus", () => document.querySelectorAll("input:focus, textarea:focus").length > 0, "OVERRIDE");
 
         // Check whether group initiative should be rolled
         const isRollForGroupInitiative = () =>
