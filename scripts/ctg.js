@@ -456,14 +456,17 @@ export default class Ctg {
                 // Loop through the IDs in case there are multiple (should be unusual)
                 ids.forEach(id => {
                     // Go through all of the groups
-                    Ctg.groups(game.settings.get(Ctg.ID, "mode")).forEach(async group => {
+                    Ctg.groups(game.settings.get(Ctg.ID, "mode")).forEach(async (group, index) => {
                         // What happens depends on the context of this roll:
                         if (context === "rollAll" // Roll for every group
                             || (context === "rollNPC" && group.every(combatant => combatant.isNPC)) // Roll only for groups which are all NPCs 
                             || (context === "roll" && group.some(combatant => combatant.id === id)) // Roll for groups which contain the current combatant
                         ) {
                             // Roll initiative for the first combatant in the group
-                            const message = await group[0].getInitiativeRoll().toMessage({ flavor: `"${getDisplayName(group)}" group rolls for Initiative!` });
+                            const message = await group[0].getInitiativeRoll().toMessage({
+                                flavor: `"${getDisplayName(group)}" group rolls for Initiative!`, // Announce to chat
+                                sound: index === 0 ? CONFIG.sounds.dice : null, // Only play a sound for the first group
+                            });
 
                             // Update all of the combatants in this group with that roll total as their new initiative
                             const updates = [];
