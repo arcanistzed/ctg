@@ -169,7 +169,7 @@ You can submit bugs via [Github Issues](https://github.com/arcanistzed/ctg/issue
 
 ### Known Issues
 
-- Not currently compatible with the old Group Initiative module or MAT's option which enables that
+- Not compatible with the old Group Initiative module (which this module is a superset of)
 - Sorting doesn't work with Mob mode
 
 ## Contact me
