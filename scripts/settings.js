@@ -25,8 +25,8 @@ export default function registerSettings() {
     });
 
     game.settings.register(Ctg.ID, "groupSkipping", {
-        name: game.i18n.localize("ctg.settings.groupSkipping.name"),
-        hint: game.i18n.localize("ctg.settings.groupSkipping.hint"),
+        name: "ctg.settings.groupSkipping.name",
+        hint: "ctg.settings.groupSkipping.hint",
         scope: "world",
         config: true,
         type: Boolean,
@@ -41,8 +41,8 @@ export default function registerSettings() {
     });
 
     game.settings.register(Ctg.ID, "openToggles", {
-        name: game.i18n.localize("ctg.settings.openToggles.name"),
-        hint: game.i18n.localize("ctg.settings.openToggles.hint"),
+        name: "ctg.settings.openToggles.name",
+        hint: "ctg.settings.openToggles.hint",
         scope: "world",
         config: true,
         type: Boolean,
@@ -50,8 +50,8 @@ export default function registerSettings() {
     });
 
     game.settings.register(Ctg.ID, "sortCombatants", {
-        name: game.i18n.localize("ctg.settings.sortCombatants.name"),
-        hint: game.i18n.localize("ctg.settings.sortCombatants.hint"),
+        name: "ctg.settings.sortCombatants.name",
+        hint: "ctg.settings.sortCombatants.hint",
         scope: "world",
         config: true,
         type: Boolean,
@@ -59,8 +59,8 @@ export default function registerSettings() {
     });
 
     game.settings.register(Ctg.ID, "onlyShowGroupsForGM", {
-        name: game.i18n.localize("ctg.settings.onlyShowGroupsForGM.name"),
-        hint: game.i18n.localize("ctg.settings.onlyShowGroupsForGM.hint"),
+        name: "ctg.settings.onlyShowGroupsForGM.name",
+        hint: "ctg.settings.onlyShowGroupsForGM.hint",
         scope: "world",
         config: true,
         type: Boolean,
@@ -71,8 +71,8 @@ export default function registerSettings() {
     });
 
     game.settings.register(Ctg.ID, "noGroupHidden", {
-        name: game.i18n.localize("ctg.settings.noGroupHidden.name"),
-        hint: game.i18n.localize("ctg.settings.noGroupHidden.hint"),
+        name: "ctg.settings.noGroupHidden.name",
+        hint: "ctg.settings.noGroupHidden.hint",
         scope: "world",
         config: true,
         type: Boolean,
@@ -82,8 +82,8 @@ export default function registerSettings() {
         },
     });
     game.settings.register(Ctg.ID, "noGroupPCs", {
-        name: game.i18n.localize("ctg.settings.noGroupPCs.name"),
-        hint: game.i18n.localize("ctg.settings.noGroupPCs.hint"),
+        name: "ctg.settings.noGroupPCs.name",
+        hint: "ctg.settings.noGroupPCs.hint",
         scope: "world",
         config: true,
         type: Boolean,
