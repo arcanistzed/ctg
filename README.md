@@ -157,11 +157,9 @@ This method returns the current sorted array of groups (which are arrays of Comb
 
 This boolean tracks whether or not to allow groups to be created for the "selection" mode.
 
-## License
+## Support
 
-Copyright © 2021 arcanist
-
-This package is under an [MIT license](LICENSE) and the [Foundry Virtual Tabletop Limited License Agreement for module development](https://foundryvtt.com/article/license/).
+Please consider supporting me on [my Patreon](https://patreon.com/arcanistzed) if you like my work. You can see a list of all my projects on [my website](https://arcanist.me).
 
 ## Bugs
 
@@ -175,3 +173,9 @@ You can submit bugs via [Github Issues](https://github.com/arcanistzed/ctg/issue
 ## Contact me
 
 Come hang out on my [my Discord server](https://discord.gg/AAkZWWqVav) or [click here to send me an email](mailto:arcanistzed@gmail.com?subject=Combat%20Tracker%20Groups%20module).
+
+## License
+
+Copyright © 2021 arcanist
+
+This package is under an [MIT license](LICENSE) and the [Foundry Virtual Tabletop Limited License Agreement for module development](https://foundryvtt.com/article/license/).
