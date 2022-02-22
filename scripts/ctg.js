@@ -363,7 +363,20 @@ export default class Ctg {
                             labelFlex.append(saveMob);
 
                             // Create a mob when the button is clicked
+                            /*
+                            FIXME: ask Lupusmalus for new parameter to not delete existing mobs, then use this instead:
                             saveMob.addEventListener("click", () => MobAttacks.createSavedMobsFromCTGgroups([Ctg.groups(mode)[index]]));
+                            */
+                            saveMob.addEventListener("click", event => {
+                                event.preventDefault();
+                                const numSelected = 1, actorList = [], selectedTokenIds = [];
+                                const mobName = `${game.settings.get("mob-attack-tool", "defaultMobPrefix")} ${Ctg.groups(mode)[index]?.[0]?.name}${game.settings.get("mob-attack-tool", "defaultMobSuffix")}`;
+                                for (let combatant of Ctg.groups(mode)[index]) {
+                                    actorList.push(combatant?.actor);
+                                    selectedTokenIds.push(combatant.data?.tokenId);
+                                }
+                                MobAttacks.saveMob(mobName, actorList, selectedTokenIds, numSelected, "ctg");
+                            });
                         }
                     }
 
