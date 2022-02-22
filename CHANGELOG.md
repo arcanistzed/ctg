@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 - 1 Jan 2022 - Public Release
+## 1.0.0 - 22 Jan 2022 - Public Release
 
 ### Added
 
@@ -8,18 +8,26 @@
 * Localization for everything
 * Add a new option for combatant sorting which improves the group skipping experience
 * Option to not group hidden combatants
+* Option to not group Player Characters
+* Debugging mode (enabled via the DevMode module)
 
 ### Fixed
 
 * Using selection tool without any active combats no longer causes console error
 * No longer attempts to add Combatants whose tokens are in multiple MAT Mobs to multiple groups, causing some weird nested groups
-* Group Skipping now works properly (with certain modes, you'll need the new sorting to be enabled)
+* Group Skipping now works properly with more modes (you may need the new sorting to be enabled)
 * Auto opens the correct toggle more often
-* Temp fix for [core issue](https://gitlab.com/foundrynet/foundryvtt/-/issues/6404)
 * Show group selection control initially on load (it was only visible after switching tools before)
 * Don't skip groups if there is only one group
-* Improved description of Group Skipping setting
-* Improve warning for when Combatants are in multiple Mob Attack Tool Mobs
+* Make sure groups are added on initial load in case the combat tracker is rendered before ready
+* Sort combatants only when the mode is changed instead of every time the groups are calculated
+* Don't show combatant context menu on toggles
+* Compatibility with MAT's new implementation of Group Initiative
+* Only play the dice rolling sound once when rolling for Group Initialize
+* No re-rendering for mob changes which caused infinite loop on load
+* Use the same naming as MAT for mobs created with the save buttons
+* The save button no longer triggers it's toggle
+* Various refactors, ci additions, and code style improvements
 
 ## 0.4.3 - 15 Nov 2021
 
