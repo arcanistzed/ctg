@@ -51,7 +51,7 @@
         "notifications": {
             "libWrapperRequired": "libWrapper must be enabled to use the {feature} functionality.",
             "invalidMode": "Grouping not possible because {mode} is not a valid mode.",
-            "alreadyInMob": "Token with ID {id} is in multiple Mob Attack Tool Mobs, but will only show up in the first created Mob when grouped in the Combat Tracker. Delete the relevant mob in the Mob Attack Tool dialog to get rid of this message.",
+            "alreadyInMob": "Token with ID {id} is in multiple Mob Attack Tool Mobs, but will only show up in the first created Mob when grouped in the Combat Tracker. Delete the relevant mob in the Mob Attack Tool dialog to get rid of this warning.",
             "groupSkippingWorksBetterWithSorting": "Group skipping works better with Combatant sorting enabled. See README for details.",
             "disableMATGroupInitiative": "Mob Attack Tool Group Initiative has been disabled since CTG provides the same functionality and more."
         },
