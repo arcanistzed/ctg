@@ -21,7 +21,7 @@
     "allowBugReporter": true
   },
   "version": "This is auto replaced",
-  "minimumCoreVersion": "0.8.9",
+  "minimumCoreVersion": "9",
   "compatibleCoreVersion": "9",
   "esmodules": [
     "scripts/ctg.js"
