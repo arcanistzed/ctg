@@ -359,7 +359,7 @@ export default class Ctg {
                             // Create a button and it to the label flex
                             const saveMob = document.createElement("div"); saveMob.classList.add("ctg-saveMob");
                             saveMob.innerHTML = "<i class='fas fa-save'></i>";
-                            saveMob.title = "Save as MAT mob";
+                            saveMob.title = game.i18n.localize("ctg.saveAsMobTitle");
                             labelFlex.append(saveMob);
 
                             // Create a mob when the button is clicked
