@@ -49,14 +49,14 @@ export default class Ctg {
             this.manageModes();
 
             // Re-render Combat Tracker when mobs update
-            if (game.modules.get("mob-attack-tool")?.active) {
+            /* if (game.modules.get("mob-attack-tool")?.active) {
                 Hooks.on("matMobUpdate", () => {
                     // FIXME: a re-render is needed, but is not being included to avoid a MAT incompatibility. See https://github.com/Stendarpaval/mob-attack-tool/issues/40)
                     if (!game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) {
                         ui.combat?.render(true);
                     };
                 });
-            }
+            } */
 
             // Manage rolling group initiative if GM
             if (game.user?.isGM) {

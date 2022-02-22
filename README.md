@@ -169,7 +169,7 @@ You can submit bugs via [Github Issues](https://github.com/arcanistzed/ctg/issue
 
 - Not compatible with the old Group Initiative module (which this module is a superset of)
 - Sorting (and therefore Group Skipping) doesn't work with Selection, Players, and Mob mode
-- Doesn't re-render when Mobs are changed in the MAT if autosave CTG Groups is enabled in MAT settings
+- Doesn't re-render Combat Tracker Groups when MAT Mobs are changed from the MAT application window
 
 ## Contact me
 
