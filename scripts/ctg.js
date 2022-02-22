@@ -498,14 +498,16 @@ export default class Ctg {
         }
 
         // Disable MAT group initiative
-        function disableMATGroupInitiative() {
-            if (game.settings.get("mob-attack-tool", "enableMobInitiative")) {
-                ui.notifications.warn((`${Ctg.ID} | ${game.i18n.localize("ctg.notifications.disableMATGroupInitiative")}`));
-                game.settings.set("mob-attack-tool", "enableMobInitiative", false);
-            };
+        if (game.modules.get("mob-attack-tool")?.active) {
+            function disableMATGroupInitiative() {
+                if (game.settings.get("mob-attack-tool", "enableMobInitiative")) {
+                    ui.notifications.warn((`${Ctg.ID} | ${game.i18n.localize("ctg.notifications.disableMATGroupInitiative")}`));
+                    game.settings.set("mob-attack-tool", "enableMobInitiative", false);
+                };
+            }
+            game.settings.settings.get("mob-attack-tool.enableMobInitiative").onChange = disableMATGroupInitiative;
+            disableMATGroupInitiative();
         }
-        game.settings.settings.get("mob-attack-tool.enableMobInitiative").onChange = disableMATGroupInitiative;
-        disableMATGroupInitiative();
     }
 
     /** Manage grouping of selected tokens */
