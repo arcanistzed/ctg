@@ -1,6 +1,30 @@
 import Ctg from "./ctg.js";
+import ModeConfig from "./modeConfig.js";
 
 export default function registerSettings() {
+    game.settings.registerMenu(Ctg.ID, "modeConfig", {
+        name: game.i18n.localize("ctg.settings.modeConfig.name"),
+        label: game.i18n.localize("ctg.settings.modeConfig.label"),
+        hint: game.i18n.localize("ctg.settings.modeConfig.hint"),
+        icon: "fas fa-cog",
+        type: ModeConfig,
+        restricted: true,
+    });
+
+    game.settings.register(Ctg.ID, "modes", {
+        scope: "world",
+        config: false,
+        default: [
+            ["none", ""],
+            ["initiative", "initiative"],
+            ["name", "name"],
+            ["selection", "data.flags.ctg.group"],
+            ["players", "players.*.id"],
+            ["actor", "data.actorId"]
+        ],
+        type: Object,
+    });
+
     game.settings.register(Ctg.ID, "mode", {
         scope: "world",
         config: false,

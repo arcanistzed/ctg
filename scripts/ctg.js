@@ -1,4 +1,5 @@
 import { recursiveGetPropertyAsString, getDisplayName } from "./helpers.js";
+import ModeConfig from "./modeConfig.js";
 import registerKeybindings from "./keybindings.js";
 import registerSettings from "./settings.js";
 
@@ -24,6 +25,7 @@ export default class Ctg {
             game.modules.get(Ctg.ID).api = mergeObject(Ctg, {
                 recursiveGetPropertyAsString,
                 getDisplayName,
+                ModeConfig,
             });
 
             // Console art
@@ -35,28 +37,15 @@ export default class Ctg {
                 `\n${game.i18n.localize("ctg.welcome.site")} https://arcanist.me/`
             );
 
-            // Localize modes
-            Ctg.MODES = [
-                [game.i18n.localize("ctg.modes.none"), ""],
-                [game.i18n.localize("ctg.modes.initiative"), "initiative"],
-                [game.i18n.localize("ctg.modes.name"), "name"],
-                [game.i18n.localize("ctg.modes.selection"), "data.flags.ctg.group"],
-                [game.i18n.localize("ctg.modes.players"), "players.*.id"],
-                [game.i18n.localize("ctg.modes.actor"), "data.actorId"]
-            ];
-
-            // Manage modes
-            this.manageModes();
-
             // Re-render Combat Tracker when mobs update
-            /* if (game.modules.get("mob-attack-tool")?.active) {
+            if (game.modules.get("mob-attack-tool")?.active) {
                 Hooks.on("matMobUpdate", () => {
                     // FIXME: a re-render is needed, but is not being included to avoid a MAT incompatibility. See https://github.com/Stendarpaval/mob-attack-tool/issues/40)
                     if (!game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) {
                         ui.combat?.render(true);
-                    };
+                    }
                 });
-            } */
+            }
 
             // Manage rolling group initiative if GM
             if (game.user?.isGM) {
@@ -74,8 +63,11 @@ export default class Ctg {
                 // Exit if there is no combat
                 if (!data.combat) return;
 
-                // Create modes if GM
-                if (game.user?.isGM) this.createModes(html[0], app.popOut);
+                // Manage and create modes if GM
+                if (game.user?.isGM) {
+                    this.manageModes();
+                    this.createModes(html[0], app.popOut);
+                }
                 // Create groups
                 this.manageGroups(game.settings.get(Ctg.ID, "mode"), app.popOut);
 
@@ -124,7 +116,14 @@ export default class Ctg {
      * @property {string} name - The name of the mode
      * @property {string} path - The path to the mode relative to the {@link CombatantData}
      */
-    static MODES = [];
+    static get MODES() {
+        return game.settings.get(Ctg.ID, "modes");
+    }
+    static set MODES(value) {
+        /* return (async () => {
+            await  */game.settings.set(Ctg.ID, "modes", value);
+        /* })(); */
+    }
 
     /** Whether the user is currently selecting groups */
     static selectGroups = false;
@@ -160,7 +159,7 @@ export default class Ctg {
                         if (already) console.warn(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.alreadyInMob", { id })}`);
                         alreadyInMob.push(id);
                         return !already;
-                    }).map(id => canvas.scene.tokens.get(id)?.combatant)) // Get combatants
+                    }).map(id => canvas.scene?.tokens.get(id)?.combatant)) // Get combatants
                 .map(arr => arr.sort(sortByTurns).filter(x => x)); // Sort combatants within each group and filter out tokens without combatants
         } else {
             // Get the path for this mode
@@ -222,12 +221,18 @@ export default class Ctg {
 
     /** Manage available modes and switch away from invalid ones */
     manageModes() {
-        if (game.modules.get("mob-attack-tool")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.mob")))
-            Ctg.MODES.push([game.i18n.localize("ctg.modes.mob"), ""]);
-        if (game.modules.get("lancer-initiative")?.active && !Ctg.MODES.find(m => m[0] === game.i18n.localize("ctg.modes.lancer")))
-            Ctg.MODES.push([game.i18n.localize("ctg.modes.lancer"), "activations.value"]);
+        // Get current modes
+        const modes = Ctg.MODES;
+
+        if (game.modules.get("mob-attack-tool")?.active && !modes.find(m => m[0] === "mob"))
+            modes.push(["mob", ""]);
+        if (game.modules.get("lancer-initiative")?.active && !modes.find(m => m[0] === "lancer"))
+            modes.push(["lancer", "activations.value"]);
         if (game.modules.get("scs")?.active)
-            Ctg.MODES.findSplice(m => m[0] === "initiative");
+            modes.findSplice(m => m[0] === "initiative");
+
+        // Update modes
+        Ctg.MODES = modes;
 
         // Change mode if saved one no longer exists
         if (!Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")))
@@ -516,7 +521,7 @@ export default class Ctg {
                 if (game.settings.get("mob-attack-tool", "enableMobInitiative")) {
                     ui.notifications.warn((`${Ctg.ID} | ${game.i18n.localize("ctg.notifications.disableMATGroupInitiative")}`));
                     game.settings.set("mob-attack-tool", "enableMobInitiative", false);
-                };
+                }
             }
             game.settings.settings.get("mob-attack-tool.enableMobInitiative").onChange = disableMATGroupInitiative;
             disableMATGroupInitiative();

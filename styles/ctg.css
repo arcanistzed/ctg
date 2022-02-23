@@ -34,6 +34,7 @@
   padding: 5px;
   width: 100%;
   text-align: center;
+  box-sizing: border-box;
 }
 
 /* Toggles */
@@ -117,15 +118,29 @@
   filter: brightness(1.25);
 }
 
-.ctg-toggle[open] > .ctg-labelBox > .active {
-  animation: fadein 0.25s ease-in;
+/* Mode Config */
+.ctg.modeConfig  ol {
+  list-style: none;
+  padding: 0;
+  max-height: 600px;
+  overflow-y: auto;
+  margin: 0;
 }
-
-@keyframes fadein {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+.ctg.modeConfig form header {
+  font-weight: bold;
+}
+.ctg.modeConfig form header, .ctg.modeConfig ol li, .ctg.modeConfig footer {
+  gap: .5em;
+  padding: 0 0.25em;
+}
+.ctg.modeConfig li {
+  margin: .5em 0;
+}
+.mode-name, .mode-path {
+  flex: 1;
+}
+.ctg.modeConfig form a {
+  flex: 0 0 24px;
+  margin: auto;
+  text-align: center;
 }
