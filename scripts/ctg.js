@@ -59,13 +59,13 @@ export default class Ctg {
                 document.head.appendChild(style);
             }
 
-            Hooks.on("renderCombatTracker", (app, html, data) => {
+            Hooks.on("renderCombatTracker", async (app, html, data) => {
                 // Exit if there is no combat
                 if (!data.combat) return;
 
                 // Manage and create modes if GM
                 if (game.user?.isGM) {
-                    this.manageModes();
+                    await this.manageModes();
                     this.createModes(html[0], app.popOut);
                 }
                 // Create groups
@@ -120,9 +120,15 @@ export default class Ctg {
         return game.settings.get(Ctg.ID, "modes");
     }
     static set MODES(value) {
-        /* return (async () => {
-            await  */game.settings.set(Ctg.ID, "modes", value);
-        /* })(); */
+        game.settings.set(Ctg.ID, "modes", value);
+    }
+    /** Update the grouping modes asynchronously
+     * @see MODES
+     * @param {string[][]} value - An array of modes
+     * @returns {Promise<string[][]>} The new modes
+     */
+    static async setMODES(value) {
+        return game.settings.set(Ctg.ID, "modes", value);
     }
 
     /** Whether the user is currently selecting groups */
@@ -220,7 +226,7 @@ export default class Ctg {
     }
 
     /** Manage available modes and switch away from invalid ones */
-    manageModes() {
+    async manageModes() {
         // Get current modes
         const modes = Ctg.MODES;
 
@@ -231,12 +237,12 @@ export default class Ctg {
         if (game.modules.get("scs")?.active)
             modes.findSplice(m => m[0] === "initiative");
 
-        // Update modes
-        Ctg.MODES = modes;
-
         // Change mode if saved one no longer exists
-        if (!Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")))
+        if (!modes.find(m => m[0] === game.settings.get(Ctg.ID, "mode")))
             game.settings?.set(Ctg.ID, "mode", "none");
+
+        // Update modes
+        await Ctg.setMODES(modes);
     }
 
     /**

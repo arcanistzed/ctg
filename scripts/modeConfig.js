@@ -75,8 +75,7 @@ export default class ModeConfig extends FormApplication {
         console.log(formData);
         // Update the Modes with the form data
         const modes = Object.values(expandObject(formData)).map(o => Object.values(o).map(o => Object.values(o)))[0]
-        await game.settings.set(Ctg.ID, "modes", modes); // FIXME should be extra once awaiting async setter is working
-        console.log(modes);
+        await Ctg.setMODES(modes);
 
         // Re-render the combat tracker and this app
         ui.combat?.render(true);
