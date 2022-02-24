@@ -77,8 +77,7 @@ export default class ModeConfig extends FormApplication {
         const modes = Object.values(expandObject(formData)).map(o => Object.values(o).map(o => Object.values(o)))[0]
         await Ctg.setMODES(modes);
 
-        // Re-render the combat tracker and this app
-        ui.combat?.render(true);
+        // Re-render the combat tracker
         this.render(true, { height: "auto" });
     }
 }

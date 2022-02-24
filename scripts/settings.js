@@ -23,6 +23,7 @@ export default function registerSettings() {
             ["actor", "data.actorId"]
         ],
         type: Object,
+        onChange: () => ui.combat?.render(true),
     });
 
     game.settings.register(Ctg.ID, "mode", {
