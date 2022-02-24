@@ -4,6 +4,7 @@
 
 ### Added
 
+* A configuration window to set completely custom grouping modes 🤯
 * v9 keybindings are used for rolling Group Initiative
 * Localization for everything
 * Add a new option for combatant sorting which improves the group skipping experience
@@ -26,7 +27,8 @@
 * Only play the dice rolling sound once when rolling for Group Initialize
 * No re-rendering for mob changes which caused infinite loop on load
 * Use the same naming as MAT for mobs created with the save buttons
-* The save button no longer triggers it's toggle
+* The group save button no longer triggers it's toggle
+* Re-render the Combat Tracker immediately when the available grouping modes change
 * Various refactors, ci additions, and code style improvements
 
 ## 0.4.3 - 15 Nov 2021
