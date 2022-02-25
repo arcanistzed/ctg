@@ -35,10 +35,11 @@ When enabled, CTG attempts to sort combatants by their group which is the optima
 
 The way that the groups are created depends on the selected mode which you can change near the top of the Combat Tracker by clicking on one of the boxes.
 
-You can create or remove grouping modes in module settings, configuring them as you wish. For example, if you want to create a mode that groups based on the Combatant's `isNPC` property, you would just insert that under path in the config:
+You can create or remove grouping modes in module settings, configuring them as you wish. For example, if you want to create a mode named "NPC" which groups based on the Combatant's `isNPC` property, you would insert this in the config:
+
 ![Custom NPC mode](https://i.imgur.com/H0n59ir.png)
 
-There are also a some modes provided by default which function as follows:
+There are also a some modes provided by default:
 
 #### None
 
