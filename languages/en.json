@@ -54,7 +54,6 @@
             "success": "Rolling Initiative for{who} group \"{group}\"",
             "failure": "Initiative not rolled for group \"{group}\""
         },
-        "saveAsMobTitle": "Save as Mob Attack Tool mob",
         "modeConfig": {
             "title": "Mode Configuration",
             "name": {
@@ -67,6 +66,10 @@
             "delete": "Delete Mode",
             "save": "Save",
             "reset": "Reset"
+        },
+        "titles": {
+            "groupBy": "Group by {mode}",
+            "saveAsMob": "Save as Mob Attack Tool mob"
         }
     }
 }

@@ -272,7 +272,7 @@ export default class Ctg {
             // Create a label for the radio button
             const label = document.createElement("label"); label.id = "ctg-modeLabel";
             label.htmlFor = "ctg-mode-radio-" + mode[0] + popOutSuffix;
-            label.title = "Group by " + mode[0].capitalize();
+            label.title = game.i18n.format("ctg.titles.groupBy", { mode: mode[0].capitalize() });
             label.innerText = mode[0].capitalize();
 
             // Add the label and the radio button to the box
@@ -370,7 +370,7 @@ export default class Ctg {
                             // Create a button and it to the label flex
                             const saveMob = document.createElement("div"); saveMob.classList.add("ctg-saveMob");
                             saveMob.innerHTML = "<i class='fas fa-save'></i>";
-                            saveMob.title = game.i18n.localize("ctg.saveAsMobTitle");
+                            saveMob.title = game.i18n.localize("ctg.titles.saveAsMob");
                             labelFlex.append(saveMob);
 
                             // Create a mob when the button is clicked
