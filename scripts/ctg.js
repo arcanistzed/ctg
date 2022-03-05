@@ -173,9 +173,6 @@ export default class Ctg {
             // Get the path for this mode
             const path = Ctg.MODES.find(m => m[0] === mode).slice(-1)[0];
 
-            // Setup turns the default way first to prepare
-            game.combat.setupTurns();
-
             // Reduce combat turns into an array of groups by matching a given property path
             groups = Object.values(game.combat?.turns.reduce((accumulator, current) => {
                 // Conditions for not grouping:
