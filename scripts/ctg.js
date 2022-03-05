@@ -208,7 +208,7 @@ export default class Ctg {
             let ib = recursiveGetPropertyAsString(b, path);
 
             // If they are numbers, sort numerically
-            if (Number.isNumeric(ia), Number.isNumeric(ib)) {
+            if (Number.isNumeric(ia) && Number.isNumeric(ib)) {
                 const ci = ib - ia;
                 if (ci !== 0) return ci;
                 return a.id > b.id ? 1 : -1;
