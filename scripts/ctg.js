@@ -417,33 +417,32 @@ export default class Ctg {
 
             if (
                 game.user?.isGM // If the user is a GM
-                && (change.turn > document.current.turn  // If this update is for a forward change of turn
-                    || (change.turn !== document.turns.length - 1 && document.current.turn === 0)) // Or if anywhere other than the end with a turn of 0
+                && change.turn != null // If there was a change of turn
                 && game.settings.get(Ctg.ID, "groupSkipping") // If the user has the setting enabled
                 && game.settings.get(Ctg.ID, "mode") !== "none" // If the mode is not "none"
                 && groups.length > 1 // If there is more than one group
-                && !change.groupSkipping // If this is not marked as an update from here
             ) {
-                // Go through each group and skip to the beginning of the group after the one containing the current combatant
-                for (const group of groups) {
+                // Get the direction of the turn change which is different if the round has also changed
+                const direction = change.round ? (change.round > document.current.round ? 1 : -1)
+                    : (change.turn > document.current.turn ? 1 : -1);
 
-                    // If the current combatant is the first in this group
-                    if (group.findIndex(c => c.id === document.combatant?.id) === 0) {
+                // Get the turn of the first turn in each group
+                const firstTurns = groups.map(group => document.turns.findIndex(c => c.id === group[0].id)).sort();
 
-                        // Go to the next round if at the end
-                        if ((change.turn + group.length - 1) >= document.turns.length) {
-                            document.nextRound();
-                        }
+                // Get the index of the current first turn in the list of first turns
+                const indexOfCurrent = firstTurns.indexOf(document.turn) !== -1
+                    ? firstTurns.indexOf(document.turn)
+                    // If this isn't a first turn, keep it undefined
+                    : undefined;
 
-                        // Mutate the turn change to skip to the start of the next group
-                        change.turn = (change.turn + group.length - 1) % document.turns.length;
+                // Get turn of the next first turn after the current one
+                const nextTurn = firstTurns?.[indexOfCurrent + direction]
+                    ?? firstTurns.at(direction === 1 ? 0 : -1); // Loop to the start or end of the list if necessary
 
-                        // Mark this as an update from here
-                        change.groupSkipping = true;
+                // Mutate the turn change to skip to the next turn
+                change.turn = nextTurn;
 
-                        break;
-                    }
-                }
+                Ctg.log(false, `Group skipping...\nNext turn: ${nextTurn}\nFirst turns: ${firstTurns} currently at ${indexOfCurrent}\nDirection: ${direction === 1 ? "forward" : "backward"}\n`);
             }
         });
     }
