@@ -142,14 +142,16 @@ export default class Ctg {
      * @return {Combatant[][]} An array of groups
      */
     static groups(mode) {
+        /** @type {Combatant[][]} */
+        let groups;
+
         // Exit if invalid mode
         if (!Ctg.MODES.map(m => m[0]).includes(mode)) {
             ui.notifications.error(`${game.i18n.localize("ctg.ID")} | ${game.i18n.format("ctg.notifications.invalidMode", { mode })}`);
             return;
         }
 
-        /** @type {Combatant[][]} */
-        let groups;
+        
 
         // Special behavior for creating groups in Mob mode
         if (mode === "mob") {
@@ -193,7 +195,11 @@ export default class Ctg {
         return groups;
     }
 
-    /** Sort the combatants */
+    /** Sort the combatants
+     * @param {Combatant} a
+     * @param {Combatant} b
+     * @return {1 | -1}
+     */
     static sortCombatants(a, b) {
         // Sort by the current mode's path
         if (game.settings.get(Ctg.ID, "sortCombatants")) {
