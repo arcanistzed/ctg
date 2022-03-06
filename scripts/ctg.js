@@ -151,8 +151,6 @@ export default class Ctg {
             return;
         }
 
-        
-
         // Special behavior for creating groups in Mob mode
         if (mode === "mob" && game.modules.get("mob-attack-tool")?.active) {
             const sortByTurns = (a, b) => game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
