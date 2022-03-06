@@ -217,6 +217,10 @@ export default class Ctg {
                 ib = Array.isArray(ib) ? ib[0] : ib;
                 return ia?.id > ib?.id ? 1 : -1;
             } else if (typeof ia === "string" && typeof ib === "string") {
+                if (/[A-Za-z0-9]{16}/.test(ia, ib)) {
+                    // Sort by initiative if they are IDs
+                    return a.initiative > b.initiative ? 1 : -1;
+                } else {
                     // Otherwise, sort alphabetically
                     return ib.localeCompare(ia);
                 }
