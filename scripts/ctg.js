@@ -218,8 +218,9 @@ export default class Ctg {
                 ib = Array.isArray(ib) ? ib[0] : ib;
                 return ia?.id > ib?.id ? 1 : -1;
             } else if (typeof ia === "string" && typeof ib === "string") {
-                // Otherwise, sort alphabetically
-                return ia.localeCompare(ib);
+                    // Otherwise, sort alphabetically
+                    return ib.localeCompare(ia);
+                }
             }
             // Fallback to comparing the IDs
             return a?.id > b?.id ? 1 : -1;
