@@ -186,6 +186,8 @@ export default class Ctg {
 
         // Sort each group
         groups.forEach(group => group.sort(this.sortCombatants));
+        // Sort the groups by the first combatant in each group
+        groups.sort((a, b) => this.sortCombatants(a[0], b[0]));
 
         return groups;
     }
