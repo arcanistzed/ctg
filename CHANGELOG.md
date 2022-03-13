@@ -8,28 +8,51 @@
 * v9 keybindings are used for rolling Group Initiative
 * Localization for everything
 * Add a new option for combatant sorting which improves the group skipping experience
-* Option to not group hidden combatants
-* Option to not group Player Characters
+* Option to not group hidden combatants or not group player characters
 * Debugging mode (enabled via the DevMode module)
 
 ### Fixed
 
+* Various refactors, ci additions, and code style improvements
+
+#### Selection tool
+
 * Using selection tool without any active combats no longer causes console error
-* No longer attempts to add Combatants whose tokens are in multiple MAT Mobs to multiple groups, causing some weird nested groups
-* Group Skipping now works properly with more modes (you may need the new sorting to be enabled)
-* Auto opens the correct toggle more often
 * Show group selection control initially on load (it was only visible after switching tools before)
-* Don't skip groups if there is only one group
-* Make sure groups are added on initial load in case the combat tracker is rendered before ready
-* Sort combatants only when the mode is changed instead of every time the groups are calculated
-* Don't show combatant context menu on toggles
+
+#### Mob Attack Tool integration
+
+* No longer attempts to add Combatants whose tokens are in multiple MAT Mobs to multiple groups, causing some weird nested groups
+* Only group by mob if MAT is active
 * Compatibility with MAT's new implementation of Group Initiative
-* Only play the dice rolling sound once when rolling for Group Initialize
-* No re-rendering for mob changes which caused infinite loop on load
 * Use the same naming as MAT for mobs created with the save buttons
+* No re-rendering for mob changes which caused infinite loop on load
+
+#### Group Skipping
+
+* Group Skipping now works properly with more modes (you may need the new sorting to be enabled)
+* Don't skip groups if there is only one group
+
+#### Grouping & Toggles
+
+* Make sure groups are added on initial load in case the combat tracker is rendered before ready
+* Don't show combatant context menu on toggles
 * The group save button no longer triggers it's toggle
 * Re-render the Combat Tracker immediately when the available grouping modes change
-* Various refactors, ci additions, and code style improvements
+* Add the toggles in the same order that the groups are in
+* Auto opens the correct toggle more often
+
+#### Group Initiative
+
+* Only play the dice rolling sound once when rolling for Group Initialize
+
+#### Combatant Sorting
+
+* Boolean values now work
+* Alphabetical sorting is in the right direction
+* Initiative values are instead compared when grouping by IDs
+* Groups are sorted by their first combatant
+* Sort combatants only when the mode is changed instead of every time the groups are calculated
 
 ## 0.4.3 - 15 Nov 2021
 
