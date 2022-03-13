@@ -254,8 +254,7 @@ export default class Ctg {
         await Ctg.setMODES(modes);
     }
 
-    /**
-     * Create Combat Tracker modes
+    /** Create Combat Tracker modes
      * @param {HTMLElement} html - The Combat Tracker's HTML
      * @param {boolean} popOut - Whether this Combat Tracker is popped out
      */
@@ -290,8 +289,7 @@ export default class Ctg {
         });
     }
 
-    /**
-     * Manage and create Combat Tracker groups
+    /** Manage and create Combat Tracker groups
      * @param {string} mode - The mode that is currently enabled @see {@link modes}
      * @param {boolean} popOut - Whether this Combat Tracker is popped out
      */
