@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 - 22 Jan 2022 - Public Release
+## 1.0.0 - 14 Mar 2022 - Public Release
 
 ### Added
 
