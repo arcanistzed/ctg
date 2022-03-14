@@ -21,13 +21,6 @@ export default class Ctg {
         });
 
         Hooks.on("ready", () => {
-            // Initialize API
-            game.modules.get(Ctg.ID).api = mergeObject(Ctg, {
-                recursiveGetPropertyAsString: recursiveGetPropertyConcat,
-                getDisplayName,
-                ModeConfig,
-            });
-
             // Console art
             console.log(
                 `%c${game.i18n.localize("ctg.welcome.name")}`,
@@ -36,6 +29,14 @@ export default class Ctg {
                 `\n\n${game.i18n.localize("ctg.welcome.support")}: https://patreon.com/arcanistzed`,
                 `\n${game.i18n.localize("ctg.welcome.site")} https://arcanist.me/`
             );
+            
+            // Initialize API
+            game.modules.get(Ctg.ID).api = mergeObject(Ctg, {
+                recursiveGetPropertyAsString: recursiveGetPropertyConcat,
+                getDisplayName,
+                ModeConfig,
+            });
+
             // Update stored version
             game.settings.set(Ctg.ID, "version", game.modules.get(Ctg.ID).data.version);
 
