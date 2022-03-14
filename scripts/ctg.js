@@ -186,11 +186,12 @@ export default class Ctg {
             }, {}));
         }
 
-        // Sort each group
-        groups.forEach(group => group.sort(this.sortCombatants));
-        // Sort the groups by the first combatant in each group
-        groups.sort((a, b) => this.sortCombatants(a[0], b[0]));
+        
+        groups = groups
+			.map(group => group.sort(this.sortCombatants)) // Sort each group
+			.sort((a, b) => this.sortCombatants(a[0], b[0])); // Sort by the first combatant
 
+		Ctg.log(false, "Groups have been recalculated:", groups);
         return groups;
     }
 
