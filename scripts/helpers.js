@@ -12,12 +12,12 @@ export function recursiveGetProperty(object, key, l = 0) {
     return Array.isArray(target) && target && nextTarget ? descend() : target;
 }
 
-/** A wrapper around the `recursiveGetProperty` helper above which always gives a string
+/** A wrapper around the `recursiveGetProperty` helper above which always gives a single value
  * @param {object} object - The object to traverse
  * @param {string} key - An object property with notation a.b.*.c where * is a wildcard
- * @return {string} A string from the values of the found properties
+ * @return {*} A single concatenated value of the found properties
  */
-export function recursiveGetPropertyAsString(object, key) {
+export function recursiveGetPropertyConcat(object, key) {
     const target = recursiveGetProperty(object, key);
     return Array.isArray(target) ? target.sort().deepFlatten().join("") : target;
 }

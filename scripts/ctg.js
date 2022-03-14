@@ -1,4 +1,4 @@
-import { recursiveGetPropertyAsString, getDisplayName } from "./helpers.js";
+import { recursiveGetPropertyConcat, getDisplayName } from "./helpers.js";
 import ModeConfig from "./modeConfig.js";
 import registerKeybindings from "./keybindings.js";
 import registerSettings from "./settings.js";
@@ -23,7 +23,7 @@ export default class Ctg {
         Hooks.on("ready", () => {
             // Initialize API
             game.modules.get(Ctg.ID).api = mergeObject(Ctg, {
-                recursiveGetPropertyAsString,
+                recursiveGetPropertyAsString: recursiveGetPropertyConcat,
                 getDisplayName,
                 ModeConfig,
             });
@@ -181,7 +181,7 @@ export default class Ctg {
                     && !(game.settings.get(Ctg.ID, "noGroupPCs") && current.hasPlayerOwner)
                 )
                     // Group by the property
-                    accumulator[recursiveGetPropertyAsString(current, path)] = [...accumulator[recursiveGetPropertyAsString(current, path)] || [], current];
+                    accumulator[recursiveGetPropertyConcat(current, path)] = [...accumulator[recursiveGetPropertyConcat(current, path)] || [], current];
                 return accumulator;
             }, {}));
         }
@@ -206,8 +206,8 @@ export default class Ctg {
             const path = Ctg.MODES.find(m => m[0] === game.settings.get(Ctg.ID, "mode")).slice(-1)[0];
 
             // Get the values for the two combatants
-            let ia = recursiveGetPropertyAsString(a, path);
-            let ib = recursiveGetPropertyAsString(b, path);
+            let ia = recursiveGetPropertyConcat(a, path);
+            let ib = recursiveGetPropertyConcat(b, path);
 
             if(typeof ia === "boolean" && typeof ib === "boolean") {
                 return ia ? 1 : -1;
