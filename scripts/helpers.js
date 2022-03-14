@@ -27,7 +27,10 @@ export function recursiveGetPropertyAsString(object, key) {
  * @return {string} Concatenated display name for this group 
  */
 export function getDisplayName(group) {
-    /** Names in the current group */
+    /**
+     * Names in the current group
+     * @type {string[]}
+     */
     let names = [];
 
     // Go through all of the combatants in the group

@@ -14,10 +14,10 @@ export default class ModeConfig extends FormApplication {
     }
 
     /** @inheritdoc */
-    getData() {
-        return {
+    getData(options={}) {
+        return mergeObject(super.getData(options), {
             modes: Ctg.MODES,
-        }
+        });
     }
 
     /** @inheritdoc */

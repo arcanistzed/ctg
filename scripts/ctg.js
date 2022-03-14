@@ -134,7 +134,9 @@ export default class Ctg {
     /** Whether the user is currently selecting groups */
     static selectGroups = false;
 
-    /** Whether the user is currently holding down the Group Initiative rolling keybind */
+    /** Whether the user is currently holding down the Group Initiative rolling keybind
+     * @type {boolean}
+    */
     static groupInitiativeKeybind;
 
     /** Create Groups of Combatants
@@ -211,7 +213,7 @@ export default class Ctg {
                 return ia ? 1 : -1;
             } else if (Number.isNumeric(ia) && Number.isNumeric(ib)) {
                 const ci = ib - ia;
-                if (ci !== 0) return ci;
+                if (ci !== 0) return ci ? 1 : -1;
                 return a.id > b.id ? 1 : -1;
             } else if (typeof ia === "object" && typeof ib === "object") {
                 // Get the first item if it's an array
@@ -219,9 +221,9 @@ export default class Ctg {
                 ib = Array.isArray(ib) ? ib[0] : ib;
                 return ia?.id > ib?.id ? 1 : -1;
             } else if (typeof ia === "string" && typeof ib === "string") {
-                if (/[A-Za-z0-9]{16}/.test(ia, ib)) {
+                if (/[A-Za-z0-9]{16}/.test(ia) && /[A-Za-z0-9]{16}/.test(ib)) {
                     // Sort by initiative if they are IDs
-                    return a.initiative > b.initiative ? 1 : -1;
+                    return a?.initiative > b?.initiative ? 1 : -1;
                 } else {
                     // Otherwise, sort alphabetically
                     return ib.localeCompare(ia);
