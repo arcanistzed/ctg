@@ -36,6 +36,8 @@ export default class Ctg {
                 `\n\n${game.i18n.localize("ctg.welcome.support")}: https://patreon.com/arcanistzed`,
                 `\n${game.i18n.localize("ctg.welcome.site")} https://arcanist.me/`
             );
+            // Update stored version
+            game.settings.set(Ctg.ID, "version", game.modules.get(Ctg.ID).data.version);
 
             // Re-render Combat Tracker when mobs update
             if (game.modules.get("mob-attack-tool")?.active) {
@@ -65,7 +67,7 @@ export default class Ctg {
 
                 // Manage and create modes if GM
                 if (game.user?.isGM) {
-                    await this.manageModes();
+                    await Ctg.manageModes();
                     this.createModes(html[0], app.popOut);
                 }
                 // Create groups
@@ -237,11 +239,19 @@ export default class Ctg {
         }
     }
 
-    /** Manage available modes and switch away from invalid ones */
-    async manageModes() {
-        // Get current modes
-        const modes = Ctg.MODES;
+    /** Manage available modes and switch away from invalid ones
+     * @param {boolean} reset - Whether to reset the modes to default
+    */
+    static async manageModes(reset = false) {
+        if (!game.user.isGM) return;
 
+        // Get current modes
+        let modes = Ctg.MODES;
+
+        // Reset to default
+        if (reset) modes = game.settings.settings.get(`${Ctg.ID}.modes`).default;
+
+        // Add integrations        
         if (game.modules.get("mob-attack-tool")?.active && !modes.find(m => m[0] === "mob"))
             modes.push(["mob", ""]);
         if (game.modules.get("lancer-initiative")?.active && !modes.find(m => m[0] === "lancer"))

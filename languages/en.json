@@ -41,6 +41,10 @@
                 "name": "Mode Configuration",
                 "label": "Configure",
                 "hint": "Configure the Combat Tracker Groups modes"
+            },
+            "version": {
+                "title": "Module update detected",
+                "content": "<p>Thanks for updating!</p><p>Would you like to reset your mode configuration?</p><p>You may want to do this if new modes have been added in this update. I recommend reading the <a href=\"https://github.com/arcanistzed/ctg/blob/main/CHANGELOG.md\">CHANGELOG</a> to find out.</p>"
             }
         },
         "notifications": {

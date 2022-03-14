@@ -1,7 +1,32 @@
 import Ctg from "./ctg.js";
 import ModeConfig from "./modeConfig.js";
 
-export default function registerSettings() {
+export default function registerSettings () {
+    game.settings.register(Ctg.ID, "version", {
+        scope: "world",
+        config: false,
+        default: "0.0.0",
+        type: String,
+        onChange: () => {
+            new Dialog({
+				title: `${Ctg.ID} | ${game.i18n.localize("ctg.settings.version.title")}`,
+				content: game.i18n.localize("ctg.settings.version.content"),
+				buttons: {
+					yes: {
+						label: game.i18n.localize("Yes"),
+						callback: () => {
+							Ctg.manageModes(true);
+						},
+					},
+					no: {
+						label: game.i18n.localize("No"),
+					},
+				},
+				default: "yes",
+			}).render(true);
+        }
+    });
+
     game.settings.registerMenu(Ctg.ID, "modeConfig", {
         name: game.i18n.localize("ctg.settings.modeConfig.name"),
         label: game.i18n.localize("ctg.settings.modeConfig.label"),

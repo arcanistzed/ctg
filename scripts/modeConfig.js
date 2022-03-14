@@ -65,14 +65,16 @@ export default class ModeConfig extends FormApplication {
         this.setPosition({ height: "auto" });
     }
 
-    _reset(_event) {
+    async _reset (_event) {
+        // Set the default values
+        await Ctg.manageModes(true);
+
         // Re-render to discard changes and adjust the app size
         this.render(true, { height: "auto" });
     }
 
     /** @inheritdoc */
     async _updateObject(_event, formData) {
-        console.log(formData);
         // Update the Modes with the form data
         const modes = Object.values(expandObject(formData)).map(o => Object.values(o).map(o => Object.values(o)))[0]
         await Ctg.setMODES(modes);
