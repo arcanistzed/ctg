@@ -437,7 +437,7 @@ export default class Ctg {
                     : (change.turn > document.current.turn ? 1 : -1);
 
                 // Get the turn of the first turn in each group
-                const firstTurns = groups.map(group => document.turns.findIndex(c => c.id === group[0].id)).sort();
+                const firstTurns = groups.map(group => document.turns.findIndex(c => c.id === group[0].id)).reverse();
 
                 // Get the index of the current first turn in the list of first turns
                 const indexOfCurrent = firstTurns.indexOf(document.turn) !== -1
