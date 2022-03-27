@@ -4,8 +4,6 @@
 
 Group combatants in the Combat Tracker and roll for group initiative.
 
-<https://user-images.githubusercontent.com/82790112/133531295-f31f0fd0-09aa-48fb-b01e-68cd827ca233.mp4>
-
 ## Installation
 
 In the setup screen, use the URL `https://github.com/arcanistzed/ctg/releases/latest/download/module.json` to install the module.
@@ -62,8 +60,6 @@ Combatants are grouped by a custom selection. You can decide this by using the t
 ![controls](https://i.imgur.com/3jtS1UI.png)
 
 Once toggled on, whenever you select any tokens in the scene, they'll be added to the same group. It's recommended to toggle this control off after you are satisfied with the groups you've created.
-
-<https://user-images.githubusercontent.com/82790112/133531297-d55892c0-41b3-4117-9f85-be0b2750c32a.mp4>
 
 #### Players
 
