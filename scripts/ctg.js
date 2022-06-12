@@ -157,7 +157,12 @@ export default class Ctg {
         }
 
         // Special behavior for creating groups in Mob mode
-        if (mode === "mob" && game.modules.get("mob-attack-tool")?.active) {
+        if (mode === "mob") {
+            if (!game.modules.get("mob-attack-tool")?.active) {
+                ui.notifications.warn(`${game.i18n.localize("ctg.ID")} | ${game.i18n.localize("ctg.notifications.mobModeRequiresMAT")}`);
+                return;
+            }
+
             const sortByTurns = (a, b) => game.combat?.turns.indexOf(a) - game.combat?.turns.indexOf(b);
             const alreadyInMob = [];
 
