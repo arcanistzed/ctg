@@ -354,7 +354,7 @@ export default class Ctg {
                     // If it's the last entry
                     if (i === arr.length - 1) {
                         // Add the toggle to the end
-                        html.querySelector("#combat-tracker").append(toggle);
+                        html.querySelector("#combat-tracker").append(group.length > 1 ? toggle : element);
 
                         // Create a label for the toggle
                         const labelBox = document.createElement("summary");
@@ -390,8 +390,13 @@ export default class Ctg {
                         labelFlex.prepend(labelName);
                         // Insert the count into the label flex
                         labelFlex.append(labelCount);
-                        // Insert the value into the label flex if there is one
-                        if (labelValue.innerText) labelFlex.append(labelValue);
+                        // If there is a value label
+                        if (labelValue.innerText) {
+							// If there is a toggle, insert the value into the label flex
+							if (group.length > 1) labelFlex.append(labelValue);
+							// If there is no toggle, add the value to the element itself
+                            else element.querySelector(".token-name").after(labelValue);
+                        }
 
                         if (game.modules.get("mob-attack-tool")?.active) {
                             // Create a button and it to the label flex
@@ -418,8 +423,8 @@ export default class Ctg {
                         }
                     }
 
-                    // Move the element into the subdirectory
-                    subdirectory.append(element);
+                    // Move the element into the subdirectory if there is one
+                    if (group.length > 1) subdirectory.append(element);
                 });
             });
 
