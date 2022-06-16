@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.0 - 16 Jun 2022
+
+### Added
+
+* Groups with a single combatant no longer have a toggle
+* Toggles now have labels in more cases
+
+### Fixed
+
+* For "mob" mode, CTG no longer proceeds if the associated MAT is not enabled
+* Combatants are now properly in descending order by default
+* Combatant sorting works better both when enabled and disabled
+* Group skipping is in correct order
+
 ## 1.0.0 - 14 Mar 2022 - Public Release
 
 ### Added
