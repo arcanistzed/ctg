@@ -1,146 +1,149 @@
 /* Modes */
 
 #ctg-modeContainer {
-  flex: 0;
-  display: flex;
-  list-style-type: none;
-  padding: 5px;
-  margin: 0;
-  gap: 5px;
-  flex-wrap: wrap;
-  text-shadow: 1px 1px 4px var(--color-shadow-dark, #000);
+	flex: 0;
+	display: flex;
+	list-style-type: none;
+	padding: 5px;
+	margin: 0;
+	gap: 5px;
+	flex-wrap: wrap;
+	text-shadow: 1px 1px 4px var(--color-shadow-dark, #000);
 }
 
 #ctg-modeBox {
-  width: 100%;
-  height: 2em;
-  flex: 1 0 25%;
-  display: flex;
+	width: 100%;
+	height: 2em;
+	flex: 1 0 25%;
+	display: flex;
 }
 
 #ctg-modeBox > input {
-  display: none;
+	display: none;
 }
 
 [name="ctg-mode-radio"]:checked + #ctg-modeLabel,
 [name="ctg-mode-radio-popOut"]:checked + #ctg-modeLabel {
-  background-color: rgba(255, 100, 0, 0.25);
+	background-color: rgba(255, 100, 0, 0.25);
 }
 
 #ctg-modeLabel {
-  border: solid var(--color-border-light-1, #ddd) 1px;
-  border-radius: 3px;
-  cursor: pointer;
-  padding: 5px;
-  width: 100%;
-  text-align: center;
-  box-sizing: border-box;
+	border: solid var(--color-border-light-1, #ddd) 1px;
+	border-radius: 3px;
+	cursor: pointer;
+	padding: 5px;
+	width: 100%;
+	text-align: center;
+	box-sizing: border-box;
 }
 
 /* Toggles */
 
 .ctg-toggle.directory-item.active:not([open]) {
-  border-top: solid 1px;
-  border-bottom: solid 1px;
-  border-color: var(--color-border-highlight, #ff6400);
+	border-top: solid 1px;
+	border-bottom: solid 1px;
+	border-color: var(--color-border-highlight, #ff6400);
 }
 
 .ctg-toggle[open] > .ctg-labelBox {
-  background: rgba(255, 255, 255, 0.2);
+	background: rgba(255, 255, 255, 0.2);
 }
 
 .ctg-labelBox {
-  text-shadow: 1px 1px 4px var(--color-shadow-dark, #000);
-  cursor: pointer;
-  line-height: calc(var(--sidebar-item-height, 48px) / 2);
-  padding: 0 6px;
-  background: rgba(0, 0, 0, 0.5);
-  border-top: 1px solid var(--color-border-dark, #000);
-  border-bottom: 1px solid var(--color-border-dark, #000);
+	text-shadow: 1px 1px 4px var(--color-shadow-dark, #000);
+	cursor: pointer;
+	line-height: calc(var(--sidebar-item-height, 48px) / 2);
+	padding: 0 6px;
+	background: rgba(0, 0, 0, 0.5);
+	border-top: 1px solid var(--color-border-dark, #000);
+	border-bottom: 1px solid var(--color-border-dark, #000);
 }
 
 .ctg-labelFlex {
-  display: inline-flex;
-  width: calc(100% - 22px);
-  justify-content: flex-start;
-  gap: 5px;
-  cursor: default;
-  padding: 6px 0;
+	display: inline-flex;
+	width: calc(100% - 22px);
+	justify-content: flex-start;
+	gap: 5px;
+	cursor: default;
+	padding: 6px 0;
 }
 
 .ctg-labelFlex > * {
-  margin: auto 0;
+	margin: auto 0;
 }
 
 .ctg-labelName {
-  flex-grow: 1;
+	flex-grow: 1;
 }
 
 .ctg-labelCount {
-  font-size: 14px;
-  visibility: hidden;
-  flex-basis: 2em;
-  text-align: center;
+	font-size: 14px;
+	visibility: hidden;
+	flex-basis: 2em;
+	text-align: center;
 }
 .ctg-labelCount::before {
-  content: "(";
+	content: "(";
 }
 .ctg-labelCount::after {
-  content: ")";
+	content: ")";
 }
 
 .ctg-labelFlex:hover .ctg-labelCount {
-  visibility: visible;
+	visibility: visible;
 }
 
 .ctg-labelCount::before,
 .ctg-labelCount::after {
-  color: var(--color-text-light-4, #bbb);
+	color: var(--color-text-light-4, #bbb);
 }
 
 .ctg-labelValue {
-  flex-basis: 2em;
-  text-align: right;
-  font-size: 16px;
-  text-overflow: ellipsis;
+	flex-basis: 2em;
+	text-align: right;
+	font-size: 16px;
+	text-overflow: ellipsis;
 }
 
 .ctg-saveMob {
-  flex: 0;
-  line-height: 1;
-  background: transparent;
-  border: none;
-  padding: 0 5px;
-  cursor: pointer;
+	flex: 0;
+	line-height: 1;
+	background: transparent;
+	border: none;
+	padding: 0 5px;
+	cursor: pointer;
 }
 
 .ctg-saveMob:hover {
-  filter: brightness(1.25);
+	filter: brightness(1.25);
 }
 
 /* Mode Config */
-.ctg.modeConfig  ol {
-  list-style: none;
-  padding: 0;
-  max-height: 600px;
-  overflow-y: auto;
-  margin: 0;
+.ctg.modeConfig ol {
+	list-style: none;
+	padding: 0;
+	max-height: 600px;
+	overflow-y: auto;
+	margin: 0;
 }
 .ctg.modeConfig form header {
-  font-weight: bold;
+	font-weight: bold;
 }
-.ctg.modeConfig form header, .ctg.modeConfig ol li, .ctg.modeConfig footer {
-  gap: .5em;
-  padding: 0 0.25em;
+.ctg.modeConfig form header,
+.ctg.modeConfig ol li,
+.ctg.modeConfig footer {
+	gap: 0.5em;
+	padding: 0 0.25em;
 }
 .ctg.modeConfig li {
-  margin: .5em 0;
+	margin: 0.5em 0;
 }
-.mode-name, .mode-path {
-  flex: 1;
+.mode-name,
+.mode-path {
+	flex: 1;
 }
 .ctg.modeConfig form a {
-  flex: 0 0 24px;
-  margin: auto;
-  text-align: center;
+	flex: 0 0 24px;
+	margin: auto;
+	text-align: center;
 }
