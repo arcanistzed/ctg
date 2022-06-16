@@ -354,7 +354,7 @@ export default class Ctg {
                     // If it's the last entry
                     if (i === arr.length - 1) {
                         // Add the toggle to the end
-                        html.querySelector("#combat-tracker").prepend(toggle);
+                        html.querySelector("#combat-tracker").append(toggle);
 
                         // Create a label for the toggle
                         const labelBox = document.createElement("summary");
