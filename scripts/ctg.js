@@ -191,7 +191,7 @@ export default class Ctg {
                     // Group by the property
                     accumulator[recursiveGetPropertyConcat(current, path)] = [...accumulator[recursiveGetPropertyConcat(current, path)] || [], current];
                 return accumulator;
-            }, {}));
+            }, {})).reverse();
         }
 
         
