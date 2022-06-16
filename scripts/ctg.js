@@ -198,6 +198,7 @@ export default class Ctg {
         groups = groups
 			.map(group => group.sort(this.sortCombatants)) // Sort each group
 			.sort((a, b) => this.sortCombatants(a[0], b[0])); // Sort by the first combatant
+		game.combat.turns.sort(this.sortCombatants);
 
 		Ctg.log(false, "Groups have been recalculated:", groups);
         return groups;
@@ -240,8 +241,8 @@ export default class Ctg {
             }
             // Fallback to comparing the IDs
             return a?.id > b?.id ? 1 : -1;
-        } else { // If disabled, sort by position in the existing turn order
-            return game.combat?.turns.indexOf(a) > game.combat?.turns.indexOf(b) ? 1 : -1;
+		} else { // If disabled, sort by the default order
+			return game.combat?._sortCombatants(a, b);
         }
     }
 
