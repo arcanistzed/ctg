@@ -8,6 +8,7 @@ export default function registerSettings() {
 		default: "0.0.0",
 		type: String,
 		onChange: () => {
+			if (!game.user.isGM) return;
 			new Dialog({
 				title: `${Ctg.ID} | ${game.i18n.localize("ctg.settings.version.title")}`,
 				content: game.i18n.localize("ctg.settings.version.content"),
