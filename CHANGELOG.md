@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1 - 2 Jul 2022
+
+### Fixed
+
+Only show settings reset dialog for Gamemasters
+
 ## 1.1.0 - 16 Jun 2022
 
 ### Added
