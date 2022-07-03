@@ -1,4 +1,4 @@
-import { recursiveGetPropertyConcat, getDisplayName } from "./helpers.js";
+import { recursiveGetPropertyConcat, getDisplayName, resizePopout } from "./helpers.js";
 import ModeConfig from "./modeConfig.js";
 import registerKeybindings from "./keybindings.js";
 import registerSettings from "./settings.js";
@@ -34,6 +34,7 @@ export default class Ctg {
 			game.modules.get(Ctg.ID).api = mergeObject(Ctg, {
 				recursiveGetPropertyAsString: recursiveGetPropertyConcat,
 				getDisplayName,
+				resizePopout,
 				ModeConfig,
 			});
 
@@ -459,6 +460,9 @@ export default class Ctg {
 								MobAttacks.saveMob(mobName, actorList, selectedTokenIds, numSelected, "ctg");
 							});
 						}
+
+						// Whenever toggled, resize the popout combat tracker window
+						toggle.addEventListener("toggle", resizePopout);
 					}
 
 					// Move the element into the subdirectory if there is one
@@ -476,6 +480,9 @@ export default class Ctg {
 				currentToggle.classList.add("active");
 				Ctg.log(false, currentToggle, game.combat.combatant?.id);
 			}
+
+			// Resize popout window
+			resizePopout();
 		}
 	}
 

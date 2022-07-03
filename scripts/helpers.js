@@ -65,3 +65,12 @@ export function getDisplayName(group) {
 	// Return a string with the names
 	return names.length < 3 ? names.join(" and ") : names.join(", ");
 }
+
+/**
+ * Resize the popout combat tracker window
+ */
+export function resizePopout() {
+	Object.values(ui.windows)
+		.find(w => w instanceof CombatTracker)
+		?.setPosition();
+}
