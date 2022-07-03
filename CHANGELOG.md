@@ -1,10 +1,17 @@
 # Changelog
 
-## 1.1.1 - 2 Jul 2022
+## 1.2.0 - 2 Jul 2022
+
+### Added
+
+* Refactor group selection to act more intuitively and to enable ungrouping ([#8](https://github.com/arcanistzed/ctg/issues/8))
+* Auto-resize popout window when groups are changed ([#7](https://github.com/arcanistzed/ctg/issues/7))
+* Falsy values (such as with "Selection" mode [#9](https://github.com/arcanistzed/ctg/issues/9)) are ungrouped by default
 
 ### Fixed
 
-Only show settings reset dialog for Gamemasters
+* Only show settings reset dialog for Gamemasters
+* Remove some code repetition to optimize performance
 
 ## 1.1.0 - 16 Jun 2022
 
