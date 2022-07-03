@@ -140,9 +140,6 @@ export default class Ctg {
 		return game.settings.set(Ctg.ID, "modes", value);
 	}
 
-	/** Whether the user is currently selecting groups */
-	static selectGroups = false;
-
 	/** Whether the user is currently holding down the Group Initiative rolling keybind
 	 * @type {boolean}
 	 */
@@ -656,36 +653,45 @@ export default class Ctg {
 					.find(c => c.name == "token")
 					.tools.push({
 						name: "groups",
-						title: "ctg.selectControl",
+						title: "ctg.selectControlTitle",
 						icon: "fas fa-users",
-						toggle: true,
-						active: Ctg.selectGroups ?? false,
-						onClick: toggled => (Ctg.selectGroups = toggled),
+						onClick: () => {
+							// Activate the default selection tool instead
+							ui.controls.control.activeTool = "select";
+							ui.controls.render();
+
+							// Generate a unique ID
+							const uid = randomID(16);
+
+							// Unset the flag if all controlled tokens have the same non-nullish value
+							const values = new Set(
+								canvas.tokens.controlled.map(token => token.combatant?.getFlag(Ctg.ID, "group") ?? null)
+							);
+							const unset = values.size === 1 && !values.has(null);
+
+							// Update the flag on each combatant whose token is controlled
+							const updates = [];
+							canvas.tokens.controlled.forEach(token => {
+								// Check if token is in combat and if the combatant is already in the updates list
+								if (token.inCombat && !updates.some(u => u._id === token.combatant.id))
+									updates.push({
+										_id: token.combatant.id,
+										[`flags.${Ctg.ID}.group`]: unset ? null : uid,
+									});
+							});
+							game.combat?.updateEmbeddedDocuments("Combatant", updates);
+
+							// Call selection hook
+							Hooks.call("ctgSelection", updates);
+
+							ui.notifications.info(game.i18n.format("ctg.notifications.groupSelection", {
+								action: unset
+								? game.i18n.localize("ctg.actions.removed")
+								: game.i18n.localize("ctg.actions.created"),
+								count: updates.length 
+							}));
+						},
 					});
-		});
-
-		// Do grouping whenever the controlled token changes
-		Hooks.on("controlToken", (_token, controlled) => {
-			// Generate a unique ID
-			const uid = randomID(16);
-
-			// If controlling at least one token, a new token is being controlled, and the user is in select groups mode
-			if (canvas.tokens.controlled.length > 0 && controlled && Ctg.selectGroups) {
-				// Add the same flag to each combatant in batch
-				const updates = [];
-				canvas.tokens.controlled.forEach(token => {
-					// Check if token is in combat and if the combatant is already in the updates list
-					if (token.inCombat && !updates.some(u => u._id === token.combatant.id))
-						updates.push({
-							_id: token.combatant.id,
-							["flags.ctg.group"]: uid,
-						});
-				});
-				game.combat?.updateEmbeddedDocuments("Combatant", updates);
-
-				// Call selection hook
-				Hooks.call("ctgSelection", updates);
-			}
 		});
 	}
 }

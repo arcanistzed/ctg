@@ -7,7 +7,7 @@
             "support": "Support me on Patreon",
             "site": "Visit my Website for more info:"
         },
-        "selectControl": "Select Combat Groups",
+        "selectControlTitle": "Group selected tokens in combat",
         "settings": {
             "groupSkipping": {
                 "hint": "Skip over each whole group of Combatants at once",
@@ -52,7 +52,12 @@
             "invalidMode": "Grouping not possible because {mode} is not a valid mode.",
             "alreadyInMob": "Token with ID {id} is in multiple Mob Attack Tool Mobs, but will only show up in the first created Mob when grouped in the Combat Tracker. Delete the relevant mob in the Mob Attack Tool dialog to get rid of this warning.",
             "groupSkippingWorksBetterWithSorting": "Group skipping works better with Combatant sorting enabled. See README for details.",
-            "disableMATGroupInitiative": "Mob Attack Tool Group Initiative has been disabled since CTG provides the same functionality and more."
+            "disableMATGroupInitiative": "Mob Attack Tool Group Initiative has been disabled since CTG provides the same functionality and more.",
+            "groupSelection": "{action} combat tracker group with {count} selected tokens"
+        },
+        "actions": {
+            "created": "Created",
+            "removed": "Removed"
         },
         "rollingGroupInitiative": {
             "success": "Rolling Initiative for{who} group \"{group}\"",

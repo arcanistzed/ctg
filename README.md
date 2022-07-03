@@ -27,7 +27,7 @@ The Group Skipping feature skips over the rest of combatants in the current grou
 
 ### Combatant Sorting
 
-When enabled, CTG attempts to sort combatants by their group which is the optimal order for group skipping. It compares numbers numerically (e.g. in Initiative mode), strings alphabetically (e.g. in Name mode), and the rest by ID (e.g. in Selection mode).
+When enabled, CTG attempts to sort combatants by their group which is the optimal order for group skipping. It compares numbers numerically (e.g. in Initiative mode), strings alphabetically (e.g. in Name mode), and the rest by ID (e.g. in "Selection" mode).
 
 ### Grouping modes
 
@@ -55,11 +55,7 @@ Combatants are alphabetically grouped by their name.
 
 #### Selection
 
-Combatants are grouped by a custom selection. You can decide this by using the tool in the Token Scene controls toolbar:
-
-![controls](https://i.imgur.com/3jtS1UI.png)
-
-Once toggled on, whenever you select any tokens in the scene, they'll be added to the same group. It's recommended to toggle this control off after you are satisfied with the groups you've created.
+Combatants are grouped by selecting their tokens. Select some tokens and then click on the button in the token scene controls toolbar to group them. Click on it again to ungroup.
 
 #### Players
 
@@ -154,10 +150,6 @@ This boolean tracks whether or not the user is currently holding down the group 
 #### `groups`
 
 This method returns the current sorted array of groups (which are arrays of Combatants). You must pass a valid mode when calling this and the groups will be created based on it's path.
-
-#### `selectGroups`
-
-This boolean tracks whether or not to allow groups to be created for the "selection" mode.
 
 ## Support
 
