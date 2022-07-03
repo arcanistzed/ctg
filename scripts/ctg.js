@@ -203,6 +203,7 @@ export default class Ctg {
 					// Conditions for not grouping:
 					if (
 						current.visible &&
+						recursiveGetPropertyConcat(current, path) &&
 						!(game.settings.get(Ctg.ID, "noGroupHidden") && current.hidden) &&
 						!(game.settings.get(Ctg.ID, "noGroupPCs") && current.hasPlayerOwner)
 					)
