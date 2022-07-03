@@ -201,18 +201,17 @@ export default class Ctg {
 			// Reduce combat turns into an array of groups by matching a given property path
 			groups = Object.values(
 				game.combat?.turns.reduce((accumulator, current) => {
+					const value = recursiveGetPropertyConcat(current, path);
+
 					// Conditions for not grouping:
 					if (
 						current.visible &&
-						recursiveGetPropertyConcat(current, path) &&
+						value &&
 						!(game.settings.get(Ctg.ID, "noGroupHidden") && current.hidden) &&
 						!(game.settings.get(Ctg.ID, "noGroupPCs") && current.hasPlayerOwner)
 					)
 						// Group by the property
-						accumulator[recursiveGetPropertyConcat(current, path)] = [
-							...(accumulator[recursiveGetPropertyConcat(current, path)] || []),
-							current,
-						];
+						accumulator[value] = [...(accumulator[value] || []), current];
 					return accumulator;
 				}, {})
 			).reverse();
