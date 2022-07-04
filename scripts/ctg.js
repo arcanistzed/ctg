@@ -407,9 +407,14 @@ export default class Ctg {
 						// Add the group name to the label
 						labelName.innerText = getDisplayName(group);
 
-						// Add the value to the label if not in name or initiative mode and if it's not an ID
+						// Get the value of this mode on the combatant
 						const value = getProperty(combatant, Ctg.MODES.find(m => m[0] === mode).slice(-1)[0]);
-						if (value && !String(value).match(/[A-Za-z0-9]{16}/) && !["name", "initiative"].includes(mode))
+						if (
+							value && // must exist
+							!String(value).match(/[A-Za-z0-9]{16}/) && // must not be an ID
+							!["name", "initiative"].includes(mode) // must not be in "Name" or "Initiative" mode
+						)
+							// Add the value to the label
 							labelValue.innerText = value;
 
 						// Add the count to the label
