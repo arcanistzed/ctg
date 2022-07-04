@@ -441,9 +441,9 @@ export default class Ctg {
 
 							// Create a mob when the button is clicked
 							/*
-                            FIXME: ask Lupusmalus for new parameter to not delete existing mobs, then use this instead:
-                            saveMob.addEventListener("click", () => MobAttacks.createSavedMobsFromCTGgroups([Ctg.groups(mode)[index]]));
-                            */
+							FIXME: ask Lupusmalus for new parameter to not delete existing mobs, then use this instead:
+							saveMob.addEventListener("click", () => MobAttacks.createSavedMobsFromCTGgroups([Ctg.groups(mode)[index]]));
+							*/
 							saveMob.addEventListener("click", event => {
 								event.preventDefault();
 								const numSelected = 1,
