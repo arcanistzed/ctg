@@ -1,8 +1,8 @@
 {
+  "id": "ctg",
   "name": "ctg",
   "title": "Combat Tracker Groups",
   "description": "Group combatants in the Combat Tracker and roll for group initiative.",
-  "author": "Arcanist",
   "authors": [
     {
       "name": "Arcanist",
@@ -21,8 +21,12 @@
     "allowBugReporter": true
   },
   "version": "This is auto replaced",
+  "compatibility": {
+    "minimum": "9",
+    "verified": "10"
+  },
   "minimumCoreVersion": "9",
-  "compatibleCoreVersion": "9",
+  "compatibleCoreVersion": "10",
   "esmodules": [
     "scripts/ctg.js"
   ],
