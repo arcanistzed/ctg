@@ -76,14 +76,6 @@ export default class Ctg {
 				// Create groups
 				this.manageGroups(game.settings.get(Ctg.ID, "mode"), app.popOut);
 
-				// Add listener to the mode containers to update settings when changing modes
-				if (game.user?.isGM)
-					document.querySelectorAll("#ctg-modeContainer").forEach(el =>
-						el.addEventListener("click", event => {
-							const mode = event.target?.id?.replace("ctg-mode-radio-", "").replace("-popOut", "");
-							if (Ctg.MODES.map(m => m[0]).includes(mode)) game.settings.set(Ctg.ID, "mode", mode);
-						})
-					);
 
 				// For debugging: expand all groups and show turn order
 				if (game.modules.get("_dev-mode")?.api?.getPackageDebugValue(Ctg.ID)) {
@@ -330,6 +322,12 @@ export default class Ctg {
 			// Add the label and the radio button to the box
 			modeBox.append(radio);
 			modeBox.append(label);
+		});
+
+		// Update mode on click
+		container.addEventListener("click", ({ target }) => {
+			const mode = target?.id?.replace("ctg-mode-radio-", "").replace("-popOut", "");
+			if (Ctg.MODES.map(m => m[0]).includes(mode)) game.settings.set(Ctg.ID, "mode", mode);
 		});
 	}
 
