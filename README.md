@@ -65,6 +65,10 @@ Combatants are grouped by the players that have `Owner` permission for the assoc
 
 Group combatants by their associated Actor which allows you to group together Combatants which are from the same Actor, but have different names (such as when using [Token Mold](https://foundryvtt.com/packages/token-mold)).
 
+### Checked
+
+Group combatants with checkboxes that appear next to each one. You can use this mode to keep track of who has gone so far in combat, for example, which is especially useful for users of the [Simultaneous Combat System](https://foundryvtt.com/packages/scs).
+
 #### Mob
 
 *Requires [Mob Attack Tool](https://foundryvtt.com/packages/mob-attack-tool))*

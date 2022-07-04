@@ -76,6 +76,26 @@ export default class Ctg {
 				// Create groups
 				this.manageGroups(game.settings.get(Ctg.ID, "mode"), app.popOut);
 
+				// Checked mode
+				if (game.settings.get(Ctg.ID, "mode") === "checked") {
+					// Create checkboxes nest to each combatant
+					html.querySelectorAll(".combatant").forEach(el => {
+						const input = document.createElement("input");
+						input.type = "checkbox";
+						input.classList.add("ctg");
+						el.prepend(input);
+						// Get initial state
+						input.checked = game.combat.combatants.get(el.dataset.combatantId).getFlag("ctg", "checked");
+					});
+
+					// Update combatant flags when a checkbox is clicked
+					html.addEventListener("click", ({ target }) => {
+						if (!target.matches("input[type='checkbox'].ctg")) return;
+						game.combat.combatants
+							.get(target.closest(".combatant").dataset.combatantId)
+							.setFlag("ctg", "checked", target.checked);
+					});
+				}
 
 				// For debugging: expand all groups and show turn order
 				if (game.modules.get("_dev-mode")?.api?.getPackageDebugValue(Ctg.ID)) {

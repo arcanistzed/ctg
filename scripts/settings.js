@@ -47,6 +47,7 @@ export default function registerSettings() {
 			["selection", "data.flags.ctg.group"],
 			["players", "players.*.id"],
 			["actor", "data.actorId"],
+			["checked", "data.flags.ctg.checked"],
 		],
 		type: Object,
 		onChange: () => ui.combat?.render(true),
