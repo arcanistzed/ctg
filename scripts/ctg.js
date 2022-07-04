@@ -85,7 +85,7 @@ export default class Ctg {
 						input.classList.add("ctg");
 						el.prepend(input);
 						// Get initial state
-						input.checked = game.combat.combatants.get(el.dataset.combatantId).getFlag("ctg", "checked");
+						input.checked = game.combat.combatants.get(el.dataset.combatantId).getFlag(Ctg.ID, "checked");
 					});
 
 					// Update combatant flags when a checkbox is clicked
@@ -93,7 +93,7 @@ export default class Ctg {
 						if (!target.matches("input[type='checkbox'].ctg")) return;
 						game.combat.combatants
 							.get(target.closest(".combatant").dataset.combatantId)
-							.setFlag("ctg", "checked", target.checked);
+							.setFlag(Ctg.ID, "checked", target.checked);
 					});
 				}
 
@@ -480,7 +480,7 @@ export default class Ctg {
 									actorList.push(combatant?.actor);
 									selectedTokenIds.push(combatant.data?.tokenId);
 								}
-								MobAttacks.saveMob(mobName, actorList, selectedTokenIds, numSelected, "ctg");
+								MobAttacks.saveMob(mobName, actorList, selectedTokenIds, numSelected, Ctg.ID);
 							});
 						}
 
