@@ -64,14 +64,14 @@ export default class Ctg {
 				document.head.appendChild(style);
 			}
 
-			Hooks.on("renderCombatTracker", async (app, html, data) => {
+			Hooks.on("renderCombatTracker", async (app, [html], data) => {
 				// Exit if there is no combat
 				if (!data.combat) return;
 
 				// Manage and create modes if GM
 				if (game.user?.isGM) {
 					await Ctg.manageModes();
-					this.createModes(html[0], app.popOut);
+					this.createModes(html, app.popOut);
 				}
 				// Create groups
 				this.manageGroups(game.settings.get(Ctg.ID, "mode"), app.popOut);
@@ -87,10 +87,10 @@ export default class Ctg {
 
 				// For debugging: expand all groups and show turn order
 				if (game.modules.get("_dev-mode")?.api?.getPackageDebugValue(Ctg.ID)) {
-					html[0].querySelectorAll("details.ctg-toggle").forEach(el => (el.open = true));
-					html[0]
-						.querySelectorAll("li.combatant")
-						.forEach(el => el.append(game.combat.turns.findIndex(t => t.id === el.dataset.combatantId)));
+					html.querySelectorAll("details.ctg-toggle").forEach(el => (el.open = true));
+					html.querySelectorAll("li.combatant").forEach(el =>
+						el.append(game.combat.turns.findIndex(t => t.id === el.dataset.combatantId))
+					);
 					ui.sidebar.activateTab("combat");
 				}
 			});
