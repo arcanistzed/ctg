@@ -426,7 +426,10 @@ export default class Ctg {
 						labelName.innerText = getDisplayName(group);
 
 						// Get the value of this mode on the combatant
-						const value = recursiveGetPropertyConcat(combatant, Ctg.MODES.find(m => m[0] === mode).slice(-1)[0]);
+						const value = recursiveGetPropertyConcat(
+							combatant,
+							Ctg.MODES.find(m => m[0] === mode).slice(-1)[0]
+						);
 						if (
 							value && // must exist
 							value !== true && // must not be literally `true`
