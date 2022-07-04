@@ -676,7 +676,9 @@ export default class Ctg {
 
 							// Unset the flag if all controlled tokens have the same non-nullish value
 							const values = new Set(
-								canvas.tokens.controlled.map(token => token.combatant?.getFlag(Ctg.ID, "group") ?? null)
+								canvas.tokens.controlled
+									.filter(token => token.combatant)
+									.map(token => token.combatant?.getFlag(Ctg.ID, "group") ?? null)
 							);
 							const unset = values.size === 1 && !values.has(null);
 
