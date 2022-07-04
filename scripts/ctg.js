@@ -697,12 +697,14 @@ export default class Ctg {
 							// Call selection hook
 							Hooks.call("ctgSelection", updates);
 
-							ui.notifications.info(game.i18n.format("ctg.notifications.groupSelection", {
-								action: unset
-								? game.i18n.localize("ctg.actions.removed")
-								: game.i18n.localize("ctg.actions.created"),
-								count: updates.length 
-							}));
+							ui.notifications.info(
+								game.i18n.format("ctg.notifications.groupSelection", {
+									action: unset
+										? game.i18n.localize("ctg.actions.removed")
+										: game.i18n.localize("ctg.actions.created"),
+									count: updates.length,
+								})
+							);
 						},
 					});
 		});
