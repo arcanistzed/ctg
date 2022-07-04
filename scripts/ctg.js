@@ -411,6 +411,7 @@ export default class Ctg {
 						const value = recursiveGetPropertyConcat(combatant, Ctg.MODES.find(m => m[0] === mode).slice(-1)[0]);
 						if (
 							value && // must exist
+							value !== true && // must not be literally `true`
 							!String(value).match(/[A-Za-z0-9]{16}/) && // must not be an ID
 							!["name", "initiative"].includes(mode) // must not be in "Name" or "Initiative" mode
 						)
