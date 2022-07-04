@@ -69,6 +69,10 @@ Group combatants by their associated Actor which allows you to group together Co
 
 Group combatants with checkboxes that appear next to each one. You can use this mode to keep track of who has gone so far in combat, for example, which is especially useful for users of the [Simultaneous Combat System](https://foundryvtt.com/packages/scs).
 
+### Type
+
+Group combatants by their Actor type. This is useful because it allows separating player characters abd NPCs in many game systems.
+
 #### Mob
 
 *Requires [Mob Attack Tool](https://foundryvtt.com/packages/mob-attack-tool))*
