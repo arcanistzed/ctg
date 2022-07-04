@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.3.0 - 4 Jul 2022
+
+Declare v10 compatibility and update the manifest
+
+### Added
+
+* New "Checked" mode that adds checkboxes which you can use to mark who has gone so far in combat
+* New "Type" mode that displays the combatant's Actor type
+
+### Fixed
+
+* Label value is determined recursively
+* Do not display the label value if it's literally the `true` boolean
+* Improve performance by delegating event listeners
+* Only apply group selection logic to tokens with combatants
+
 ## 1.2.0 - 2 Jul 2022
 
 ### Added
