@@ -42,6 +42,7 @@
   ],
   "manifest": "This is auto replaced",
   "download": "This is auto replaced",
+  "socket": true,
   "manifestPlusVersion": "1.2.0",
   "media": [
     {

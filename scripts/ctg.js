@@ -91,9 +91,10 @@ export default class Ctg {
 					// Update combatant flags when a checkbox is clicked
 					html.addEventListener("click", ({ target }) => {
 						if (!target.matches("input[type='checkbox'].ctg")) return;
-						game.combat.combatants
-							.get(target.closest(".combatant").dataset.combatantId)
-							.setFlag(Ctg.ID, "checked", target.checked);
+						const id = target.closest(".combatant").dataset.combatantId;
+						if (game.user.isGM) game.combat.combatants.get(id).setFlag(Ctg.ID, "checked", target.checked);
+						// Proxy to GM
+						else game.socket.emit("module.ctg", { id, checked: target.checked });
 					});
 				}
 
@@ -109,6 +110,18 @@ export default class Ctg {
 
 			// Re-render the combat tracker in case the initial render was missed
 			ui.combat.render(true);
+
+			// Manage proxied changes
+			if (game.user?.isGM)
+				game.socket.on("module.ctg", ({ id, checked }) => {
+					// If the logged in user is the active GM with the lowest user id
+					const isResponsibleGM = game.users
+						.filter(user => user.isGM && user.active)
+						.some(other => other.id <= game.user.id);
+					console.log(isResponsibleGM, id, checked);
+					if (!isResponsibleGM) return;
+					game.combat.combatants.get(id).setFlag(Ctg.ID, "checked", checked);
+				});
 		});
 
 		// Run group skipping code
