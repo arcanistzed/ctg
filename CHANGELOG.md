@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1 - 5 Jul 2022
+
+### Fixed
+
+Proxy flag updates via a GM user in "Checked" mode since players do not have permission to update all flags
+
 ## 1.3.0 - 4 Jul 2022
 
 Declare v10 compatibility and update the manifest
