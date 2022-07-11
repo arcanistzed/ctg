@@ -1,5 +1,6 @@
 import Ctg from "./ctg.js";
 
+/** Register module keybindings */
 export default function registerKeybindings() {
 	game.keybindings.register(Ctg.ID, "rollGroupInitiative", {
 		name: game.i18n.localize("ctg.settings.rollGroupInitiative.name"),

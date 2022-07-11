@@ -34,7 +34,7 @@ export function getDisplayName(group) {
 	 * Names in the current group
 	 * @type {string[]}
 	 */
-	let names = [];
+	const names = [];
 
 	// Go through all of the combatants in the group
 	group.forEach(combatant => {
@@ -45,7 +45,7 @@ export function getDisplayName(group) {
 		const trackerName = element?.querySelector(".token-name > h4").textContent;
 
 		// Add the name of the current combatant if it is not already
-		if (!names.includes(combatant?.name))
+		if (!names.includes(combatant?.name)) {
 			names.push(
 				// Compatibility with CUB Hide Actor Names: check whether the name is being hidden by CUB
 				game.modules.get("combat-utility-belt")?.active &&
@@ -56,10 +56,11 @@ export function getDisplayName(group) {
 							trackerName === game.settings.get("combat-utility-belt", "neutralNameReplacement")) ||
 						(game.settings.get("combat-utility-belt", "enableHideFriendlyNames") &&
 							trackerName === game.settings.get("combat-utility-belt", "friendlyNameReplacement")))
-					? // Add the name in the tracker instead if it has been hidden
-					  trackerName
+					// Add the name in the tracker instead if it has been hidden
+					? trackerName
 					: combatant?.name
 			);
+		}
 	});
 
 	// Return a string with the names

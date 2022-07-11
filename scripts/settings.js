@@ -81,10 +81,11 @@ export default function registerSettings() {
 			ui.combat?.render(true);
 			game.combat?.update({ turn: 0 });
 
-			if (value && !game.settings.get(Ctg.ID, "sortCombatants"))
+			if (value && !game.settings.get(Ctg.ID, "sortCombatants")) {
 				ui.notifications.warn(
 					`${Ctg.ID} ${game.i18n.localize("ctg.notifications.groupSkippingWorksBetterWithSorting")}`
 				);
+			}
 		},
 	});
 

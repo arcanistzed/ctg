@@ -28,7 +28,7 @@ export default class ModeConfig extends FormApplication {
 		html[0].querySelector(".reset").addEventListener("click", this._reset.bind(this));
 	}
 
-	_create(_event) {
+	_create() {
 		const i = parseInt(document.querySelector("#ctg-modeConfig .mode:last-child").dataset.index) + 1;
 
 		const modeRow = document.createElement("li");
@@ -47,7 +47,7 @@ export default class ModeConfig extends FormApplication {
 
 		const deleteButton = document.createElement("a");
 		deleteButton.title = "Delete Mode";
-		deleteButton.innerHTML = `<i class="fas fa-trash fa-fw"></i>`;
+		deleteButton.innerHTML = '<i class="fas fa-trash fa-fw"></i>';
 		deleteButton.addEventListener("click", this._delete.bind(this));
 
 		modeRow.append(nameInput, pathInput, deleteButton);
@@ -65,7 +65,7 @@ export default class ModeConfig extends FormApplication {
 		this.setPosition({ height: "auto" });
 	}
 
-	async _reset(_event) {
+	async _reset() {
 		// Set the default values
 		await Ctg.manageModes(true);
 

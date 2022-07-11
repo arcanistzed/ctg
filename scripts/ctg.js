@@ -45,9 +45,7 @@ export default class Ctg {
 			if (game.modules.get("mob-attack-tool")?.active) {
 				Hooks.on("matMobUpdate", () => {
 					// FIXME: a re-render is needed, but is not being included to avoid a MAT incompatibility. See https://github.com/Stendarpaval/mob-attack-tool/issues/40)
-					if (!game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) {
-						ui.combat?.render(true);
-					}
+					if (!game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) ui.combat?.render(true);
 				});
 			}
 
@@ -112,7 +110,7 @@ export default class Ctg {
 			ui.combat.render(true);
 
 			// Manage proxied changes
-			if (game.user?.isGM)
+			if (game.user?.isGM) {
 				game.socket.on("module.ctg", ({ id, checked }) => {
 					// If the logged in user is the active GM with the lowest user id
 					const isResponsibleGM = game.users
@@ -122,6 +120,7 @@ export default class Ctg {
 					if (!isResponsibleGM) return;
 					game.combat.combatants.get(id).setFlag(Ctg.ID, "checked", checked);
 				});
+			}
 		});
 
 		// Run group skipping code
@@ -173,7 +172,7 @@ export default class Ctg {
 
 	/** Create Groups of Combatants
 	 * @param {string} mode - The current mode
-	 * @return {Combatant[][]} An array of groups
+	 * @returns {Combatant[][]} An array of groups
 	 */
 	static groups(mode) {
 		/** @type {Combatant[][]} */
@@ -206,13 +205,14 @@ export default class Ctg {
 						.filter(id => {
 							// Don't add a combatant to more than one group
 							const already = alreadyInMob.includes(id);
-							if (already)
+							if (already) {
 								console.warn(
 									`${game.i18n.localize("ctg.ID")} | ${game.i18n.format(
 										"ctg.notifications.alreadyInMob",
 										{ id }
 									)}`
 								);
+							}
 							alreadyInMob.push(id);
 							return !already;
 						})
@@ -234,9 +234,10 @@ export default class Ctg {
 						value &&
 						!(game.settings.get(Ctg.ID, "noGroupHidden") && current.hidden) &&
 						!(game.settings.get(Ctg.ID, "noGroupPCs") && current.hasPlayerOwner)
-					)
+					) {
 						// Group by the property
 						accumulator[value] = [...(accumulator[value] || []), current];
+					}
 					return accumulator;
 				}, {})
 			).reverse();
@@ -254,7 +255,7 @@ export default class Ctg {
 	/** Sort the combatants
 	 * @param {Combatant} a
 	 * @param {Combatant} b
-	 * @return {1 | -1}
+	 * @returns {1 | -1} 1 if a should go before b, -1 if b should go before a
 	 */
 	static sortCombatants(a, b) {
 		// Sort by the current mode's path
@@ -308,8 +309,9 @@ export default class Ctg {
 
 		// Add integrations
 		if (game.modules.get("mob-attack-tool")?.active && !modes.find(m => m[0] === "mob")) modes.push(["mob", ""]);
-		if (game.modules.get("lancer-initiative")?.active && !modes.find(m => m[0] === "lancer"))
+		if (game.modules.get("lancer-initiative")?.active && !modes.find(m => m[0] === "lancer")) {
 			modes.push(["lancer", "activations.value"]);
+		}
 		if (game.modules.get("scs")?.active) modes.findSplice(m => m[0] === "initiative");
 
 		// Change mode if saved one no longer exists
@@ -341,14 +343,14 @@ export default class Ctg {
 
 			// Create a radio button
 			const radio = document.createElement("input");
-			radio.id = "ctg-mode-radio-" + mode[0] + popOutSuffix;
+			radio.id = `ctg-mode-radio-${mode[0]}${popOutSuffix}`;
 			radio.type = "radio";
-			radio.name = "ctg-mode-radio" + popOutSuffix;
+			radio.name = `ctg-mode-radio${popOutSuffix}`;
 
 			// Create a label for the radio button
 			const label = document.createElement("label");
 			label.id = "ctg-modeLabel";
-			label.htmlFor = "ctg-mode-radio-" + mode[0] + popOutSuffix;
+			label.htmlFor = `ctg-mode-radio-${mode[0]}${popOutSuffix}`;
 			label.title = game.i18n.format("ctg.titles.groupBy", { mode: mode[0].capitalize() });
 			label.innerText = mode[0].capitalize();
 
@@ -385,10 +387,11 @@ export default class Ctg {
 		html?.querySelectorAll("details.ctg-toggle").forEach(toggle => toggle.remove());
 
 		// Show current mode if GM and mode is defined
-		if (game.user?.isGM && mode)
-			html?.querySelectorAll("#ctg-mode-radio-" + mode + ",#ctg-mode-radio-" + mode + popOutSuffix).forEach(
+		if (game.user?.isGM && mode) {
+			html?.querySelectorAll(`#ctg-mode-radio-${mode},#ctg-mode-radio-${mode}${popOutSuffix}`).forEach(
 				el => (el.checked = true)
 			);
+		}
 
 		// Don't group if mode is None or if onlyShowGroupsForGM is enabled and this is not a GM
 		if (!(mode === "none" || (game.settings.get(Ctg.ID, "onlyShowGroupsForGM") && !game.user?.isGM))) {
@@ -448,9 +451,10 @@ export default class Ctg {
 							value !== true && // must not be literally `true`
 							!String(value).match(/[A-Za-z0-9]{16}/) && // must not be an ID
 							!["name", "initiative"].includes(mode) // must not be in "Name" or "Initiative" mode
-						)
+						) {
 							// Add the value to the label
 							labelValue.innerText = value;
+						}
 
 						// Add the count to the label
 						labelCount.innerText = arr.length;
@@ -472,6 +476,8 @@ export default class Ctg {
 						}
 
 						if (game.modules.get("mob-attack-tool")?.active) {
+							/* global MobAttacks */
+
 							// Create a button and it to the label flex
 							const saveMob = document.createElement("div");
 							saveMob.classList.add("ctg-saveMob");
@@ -486,13 +492,13 @@ export default class Ctg {
 							*/
 							saveMob.addEventListener("click", event => {
 								event.preventDefault();
-								const numSelected = 1,
-									actorList = [],
+								const actorList = [],
+									numSelected = 1,
 									selectedTokenIds = [];
 								const mobName = `${game.settings.get("mob-attack-tool", "defaultMobPrefix")} ${
 									Ctg.groups(mode)[index]?.[0]?.name
 								}${game.settings.get("mob-attack-tool", "defaultMobSuffix")}`;
-								for (let combatant of Ctg.groups(mode)[index]) {
+								for (const combatant of Ctg.groups(mode)[index]) {
 									actorList.push(combatant?.actor);
 									selectedTokenIds.push(combatant.data?.tokenId);
 								}
@@ -552,11 +558,9 @@ export default class Ctg {
 				const firstTurns = groups.map(group => document.turns.findIndex(c => c.id === group[0].id));
 
 				// Get the index of the current first turn in the list of first turns
+				// If this isn't a first turn, keep it undefined
 				const indexOfCurrent =
-					firstTurns.indexOf(document.turn) !== -1
-						? firstTurns.indexOf(document.turn)
-						: // If this isn't a first turn, keep it undefined
-						  undefined;
+					firstTurns.indexOf(document.turn) !== -1 ? firstTurns.indexOf(document.turn) : undefined;
 
 				// Get turn of the next first turn after the current one
 				const nextTurn = firstTurns?.[indexOfCurrent + direction] ?? firstTurns.at(direction === 1 ? 0 : -1); // Loop to the start or end of the list if necessary
@@ -586,8 +590,10 @@ export default class Ctg {
 			return;
 		}
 
+		/* global libWrapper */
+
 		// Temporary fix for Foundry VTT issue: https://gitlab.com/foundrynet/foundryvtt/-/issues/6404
-		if (isNewerVersion(9.239, game.version ?? game.data.version))
+		if (isNewerVersion(9.239, game.version ?? game.data.version)) {
 			// Not needed after v9s1
 			libWrapper.register(
 				Ctg.ID,
@@ -595,6 +601,7 @@ export default class Ctg {
 				() => document.querySelectorAll("input:focus, textarea:focus").length > 0,
 				"OVERRIDE"
 			);
+		}
 
 		// Check whether group initiative should be rolled
 		const isRollForGroupInitiative = () =>
@@ -657,7 +664,7 @@ export default class Ctg {
 							Ctg.log(
 								false,
 								game.i18n.format("ctg.rollingGroupInitiative.success", {
-									who: who,
+									who,
 									group: getDisplayName(group),
 								})
 							);
@@ -695,9 +702,9 @@ export default class Ctg {
 		// Scene controls toggle button
 		Hooks.on("getSceneControlButtons", controls => {
 			// Add a scene control under the tokens menu if GM
-			if (game.user?.isGM)
+			if (game.user?.isGM) {
 				controls
-					.find(c => c.name == "token")
+					.find(c => c.name === "token")
 					.tools.push({
 						name: "groups",
 						title: "ctg.selectControlTitle",
@@ -722,11 +729,12 @@ export default class Ctg {
 							const updates = [];
 							canvas.tokens.controlled.forEach(token => {
 								// Check if token is in combat and if the combatant is already in the updates list
-								if (token.inCombat && !updates.some(u => u._id === token.combatant.id))
+								if (token.inCombat && !updates.some(u => u._id === token.combatant.id)) {
 									updates.push({
 										_id: token.combatant.id,
 										[`flags.${Ctg.ID}.group`]: unset ? null : uid,
 									});
+								}
 							});
 							game.combat?.updateEmbeddedDocuments("Combatant", updates);
 
@@ -743,6 +751,7 @@ export default class Ctg {
 							);
 						},
 					});
+			}
 		});
 	}
 }
