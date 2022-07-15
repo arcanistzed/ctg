@@ -15,6 +15,9 @@ export default class Ctg {
 			registerSettings();
 		});
 
+		// Patch for v9 users to avoid stacked tabs foundryvtt/foundryvtt#7420
+		Hooks.on("renderSidebarTab", () => ui.sidebar.activateTab(ui.sidebar.activeTab));
+
 		// Register for DevMode
 		Hooks.once("devModeReady", ({ registerPackageDebugFlag }) => {
 			registerPackageDebugFlag(Ctg.ID);
