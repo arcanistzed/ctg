@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.4.1 - 14 Jul 2022
+
+Dropped leftover code that was used to provide 0.8.x compatibility
+
+### Added
+
+Option to always roll group initiative ([#15](https://github.com/arcanistzed/ctg/issues/15))
+
+### Fixed
+
+Issue with sidebar tabs becoming stacked on top of each other ([#14](https://github.com/arcanistzed/ctg/issues/14))
+
 ## 1.3.1 - 5 Jul 2022
 
 ### Fixed
