@@ -6,11 +6,8 @@ import registerSettings from "./settings.js";
 export default class Ctg {
 	constructor() {
 		Hooks.on("init", () => {
-			// Initialize keybindings in v9
-			if (!isNewerVersion(9, game.version ?? game.data.version)) {
-				registerKeybindings();
-				Ctg.groupInitiativeKeybind = false;
-			}
+			// Initialize keybindings
+			registerKeybindings();
 			// Register settings
 			registerSettings();
 		});
@@ -172,7 +169,7 @@ export default class Ctg {
 	/** Whether the user is currently holding down the Group Initiative rolling keybind
 	 * @type {boolean}
 	 */
-	static groupInitiativeKeybind;
+	static groupInitiativeKeybind = false;
 
 	/** Create Groups of Combatants
 	 * @param {string} mode - The current mode
@@ -597,25 +594,12 @@ export default class Ctg {
 
 		/* global libWrapper */
 
-		// Temporary fix for foundryvtt/foundryvtt#6404
-		if (isNewerVersion(9.239, game.version ?? game.data.version)) {
-			// Not needed after v9s1
-			libWrapper.register(
-				Ctg.ID,
-				"KeyboardManager.prototype.hasFocus",
-				() => document.querySelectorAll("input:focus, textarea:focus").length > 0,
-				"OVERRIDE"
-			);
-		}
-
 		// Check whether group initiative should be rolled
 		const isRollForGroupInitiative = () =>
 			// Don't roll in "none" mode
-			game.settings.get(Ctg.ID, "mode") !== "none" && // Use keybinding in v9d2 and later
-			// Only Roll if the keybinding is being held down
-			(Ctg.groupInitiativeKeybind ??
-				// Otherwise, fallback to the old method
-				(game.keyboard._downKeys.has("Control") || game.keyboard._downKeys.has("Shift")));
+			game.settings.get(Ctg.ID, "mode") !== "none" &&
+			// By default, only roll if the keybinding is being held down
+			Ctg.groupInitiativeKeybind;
 
 		// Wrap initiative rolling methods
 		libWrapper.register(Ctg.ID, "Combat.prototype.rollAll", groupInitiativeWrapper.bind(null, "rollAll"), "MIXED");
