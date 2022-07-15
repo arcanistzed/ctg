@@ -598,8 +598,10 @@ export default class Ctg {
 		const isRollForGroupInitiative = () =>
 			// Don't roll in "none" mode
 			game.settings.get(Ctg.ID, "mode") !== "none" &&
-			// By default, only roll if the keybinding is being held down
-			Ctg.groupInitiativeKeybind;
+			// Allow always rolling group initiative
+			(game.settings.get(Ctg.ID, "alwaysRollGroupInitiative") ||
+				// By default, only roll if the keybinding is being held down
+				Ctg.groupInitiativeKeybind);
 
 		// Wrap initiative rolling methods
 		libWrapper.register(Ctg.ID, "Combat.prototype.rollAll", groupInitiativeWrapper.bind(null, "rollAll"), "MIXED");

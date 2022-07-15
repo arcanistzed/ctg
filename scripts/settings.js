@@ -141,4 +141,13 @@ export default function registerSettings() {
 			ui.combat?.render(true);
 		},
 	});
+
+	game.settings.register(Ctg.ID, "alwaysRollGroupInitiative", {
+		name: "ctg.settings.alwaysRollGroupInitiative.name",
+		hint: "ctg.settings.alwaysRollGroupInitiative.hint",
+		scope: "world",
+		config: true,
+		type: Boolean,
+		default: false,
+	});
 }
