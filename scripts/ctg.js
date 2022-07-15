@@ -47,7 +47,8 @@ export default class Ctg {
 			// Re-render Combat Tracker when mobs update
 			if (game.modules.get("mob-attack-tool")?.active) {
 				Hooks.on("matMobUpdate", () => {
-					// FIXME: a re-render is needed, but is not being included to avoid a MAT incompatibility. See https://github.com/Stendarpaval/mob-attack-tool/issues/40)
+					// FIXME: a re-render is needed, but is not being included to avoid a MAT incompatibility
+					// Stendarpaval/mob-attack-tool#40
 					if (!game.settings.get("mob-attack-tool", "autoSaveCTGgroups")) ui.combat?.render(true);
 				});
 			}
@@ -596,7 +597,7 @@ export default class Ctg {
 
 		/* global libWrapper */
 
-		// Temporary fix for Foundry VTT issue: https://gitlab.com/foundrynet/foundryvtt/-/issues/6404
+		// Temporary fix for foundryvtt/foundryvtt#6404
 		if (isNewerVersion(9.239, game.version ?? game.data.version)) {
 			// Not needed after v9s1
 			libWrapper.register(
