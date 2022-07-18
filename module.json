@@ -1,54 +1,54 @@
 {
-  "id": "ctg",
-  "name": "ctg",
-  "title": "Combat Tracker Groups",
-  "description": "Group combatants in the Combat Tracker and roll for group initiative.",
-  "authors": [
-    {
-      "name": "Arcanist",
-      "url": "https://arcanist.me",
-      "email": "arcanistzed@gmail.com",
-      "discord": "arcanist#4317",
-      "reddit": "u/arcanistzed"
-    }
-  ],
-  "url": "This is auto replaced",
-  "license": "https://github.com/arcanistzed/ctg/blob/main/LICENSE",
-  "readme": "https://github.com/arcanistzed/ctg/blob/main/README.md",
-  "bugs": "https://github.com/arcanistzed/ctg/issues/new/choose",
-  "changelog": "https://github.com/arcanistzed/ctg/blob/main/CHANGELOG.md",
-  "flags": {
-    "allowBugReporter": true
-  },
-  "version": "This is auto replaced",
-  "compatibility": {
-    "minimum": "9",
-    "verified": "10"
-  },
-  "minimumCoreVersion": "9",
-  "compatibleCoreVersion": "10",
-  "esmodules": [
-    "scripts/ctg.js"
-  ],
-  "styles": [
-    "styles/ctg.css"
-  ],
-  "languages": [
-    {
-      "lang": "en",
-      "name": "English",
-      "path": "languages/en.json"
-    }
-  ],
-  "manifest": "This is auto replaced",
-  "download": "This is auto replaced",
-  "socket": true,
-  "manifestPlusVersion": "1.2.0",
-  "media": [
-    {
-      "type": "cover",
-      "url": "https://i.imgur.com/Bi5mWjL.png",
-      "caption": "Combat Tracker Groups"
-    }
-  ]
+    "id": "ctg",
+    "name": "ctg",
+    "title": "Combat Tracker Groups",
+    "description": "Group combatants in the Combat Tracker and roll for group initiative.",
+    "authors": [
+        {
+            "name": "Arcanist",
+            "url": "https://arcanist.me",
+            "email": "arcanistzed@gmail.com",
+            "discord": "arcanist#4317",
+            "reddit": "u/arcanistzed"
+        }
+    ],
+    "url": "This is auto replaced",
+    "license": "https://github.com/arcanistzed/ctg/blob/main/LICENSE",
+    "readme": "https://github.com/arcanistzed/ctg/blob/main/README.md",
+    "bugs": "https://github.com/arcanistzed/ctg/issues/new/choose",
+    "changelog": "https://github.com/arcanistzed/ctg/blob/main/CHANGELOG.md",
+    "flags": {
+        "allowBugReporter": true
+    },
+    "version": "This is auto replaced",
+    "compatibility": {
+        "minimum": "9",
+        "verified": "10"
+    },
+    "minimumCoreVersion": "9",
+    "compatibleCoreVersion": "10",
+    "esmodules": [
+        "scripts/ctg.js"
+    ],
+    "styles": [
+        "styles/ctg.css"
+    ],
+    "languages": [
+        {
+            "lang": "en",
+            "name": "English",
+            "path": "languages/en.json"
+        }
+    ],
+    "manifest": "This is auto replaced",
+    "download": "This is auto replaced",
+    "socket": true,
+    "manifestPlusVersion": "1.2.0",
+    "media": [
+        {
+            "type": "cover",
+            "url": "https://i.imgur.com/Bi5mWjL.png",
+            "caption": "Combat Tracker Groups"
+        }
+    ]
 }
