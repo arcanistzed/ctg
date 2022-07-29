@@ -1,6 +1,10 @@
 # Changelog
 
-## 1.4.1 - 14 Jul 2022
+## 1.4.3
+
+Fix to use default roll if rolling group initiative is impossible in all groups
+
+## 1.4.2 - 14 Jul 2022
 
 Dropped leftover code that was used to provide 0.8.x compatibility
 
