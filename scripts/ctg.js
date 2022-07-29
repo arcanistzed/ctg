@@ -623,8 +623,8 @@ export default class Ctg {
 			if (isRollForGroupInitiative()) {
 				// Loop through the IDs in case there are multiple (should be unusual)
 				ids.forEach(id => {
-					// Go through all of the groups
-					Ctg.groups(game.settings.get(Ctg.ID, "mode")).forEach(async (group, index) => {
+					// Go through all of the groups and count failures
+					const failures = Ctg.groups(game.settings.get(Ctg.ID, "mode")).filter(async (group, index) => {
 						// What happens depends on the context of this roll:
 						if (
 							context === "rollAll" || // Roll for every group
@@ -660,13 +660,19 @@ export default class Ctg {
 								})
 							);
 							Hooks.call(`ctg${context.capitalize()}`, updates, message.roll, id);
+							return false;
 						} else {
 							Ctg.log(
 								false,
 								game.i18n.format("ctg.rollingGroupInitiative.failure", { group: getDisplayName(group) })
 							);
+							return true;
 						}
 					});
+
+					if (failures.length > 0) {
+						wrapped(ids);
+					}
 				});
 			} else {
 				wrapped(ids);
