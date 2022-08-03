@@ -430,7 +430,7 @@ export default class Ctg {
 						labelFlex.classList.add("ctg-labelFlex");
 
 						const labelName = document.createElement("h3");
-						labelName.classList.add("ctg-labelName");
+						labelName.classList.add("ctg-labelName", "noborder");
 
 						const labelCount = document.createElement("div");
 						labelCount.classList.add("ctg-labelCount");
