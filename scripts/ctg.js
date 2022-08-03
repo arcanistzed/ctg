@@ -424,8 +424,7 @@ export default class Ctg {
 
 						// Create a label for the toggle
 						const labelBox = document.createElement("summary");
-						labelBox.classList.add("ctg-labelBox");
-						labelBox.classList.add("folder-header");
+						labelBox.classList.add("ctg-labelBox", "folder-header");
 
 						const labelFlex = document.createElement("div");
 						labelFlex.classList.add("ctg-labelFlex");
