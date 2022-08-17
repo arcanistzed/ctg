@@ -1,0 +1,89 @@
+{
+	"ctg": {
+		"ID": "CTG",
+		"welcome": {
+			"name": "Rastreador de Combate Grupal",
+			"author": "por Arcanist",
+			"support": "Apoyame en  Patreon",
+			"site": "Visiten mi sitio web para más info:"
+		},
+		"selectControlTitle": "Agrupar los elegidos tokens en combate",
+		"settings": {
+			"groupSkipping": {
+				"hint": "Saltar de una vez sobre cada grupo de Combatientes",
+				"name": "Saltear Grupos"
+			},
+			"openToggles": {
+				"name": "Abrir Alternativas",
+				"hint": "Automáticamente abre las alternativas del grupo actual"
+			},
+			"rollGroupInitiative": {
+				"name": "Tirada de Iniciativa Grupal",
+				"hint": "Cuando está seleccionado, al presionar cualquier botón de tirada de iniciativa en el Rastreador de Combate resultará en una Tirada Iniciativa Grupal. "
+			},
+			"sortCombatants": {
+				"name": "Clasificar Combatientes",
+				"hint": "Clasificar los combatientes en el Rastreador de Combate de la misma forma en que están agrupados. Esto va a prevenir que el Rastreador salte al intercambiar turnos y se recomienda para usuarios que tengan ‘Saltear Grupos’ habilitado."
+			},
+			"onlyShowGroupsForGM": {
+				"name": "Mostrar grupos solo a GMs",
+				"hint": "Cuando está seleccionado, los grupos del Rastreador de Combate solo seran creados por el GM."
+			},
+			"noGroupHidden": {
+				"name": "No Agrupar Combatientes Ocultos",
+				"hint": "Cuando está seleccionado,no se agrupan los combatientes que estén ocultos."
+			},
+			"noGroupPCs": {
+				"name": "No Agrupar los Combatientes de los Jugadores",
+				"hint": "Cuando está seleccionado, los combatientes que pertenecen a los jugadores no serán agrupados."
+			},
+			"modeConfig": {
+				"name": "Configuración de Modo",
+				"label": "Configurar",
+				"hint": "Configura el modo Grupos del Rastreador de Combate."
+			},
+			"version": {
+				"title": "Actualización de Módulo Disponible",
+				"content": "<p>¡Gracias por Actualizar!</p><p>¿Desea reiniciar la configuración del módulo?</p><p>Puede ser recomendable si se agregaron nuevos modos a esta actualizacion. Se sugiere leer el <a href=\"https://github.com/arcanistzed/ctg/blob/main/CHANGELOG.md\">CHANGELOG</a> to find out.</p>"
+			},
+			"alwaysRollGroupInitiative": {
+				"name": "Siempre Tirar la Iniciativa Grupal",
+				"hint": "Cuando está seleccionado, todas las tiradas de iniciativa hechas desde el Rastreador de Combate serán Iniciativas Grupales."
+			}
+		},
+		"notifications": {
+			"libWrapperRequired": "libWrapper debe estar habilitado para usar la función {feature}.",
+			"invalidMode": "No se puede agrupar porque {mode} no es un modo válido.",
+			"alreadyInMob": "El Token con ID {id} tiene múltiples Herramientas de Ataque Mob a la vez, pero solo se podrá ver la primera cuando se las agrupe en el Rastreador de Combate. Borrar el Mob relevante en la Herramienta de Ataque Mob para eliminar esta advertencia.",
+			"groupSkippingWorksBetterWithSorting": "Saltear Grupos funciona mejor cuando ‘Clasificar Combatientes’ está habilitado. Leer el archivo README para más detalles.",
+			"disableMATGroupInitiative": "La Iniciativa Grupal de la Herramienta de Ataque Mob ha sido deshabilitada ya que CTG provee la misma funcionalidad y más.",
+			"groupSelection": "{action} grupo del Rastreador de Combate con {count} tokens seleccionados",
+			"mobModeRequiresMAT": "\"Mob\" modo requiere que la Herramienta de Ataque Mob esté habilitada"
+		},
+		"actions": {
+			"created": "Creado",
+			"removed": "Removido"
+		},
+		"rollingGroupInitiative": {
+			"success": "Tirando Iniciativa para {who} grupo \"{group}\"",
+			"failure": "Iniciativa no tirada para el grupo \"{group}\""
+		},
+		"modeConfig": {
+			"title": "Configuración de Modo",
+			"name": {
+				"header": "Nombre"
+			},
+			"path": {
+				"header": "Ruta"
+			},
+			"create": "Crear Modo Nuevo",
+			"delete": "Borrar Modo",
+			"save": "Guardar",
+			"reset": "Reiniciar"
+		},
+		"titles": {
+			"groupBy": "Grupo por {mode}",
+			"saveAsMob": "Guardar como Herramienta de Ataque Mob"
+		}
+	}
+}
