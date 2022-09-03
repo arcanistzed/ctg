@@ -39,7 +39,7 @@ export default class Ctg {
 			});
 
 			// Update stored version
-			game.settings.set(Ctg.ID, "version", game.modules.get(Ctg.ID).data.version);
+			game.settings.set(Ctg.ID, "version", game.modules.get(Ctg.ID).version);
 
 			// Re-render Combat Tracker when mobs update
 			if (game.modules.get("mob-attack-tool")?.active) {
