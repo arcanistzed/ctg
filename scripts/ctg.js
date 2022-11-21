@@ -333,7 +333,10 @@ export default class Ctg {
 		/** Create container for mode selection boxes */
 		const container = document.createElement("ul");
 		container.id = "ctg-modeContainer";
-		html.querySelector("#combat > #combat-round")?.after(container);
+		const combatRoundContainer =
+				 html.querySelector('.combat-sidebar .combat-tracker-header') // v10
+			|| html.querySelector('#combat > #combat-round') // v9
+		combatRoundContainer?.after(container);
 
 		// For each mode that exists
 		Ctg.MODES.forEach(mode => {
